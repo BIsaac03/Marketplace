@@ -2,7 +2,7 @@ export const allTrinkets = [
     {
         "name": "Artwork",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Artwork.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "(numTrinkets >= 2)*1 + (numTrinkets >= 4)*4 + (numTrinkets >= 6)*5 + (numTrinkets >= 8)*10"
@@ -10,7 +10,7 @@ export const allTrinkets = [
     {
         "name": "Bracelets",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Bracelets.png",
         "onPlay": "none",
         "ongoing": "GET COINS WHEN SKIP SALE",
         "VP": "0"
@@ -18,7 +18,7 @@ export const allTrinkets = [
     {
         "name": "Carvings",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Carvings.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "4*NUM PLAYERS LESS COINS"
@@ -26,7 +26,7 @@ export const allTrinkets = [
     {
         "name": "Charms",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Charms.png",
         "onPlay": "none",
         "ongoing": "MINORITY BONUS",
         "VP": "0"
@@ -34,7 +34,7 @@ export const allTrinkets = [
     {
         "name": "Earrings",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Earrings.png",
         "onPlay": "none",
         "ongoing": "CARDS COST 1 LESS",
         "VP": "NOT HERE, BOTH NEIGHBORING"
@@ -42,7 +42,7 @@ export const allTrinkets = [
     {
         "name": "Fabrics",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Fabrics.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "3*Math.min(numFruits, numTrinkets)"
@@ -50,7 +50,7 @@ export const allTrinkets = [
     {
         "name": "Figurines",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Figurines.png",
         "onPlay": "numWorkers+=5",
         "ongoing": "TWO WORKERS PER TURN",
         "VP": "0"
@@ -58,7 +58,7 @@ export const allTrinkets = [
     {
         "name": "Lanterns",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Lanterns.png",
         "onPlay": "none",
         "ongoing": "POINTS FOR UNIQUENESS",
         "VP": "0"
@@ -66,7 +66,7 @@ export const allTrinkets = [
     {
         "name": "Masks",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Masks.png",
         "onPlay": "none",
         "ongoing": "ADAPT TYPE BASED ON DISCARDED COINS",
         "VP": "0"
@@ -74,7 +74,7 @@ export const allTrinkets = [
     {
         "name": "Necklaces",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Necklaces.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "9"
@@ -82,7 +82,7 @@ export const allTrinkets = [
     {
         "name": "Perfume",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Perfume.png",
         "onPlay": "none",
         "ongoing": "DISCARD GOOD FOR VP",
         "VP": "0"
@@ -90,7 +90,7 @@ export const allTrinkets = [
     {
         "name": "Pins",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Pins.png",
         "onPlay": "ALONGSIDE ANOTHER",
         "ongoing": "none",
         "VP": "2*numFruits-numTrinkets"
@@ -98,7 +98,7 @@ export const allTrinkets = [
     {
         "name": "Postcards",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Postcards.png",
         "onPlay": "score(self, 0.5, -4)",
         "ongoing": "none",
         "VP": "0"
@@ -106,7 +106,7 @@ export const allTrinkets = [
     {
         "name": "Pouches",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Pouches.png",
         "onPlay": "none",
         "ongoing": "CAN BUY WORKERS",
         "VP": "2"
@@ -114,7 +114,7 @@ export const allTrinkets = [
     {
         "name": "Shells",
         "type": "Trinket",
-        "image": "",
+        "image": "./Images/Shells.png",
         "onPlay": "none",
         "ongoing": "RECEIVE COINS IF CANNOT BUY",
         "VP": "numCoins/5"

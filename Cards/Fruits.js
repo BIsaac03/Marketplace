@@ -2,7 +2,7 @@ export const allFruits = [
     {
         "name": "Apples",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Apples.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "7"
@@ -10,7 +10,7 @@ export const allFruits = [
     {
         "name": "Bananas",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Bananas.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "Math.ceil(3/2*numFruits)"
@@ -18,7 +18,7 @@ export const allFruits = [
     {
         "name": "Blackberries",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Blackberries.png",
         "onPlay": "score(self, 0.25)",
         "ongoing": "none",
         "VP": "0"
@@ -26,7 +26,7 @@ export const allFruits = [
     {
         "name": "Cherries",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Cherries.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "3*Math.min(numCoins/4, numFruits)"
@@ -34,7 +34,7 @@ export const allFruits = [
     {
         "name": "Coconuts",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Coconuts.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "11-numFruits"
@@ -42,7 +42,7 @@ export const allFruits = [
     {
         "name": "Grapes",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Grapes.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "neighbors[0].numFruits+neighbors[1].numFruits"
@@ -50,7 +50,7 @@ export const allFruits = [
     {
         "name": "Guavas",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Guavas.png",
         "onPlay": "none",
         "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
         "VP": "0"
@@ -58,7 +58,7 @@ export const allFruits = [
     {
         "name": "Kiwis",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Kiwis.png",
         "onPlay": "vendor.numCoins++",
         "ongoing": "none",
         "VP": "3*KIWIS IN PLAY"
@@ -66,7 +66,7 @@ export const allFruits = [
     {
         "name": "Mangoes",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Mangoes.png",
         "onPlay": "none",
         "ongoing": "TRIPLE LOWEST SCORING CROP",
         "VP": "0"
@@ -74,7 +74,7 @@ export const allFruits = [
     {
         "name": "Oranges",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Oranges.png",
         "onPlay": "numCoins += 4",
         "ongoing": "none",
         "VP": "numTrinkets"
@@ -82,7 +82,7 @@ export const allFruits = [
     {
         "name": "Papayas",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Papayas.png",
         "onPlay": "numCoins += 10; numWorkers += 2",
         "ongoing": "none",
         "VP": "0"
@@ -90,7 +90,7 @@ export const allFruits = [
     {
         "name": "Passion Fruit",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Passion_Fruit.png",
         "onPlay": "none",
         "ongoing": "KEEP FINAL DRAFT",
         "VP": "0"
@@ -98,7 +98,7 @@ export const allFruits = [
     {
         "name": "Pears",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Pears.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "2*NUM GOOD IN exactly one neighboring tableau"
@@ -106,7 +106,7 @@ export const allFruits = [
     {
         "name": "Pineapples",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Pineapples.png",
         "onPlay": "pineappleTarget()",
         "ongoing": "none",
         "VP": "pineappleTarget.VP"
@@ -114,7 +114,7 @@ export const allFruits = [
     {
         "name": "Strawberries",
         "type": "Fruit",
-        "image": "",
+        "image": "./Images/Strawberries.png",
         "onPlay": "none",
         "ongoing": "none",
         "VP": "numCoins/3"
