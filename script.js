@@ -2,6 +2,28 @@ import {allFruits} from "./Cards/Fruits.js";
 import {allCrops} from "./Cards/Crops.js";
 import {allTrinkets} from "./Cards/Trinkets.js";
 
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://127.0.0.1:5500",
+    }
+});
+
+io.on("connection", (socket) => {
+    console.log(socket.id + " connected.");
+
+    socket.on("joinGame", (playerName) => {
+        console.log("thanks for joining, " + playerName)
+    })
+});
+
+httpServer.listen(3000);
+
 let players = [];
 
 function makePlayer(name, color){
@@ -160,12 +182,15 @@ function playGame(){
     let cropsRemaining = allCrops;
     let trinketsRemaining = allTrinkets;
 
-    if (players.length < 5){
+    let run = prompt("Run through the game?");
+    if (run === "y"){
+        if (players.length < 5){
+            playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
+        }
         playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
+        playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 1, true)
     }
-    playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
-    playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 1, true)
 }
 
-gameSetUp();
-playGame();
+//gameSetUp();
+//playGame();
