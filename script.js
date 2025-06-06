@@ -19,6 +19,18 @@ io.on("connection", (socket) => {
 
     socket.on("joinGame", (playerName) => {
         console.log("thanks for joining, " + playerName)
+        let newPlayer = makePlayer(playerName, "rgb(60, 60, 60)")
+        players.push(newPlayer)
+        io.emit("newPlayer", playerName)
+    })
+
+    socket.on("startGame", () => {
+        //gameSetUp();
+        //playGame();
+    })
+
+    socket.on("sellGood", (price) => {
+        socket.broadcast("cardsOrCoins", (price))
     })
 });
 
@@ -142,6 +154,7 @@ function performSale(vendor){
 }
 
 function gameSetUp(){
+    /*
     let playerCount = 3//prompt("How many players will there be?")
     for (let i = 0; i < playerCount; i++){
         let name = "player"//prompt("What is Player" + (i+1) + "'s name?");
@@ -149,7 +162,7 @@ function gameSetUp(){
         let player = makePlayer(name, color);
         players.push(player);
     }
-
+    */
     for (let i = 0; i < players.length; i++){
         players[i].setNeighbors();
     }
@@ -182,15 +195,12 @@ function playGame(){
     let cropsRemaining = allCrops;
     let trinketsRemaining = allTrinkets;
 
-    let run = prompt("Run through the game?");
-    if (run === "y"){
+    //let run = prompt("Run through the game?");
+    //if (run === "y"){
         if (players.length < 5){
             playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
         }
         playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
         playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 1, true)
-    }
+    //}
 }
-
-//gameSetUp();
-//playGame();
