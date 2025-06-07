@@ -1,12 +1,12 @@
 const socket = io("http://localhost:3000");
 
 const bodyElement = document.body;
-const joinGameButton = document.createElement("button");
-joinGameButton.id = "joinGame";
-joinGameButton.textContent = "Join Game"
+const joinGameButton = document.getElementById("joinGame");
 joinGameButton.addEventListener("click", () => {
-    let playerName = prompt("what is your name?");
-    socket.emit("joinGame", playerName);
+    let playerName = document.getElementById("playerName").value;
+    if (playerName != ""){
+        socket.emit("joinGame", playerName);
+    }
 
     const startGameButton = document.createElement("button");
     startGameButton.id = "startGame";
@@ -17,15 +17,34 @@ joinGameButton.addEventListener("click", () => {
     bodyElement.appendChild(startGameButton);
     bodyElement.removeChild(joinGameButton);
 
+    socket.on("disconnecting", (playerName) => {
+        socket.emit('test', playerName);
+    })
 })
 bodyElement.appendChild(joinGameButton);
 
+const playerList = document.getElementById("playerList");
+socket.on("playerJoined", (newPlayerName) => {
+    const newPlayer = document.createElement("li");
+    newPlayer.classList.add(newPlayerName);
+    newPlayer.textContent = newPlayerName;
+    playerList.appendChild(newPlayer);
+})
+socket.on("playerLeft", (playerName) => {
+    const leavingPlayer = document.getElementById(playerName);
+    playerList.removeChild(leavingPlayer);
+})
 
-// Displays players currently in the game
-const playerList = document.createElement("p");
-playerList.id = "playerList"
-playerList.textContent = "Joined players: ";
-bodyElement.appendChild(playerList)
-socket.on("newPlayer", (newPlayerName) => {
-    playerList.textContent += "\n" + newPlayerName;
+let price = 3;
+let good = {name: "blueberries"};
+socket.emit("sellGood", price, good)
+
+socket.on("cardOrCoins", (price) => {
+    choice = prompt("Do you want to pay " + price + " coins for " + good.name + "? Otherwise, you will gain " + price + " coins.")
+    if (choice == "y"){
+        socket.emit("cardOrCoins", "card");
+    }
+    else{
+        socket.emit("cardOrCoins", "coins");
+    }
 })

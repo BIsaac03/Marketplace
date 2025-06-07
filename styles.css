@@ -1,8 +1,19 @@
-p#playerList{
-    size:40px;
+body{
+    display: grid;
 }
 
-button{
+#lobby{
+    display: grid;
+    grid-template: 2fr 1fr / 1fr 1fr;
+    gap: 30px;
+}
+
+p#playerList{
+    font-size:40px;
+    white-space: pre;
+}
+
+#joinGame{
     width: 100px;
     height: 100px;
     border-radius: 50px;

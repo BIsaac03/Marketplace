@@ -17,20 +17,33 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     console.log(socket.id + " connected.");
 
+    // PLAYER COLOR SHOULD BE SELECTED, OR ABLE TO BE CHANGED
     socket.on("joinGame", (playerName) => {
         console.log("thanks for joining, " + playerName)
-        let newPlayer = makePlayer(playerName, "rgb(60, 60, 60)")
-        players.push(newPlayer)
-        io.emit("newPlayer", playerName)
-    })
+        let thisPlayer = makePlayer(playerName, "rgb(60, 60, 60)")
+        players.push(thisPlayer)
+        io.emit("playerJoined", playerName)
 
-    socket.on("startGame", () => {
-        //gameSetUp();
-        //playGame();
-    })
-
-    socket.on("sellGood", (price) => {
-        socket.broadcast("cardsOrCoins", (price))
+        socket.on("startGame", () => {
+            gameSetUp();
+            playGame();
+        })
+    
+        socket.on("sellGood", (price, good) => {
+            socket.broadcast("cardOrCoins", (price, good))
+            socket.on("cardOrCoins", (choice) => {
+                if (choice == "card"){
+    
+                }
+                else if (choice == "coins"){
+    
+                }
+            })
+        })
+        socket.on("disconnect", (reason) => {
+            console.log(playerName + " left");
+            io.emit("playerLeft", playerName);
+        });
     })
 });
 
@@ -154,15 +167,6 @@ function performSale(vendor){
 }
 
 function gameSetUp(){
-    /*
-    let playerCount = 3//prompt("How many players will there be?")
-    for (let i = 0; i < playerCount; i++){
-        let name = "player"//prompt("What is Player" + (i+1) + "'s name?");
-        let color = "rgb(i*60, i*60, i*60)";
-        let player = makePlayer(name, color);
-        players.push(player);
-    }
-    */
     for (let i = 0; i < players.length; i++){
         players[i].setNeighbors();
     }
