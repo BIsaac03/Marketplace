@@ -3,24 +3,77 @@ import {allCrops} from "./Cards/Crops.js";
 import {allTrinkets} from "./Cards/Trinkets.js";
 
 import express from "express";
+import session from "express-session";
 import { createServer } from "http";
 import { Server } from "socket.io";
+
+let users = [];
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
+    cookie: true,
     cors: {
         origin: "http://127.0.0.1:5500",
     }
 });
+/*
+const sessionMiddleware = session({
+    secret: "changeit",
+    resave: true,
+    saveUninitialized: true,
+  });
+  
+  app.use(sessionMiddleware);
+  
+  app.get("/", (req, res) => {
+    res.sendFile(new URL("./index.html", import.meta.url).pathname);
+  });
+  
+  app.post("/incr", (req, res) => {
+    const session = req.session;
+    session.count = (session.count || 0) + 1;
+    res.status(200).end("" + session.count);
+  });
+  
+  io.engine.use(sessionMiddleware);
+  */
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected.");
 
+    socket.on("currentCookie", (cookie) => {
+        let user = undefined
+        for (let i = 0; i < users.length; i++){
+            if (Object.values(users[i])[0] == cookie){
+                user = users[i];
+                break;
+            }
+        }
+        if (user === undefined){
+            // !!!! modify to make unique
+            const newID = Math.random()*9999999999999;
+            socket.emit("addCookie", newID);
+            users.push({userID: newID, chosenName: ""})
+        }
+        else{
+            socket.emit("storedName", user.chosenName);
+        }
+    })
+
     // PLAYER COLOR SHOULD BE SELECTED, OR ABLE TO BE CHANGED
-    socket.on("joinGame", (playerName) => {
+    socket.on("joinGame", (playerName, userID) => {
         console.log("thanks for joining, " + playerName)
-        let thisPlayer = makePlayer(playerName, "rgb(60, 60, 60)")
+        let user
+        for (let i = 0; i < users.length; i++){
+            if (Object.values(users[i])[0] == userID){
+                user = users[i];
+                break;
+            }
+        }
+        user.chosenName = playerName;
+
+        let thisPlayer = makePlayer(user.userID, playerName, "rgb(60, 60, 60)");
         players.push(thisPlayer)
         io.emit("playerJoined", playerName)
 
@@ -51,7 +104,7 @@ httpServer.listen(3000);
 
 let players = [];
 
-function makePlayer(name, color){
+function makePlayer(userID, name, color){
     let playerNum = players.length;
     let neighbors = [];
     let tableau = [];
@@ -95,7 +148,7 @@ function makePlayer(name, color){
         VP += adjustedScore;
     }
 
-    return {name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, setNeighbors, buyCard, scoreTableau}
+    return {userID, name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, setNeighbors, buyCard, scoreTableau}
 }
 
 function draftCards(deck){

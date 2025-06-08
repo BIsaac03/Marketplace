@@ -1,11 +1,23 @@
 const socket = io("http://localhost:3000");
 
+socket.on("connect", () => {
+    allCookies = document.cookie;
+    socket.emit("currentCookie", allCookies);
+});
+socket.on("addCookie", (cookie) => {
+    document.cookie = cookie;
+})
+socket.on("storedName", (chosenName) => {
+    const nameEntryField = getElementById("playerName");
+    nameEntryField.textContent = chosenName;
+})
+
 const bodyElement = document.body;
 const joinGameButton = document.getElementById("joinGame");
 joinGameButton.addEventListener("click", () => {
     let playerName = document.getElementById("playerName").value;
     if (playerName != ""){
-        socket.emit("joinGame", playerName);
+        socket.emit("joinGame", playerName, document.cookie);
     }
 
     const startGameButton = document.createElement("button");
