@@ -12,7 +12,7 @@ function readCookieValue(name){
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
-const joinGameButton = document.getElementById("joinGame");
+const joinGameButton = document.getElementsByClassName('joinGame')[0];
 // should check to ensure no duplicate names
 // ???????????????????????
 joinGameButton.addEventListener("click", () => {
@@ -34,7 +34,6 @@ joinGameButton.addEventListener("click", () => {
         socket.emit('test', playerName);
     })
 })
-bodyElement.appendChild(joinGameButton);
 
 ////// SOCKET EVENTS
 socket.on("connect", () => {
