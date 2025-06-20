@@ -12,23 +12,26 @@ function readCookieValue(name){
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
-const joinGameButton = document.getElementsByClassName('joinGame')[0];
+const joinGameButton = document.getElementsByClassName("joinGame")[0];
 // should check to ensure no duplicate names
 // ???????????????????????
 joinGameButton.addEventListener("click", () => {
     let playerName = document.getElementById("playerName").value;
+    let playerColor = document.getElementById("playerColor").value;
     if (playerName != ""){
         document.cookie = "chosenName="+playerName;
-        socket.emit("joinGame", playerName, readCookieValue("userID"));
+        document.cookie = "preferredColor="+playerColor;
+        socket.emit("joinGame", readCookieValue("userID"), playerName, playerColor);
+
+        const startGameButton = document.createElement("button");
+        startGameButton.id = "startGame";
+        startGameButton.textContent = "Start Game"
+        startGameButton.addEventListener("click", () => {
+            socket.emit("startGame");
+        })
+        bodyElement.appendChild(startGameButton);
+        joinGameButton.value = "Update Name/Color"
     }
-    const startGameButton = document.createElement("button");
-    startGameButton.id = "startGame";
-    startGameButton.textContent = "Start Game"
-    startGameButton.addEventListener("click", () => {
-        socket.emit("startGame");
-    })
-    bodyElement.appendChild(startGameButton);
-    joinGameButton.value = "Change Name"
 })
 
 ////// SOCKET EVENTS
@@ -45,36 +48,56 @@ socket.on("connect", () => {
     if (nameEntryField != undefined && chosenName != undefined){
         nameEntryField.value = chosenName;
     }
+    const colorSelector = document.getElementById("playerColor");
+    let preferredColor = readCookieValue("preferredColor");
+    if (colorSelector != undefined && preferredColor != undefined){
+        colorSelector.value = preferredColor;
+    }
 });
 
 socket.on("returningPlayer", (returningPlayer) => {
     console.log(returningPlayer.name + " has returned!")
-    const joinGameButton = document.getElementsByClassName('joinGame')[0];
-    joinGameButton.value = "Change Name"
+    const joinGameButton = document.getElementsByClassName("joinGame")[0];
+    joinGameButton.value = "Update Name/Color"
 })
 
+// modifies list of players in lobby
 const playerList = document.getElementById("playerList");
 socket.on("displayExistingPlayers", (players) => {
     for (let i = 0; i < players.length; i++){
         const player = document.createElement("li");
-        player.id = "player:"+players[i].userID;
+        player.id = "name:"+players[i].userID;
         player.textContent = players[i].name;
         playerList.appendChild(player);
+
+        const playerColor = document.createElement("div")
+        playerColor.id = "color:"+players[i].userID;
+        playerColor.style.backgroundColor = players[i].color;
+        playerList.appendChild(playerColor);
     }
 })
-socket.on("playerJoined", (newPlayerID, newPlayerName) => {
+socket.on("playerJoined", (newPlayerID, newPlayerName, newPlayerColor) => {
     const newPlayer = document.createElement("li");
-    newPlayer.id = "player:"+newPlayerID;
+    newPlayer.id = "name:"+newPlayerID;
     newPlayer.textContent = newPlayerName;
     playerList.appendChild(newPlayer);
+
+    const playerColor = document.createElement("div")
+    playerColor.id = "color:"+newPlayerID;
+    console.log("color: "+newPlayerColor)
+    playerColor.style.backgroundColor = newPlayerColor;
+    playerList.appendChild(playerColor);
 })
-socket.on("playerRenamed", (playerID, newPlayerName) => {
-    const renamedPlayer = document.getElementById("player:"+playerID);
-    renamedPlayer.textContent = newPlayerName;
+socket.on("playerModified", (playerID, newPlayerName, newPlayerColor) => {
+    const modifiedPlayer = [document.getElementById("name:"+playerID), document.getElementById("color:"+playerID)];
+    modifiedPlayer[0].textContent = newPlayerName;
+    modifiedPlayer[1].style.backgroundColor = newPlayerColor;
+
 })
 socket.on("playerLeft", (playerID) => {
-    const leavingPlayer = document.getElementById("player:"+playerID);
-    playerList.removeChild(leavingPlayer);
+    const leavingPlayer = [document.getElementById("name:"+playerID), document.getElementById("color:"+playerID)];
+    playerList.removeChild(leavingPlayer[0]);
+    playerList.removeChild(leavingPlayer[1]);
 })
 
 /////// GAME LOGIC

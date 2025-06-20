@@ -18,7 +18,6 @@ const io = new Server(httpServer, {
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
-  
     socket.on("currentID", (currentID) => {
         const existingPlayer = players.find(player => player.userID == currentID);
         if (existingPlayer != undefined) {
@@ -27,20 +26,18 @@ io.on("connection", (socket) => {
         socket.emit("displayExistingPlayers", players);
     })
 
-    // PLAYER COLOR SHOULD BE SELECTED, OR ABLE TO BE CHANGED
-    // ???????????????????????
-
-    socket.on("joinGame", (playerName, userID) => {
+    socket.on("joinGame", (userID, playerName, playerColor) => {
         const existingPlayer = players.find(player => player.userID == userID);
         if (existingPlayer == undefined){
-            let thisPlayer = makePlayer(userID, playerName, "rgb(60, 60, 60)");
+            let thisPlayer = makePlayer(userID, playerName, playerColor);
             players.push(thisPlayer);
-            io.emit("playerJoined", userID, playerName);
+            io.emit("playerJoined", userID, playerName, playerColor);
         }
 
         else{
             existingPlayer.name = playerName;
-            io.emit("playerRenamed", userID, playerName);
+            existingPlayer.color = playerColor
+            io.emit("playerModified", userID, playerName, playerColor);
         }
         
         socket.on("startGame", () => {
