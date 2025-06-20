@@ -45,6 +45,7 @@ form.playerName input.playerName{
 }
 
 form.playerName input.joinGame{
+    visibility: visible;
     width: 100px;
     height: 100px;
     border-radius: 50px;

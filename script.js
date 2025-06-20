@@ -18,14 +18,14 @@ const io = new Server(httpServer, {
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
-    console.log(socket.id + " connected.");
+    //console.log(socket.id + " connected.");
 
     socket.on("currentID", (currentID) => {
         const existingPlayer = players.find(player => player.userID == currentID);
         if (existingPlayer != undefined) {
-            socket.emit("updateClient", existingPlayer);
+            socket.emit("returningPlayer", existingPlayer);
         }
-        socket.emit("existingPlayers", players);
+        socket.emit("displayExistingPlayers", players);
     })
 
     // PLAYER COLOR SHOULD BE SELECTED, OR ABLE TO BE CHANGED
@@ -33,12 +33,17 @@ io.on("connection", (socket) => {
 
     socket.on("joinGame", (playerName, userID) => {
         console.log("thanks for joining, " + playerName);
-        socket.emit("recordChosenName", playerName);
+        const existingPlayer = players.find(player => player.userID == userID);
+        if (existingPlayer == undefined){
+            let thisPlayer = makePlayer(userID, playerName, "rgb(60, 60, 60)");
+            players.push(thisPlayer);
+            io.emit("playerJoined", userID, playerName);
+        }
 
-        let thisPlayer = makePlayer(userID, playerName, "rgb(60, 60, 60)");
-        players.push(thisPlayer)
-        io.emit("playerJoined", playerName)
-
+        else{
+            console.log("player already exists")
+        }
+        
         socket.on("startGame", () => {
             gameSetUp();
             playGame();
@@ -56,10 +61,7 @@ io.on("connection", (socket) => {
             })
         })
         socket.on("disconnect", (reason) => {
-            console.log(playerName + " left");
-            // should be removed from 'players' array if the game has not yet started; allow reconnect if it has
-            // ???????????????????????
-            io.emit("playerLeft", playerName);
+            console.log(reason);
         });
     })
 });

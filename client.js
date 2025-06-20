@@ -2,11 +2,11 @@ const socket = io("http://localhost:3000");
 
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');
-    const cookie = allCookies.find((cookie) => cookie.startsWith(name));
+    const cookie = allCookies.find((cookie) => cookie.trim().startsWith(name));
     if (cookie === undefined){
         return undefined;
     }
-    const value = cookie.replace(name+"=", "");
+    const value = cookie.trim().replace(name+"=", "");
     return value;
 }
 
@@ -18,9 +18,9 @@ const joinGameButton = document.getElementsByClassName('joinGame')[0];
 joinGameButton.addEventListener("click", () => {
     let playerName = document.getElementById("playerName").value;
     if (playerName != ""){
-        socket.emit("joinGame", playerName, document.cookie);
+        document.cookie = "chosenName="+playerName;
+        socket.emit("joinGame", playerName, readCookieValue("userID"));
     }
-
     const startGameButton = document.createElement("button");
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
@@ -28,11 +28,8 @@ joinGameButton.addEventListener("click", () => {
         socket.emit("startGame");
     })
     bodyElement.appendChild(startGameButton);
-    bodyElement.removeChild(joinGameButton);
-
-    socket.on("disconnecting", (playerName) => {
-        socket.emit('test', playerName);
-    })
+    console.log("should hide"+joinGameButton)
+    joinGameButton.style.visibility = "hidden"
 })
 
 ////// SOCKET EVENTS
@@ -46,33 +43,36 @@ socket.on("connect", () => {
     socket.emit("currentID", userIDCookie);
 
     const nameEntryField = document.getElementById("playerName");
-    const chosenName = readCookieValue("chosenName");
-    if (chosenName != undefined){
-        nameEntryField.textContent = chosenName;
+    let chosenName = readCookieValue("chosenName");
+    if (nameEntryField != undefined && chosenName != undefined){
+        nameEntryField.value = chosenName;
     }
 });
-socket.on("recordChosenName", (chosenName) => {
-    document.cookie = "chosenName="+chosenName;
+
+socket.on("returningPlayer", (returningPlayer) => {
+    console.log(returningPlayer.name + " has returned!")
+    const joinGameButton = document.getElementsByClassName('joinGame')[0];
+    joinGameButton.style.visibility = "hidden"
 })
 
 const playerList = document.getElementById("playerList");
-socket.on("existingPlayers", (players) => {
+socket.on("displayExistingPlayers", (players) => {
     for (let i = 0; i < players.length; i++){
-        let playerName = players[i].name;
         const player = document.createElement("li");
-        player.id = "player:"+playerName;
-        player.textContent = playerName;
+        console.log(players[i].userID)
+        player.id = "player:"+players[i].userID;
+        player.textContent = players[i].name;
         playerList.appendChild(player);
     }
 })
-socket.on("playerJoined", (newPlayerName) => {
+socket.on("playerJoined", (newPlayerID, newPlayerName) => {
     const newPlayer = document.createElement("li");
-    newPlayer.id = "player:"+newPlayerName;
+    newPlayer.id = "player:"+newPlayerID;
     newPlayer.textContent = newPlayerName;
     playerList.appendChild(newPlayer);
 })
-socket.on("playerLeft", (playerName) => {
-    const leavingPlayer = document.getElementById("player:"+playerName);
+socket.on("playerLeft", (playerID) => {
+    const leavingPlayer = document.getElementById("player:"+playerID);
     playerList.removeChild(leavingPlayer);
 })
 
