@@ -19,24 +19,28 @@ const io = new Server(httpServer, {
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
     socket.on("currentID", (currentID) => {
-        const existingPlayer = players.find(player => player.userID == currentID);
-        if (existingPlayer != undefined) {
-            socket.emit("returningPlayer", existingPlayer);
+        const existingID = players.find(player => player.userID == currentID);
+        if (existingID != undefined) {
+            socket.emit("returningPlayer", existingID);
         }
         socket.emit("displayExistingPlayers", players);
     })
 
     socket.on("joinGame", (userID, playerName, playerColor) => {
-        const existingPlayer = players.find(player => player.userID == userID);
-        if (existingPlayer == undefined){
+        const existingName = players.find(player => player.name == playerName);
+        const existingID = players.find(player => player.userID == userID);
+        if (existingName != undefined && existingName.userID != userID){
+            socket.emit("nameTaken", playerName);
+        }
+        else if (existingID == undefined){
             let thisPlayer = makePlayer(userID, playerName, playerColor);
             players.push(thisPlayer);
+            socket.emit("joinedLobby");
             io.emit("playerJoined", userID, playerName, playerColor);
         }
-
         else{
-            existingPlayer.name = playerName;
-            existingPlayer.color = playerColor
+            existingID.name = playerName;
+            existingID.color = playerColor
             io.emit("playerModified", userID, playerName, playerColor);
         }
         

@@ -22,15 +22,6 @@ joinGameButton.addEventListener("click", () => {
         document.cookie = "chosenName="+playerName;
         document.cookie = "preferredColor="+playerColor;
         socket.emit("joinGame", readCookieValue("userID"), playerName, playerColor);
-
-        const startGameButton = document.createElement("button");
-        startGameButton.id = "startGame";
-        startGameButton.textContent = "Start Game"
-        startGameButton.addEventListener("click", () => {
-            socket.emit("startGame");
-        })
-        bodyElement.appendChild(startGameButton);
-        joinGameButton.value = "Update Name/Color"
     }
 })
 
@@ -55,11 +46,27 @@ socket.on("connect", () => {
     }
 });
 
+socket.on("nameTaken", (duplicateName) => {
+    alert("The name "+duplicateName+" is already being used by another player!");
+})
+
+socket.on("joinedLobby", () => {
+    const startGameButton = document.createElement("button");
+    startGameButton.id = "startGame";
+    startGameButton.textContent = "Start Game"
+    startGameButton.addEventListener("click", () => {
+        socket.emit("startGame");
+    })
+    bodyElement.appendChild(startGameButton);
+    joinGameButton.value = "Update"
+})
+
 socket.on("returningPlayer", (returningPlayer) => {
     console.log(returningPlayer.name + " has returned!")
     const joinGameButton = document.getElementsByClassName("joinGame")[0];
-    joinGameButton.value = "Update Name/Color"
+    joinGameButton.value = "Update"
 })
+
 
 // modifies list of players in lobby
 const playerList = document.getElementById("playerList");
