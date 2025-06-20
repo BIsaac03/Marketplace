@@ -18,8 +18,7 @@ const io = new Server(httpServer, {
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
-    //console.log(socket.id + " connected.");
-
+  
     socket.on("currentID", (currentID) => {
         const existingPlayer = players.find(player => player.userID == currentID);
         if (existingPlayer != undefined) {
@@ -32,7 +31,6 @@ io.on("connection", (socket) => {
     // ???????????????????????
 
     socket.on("joinGame", (playerName, userID) => {
-        console.log("thanks for joining, " + playerName);
         const existingPlayer = players.find(player => player.userID == userID);
         if (existingPlayer == undefined){
             let thisPlayer = makePlayer(userID, playerName, "rgb(60, 60, 60)");
@@ -41,7 +39,8 @@ io.on("connection", (socket) => {
         }
 
         else{
-            console.log("player already exists")
+            existingPlayer.name = playerName;
+            io.emit("playerRenamed", userID, playerName);
         }
         
         socket.on("startGame", () => {

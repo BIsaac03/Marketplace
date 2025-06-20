@@ -28,8 +28,7 @@ joinGameButton.addEventListener("click", () => {
         socket.emit("startGame");
     })
     bodyElement.appendChild(startGameButton);
-    console.log("should hide"+joinGameButton)
-    joinGameButton.style.visibility = "hidden"
+    joinGameButton.value = "Change Name"
 })
 
 ////// SOCKET EVENTS
@@ -39,7 +38,6 @@ socket.on("connect", () => {
         document.cookie = "userID="+Math.random().toString(36).substring(1, 30);
         userIDCookie = readCookieValue("userID");
     }
-    console.log("ID:" + userIDCookie);
     socket.emit("currentID", userIDCookie);
 
     const nameEntryField = document.getElementById("playerName");
@@ -52,14 +50,13 @@ socket.on("connect", () => {
 socket.on("returningPlayer", (returningPlayer) => {
     console.log(returningPlayer.name + " has returned!")
     const joinGameButton = document.getElementsByClassName('joinGame')[0];
-    joinGameButton.style.visibility = "hidden"
+    joinGameButton.value = "Change Name"
 })
 
 const playerList = document.getElementById("playerList");
 socket.on("displayExistingPlayers", (players) => {
     for (let i = 0; i < players.length; i++){
         const player = document.createElement("li");
-        console.log(players[i].userID)
         player.id = "player:"+players[i].userID;
         player.textContent = players[i].name;
         playerList.appendChild(player);
@@ -70,6 +67,10 @@ socket.on("playerJoined", (newPlayerID, newPlayerName) => {
     newPlayer.id = "player:"+newPlayerID;
     newPlayer.textContent = newPlayerName;
     playerList.appendChild(newPlayer);
+})
+socket.on("playerRenamed", (playerID, newPlayerName) => {
+    const renamedPlayer = document.getElementById("player:"+playerID);
+    renamedPlayer.textContent = newPlayerName;
 })
 socket.on("playerLeft", (playerID) => {
     const leavingPlayer = document.getElementById("player:"+playerID);
