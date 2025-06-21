@@ -80,7 +80,9 @@ socket.on("joinedLobby", () => {
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
     startGameButton.addEventListener("click", () => {
-        socket.emit("startGame");
+        if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
+            socket.emit("startGame");
+        }
     })
     bodyElement.appendChild(startGameButton);
     joinGameButton.value = "Update"
@@ -107,6 +109,13 @@ socket.on("playerLeft", (playerID) => {
     playerList.removeChild(leavingPlayer);
 })
 
+
+socket.on("gameStart", (players) => {
+    const userID = readCookieValue("userID");
+    const thisPlayer = players.find(player => player.userID == userID)
+})
+
+
 /////// GAME LOGIC
 let price = 3;
 let good = {name: "blueberries"};
@@ -121,3 +130,51 @@ socket.on("cardOrCoins", (price) => {
         socket.emit("cardOrCoins", "coins");
     }
 })
+
+
+/////// UPDATES
+function updateHand(thisPlayer){
+
+}
+
+function updateReserve(thisPlayer){
+
+}
+
+function updateCurrentOffer(){
+
+}
+
+function updateTableaus(){
+
+}
+
+function updateCoins(players){
+    for (let i = 0; i < players.length; i++){
+        const numCoins = players[i].VP;
+        const displayedCoins = document.getElementById("player"+i+"coins");
+        displayedCoins.textContent = coins;
+    }
+}
+
+function updateActivePlayer(){
+
+}
+
+function updateScores(players){
+    for (let i = 0; i < players.length; i++){
+        const score = players[i].VP;
+        const displayedScore = document.getElementById("player"+i+"score");
+        displayedScore.textContent = score;
+    }
+}
+
+function fullUpdate(players, thisPlayer){
+    updateHand(thisPlayer);
+    updateReserve(thisPlayer);
+    updateCurrentOffer();
+    updateTableaus(players);
+    updateCoins(players);
+    updateActivePlayer();
+    updateScores(players);
+}
