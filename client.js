@@ -10,11 +10,36 @@ function readCookieValue(name){
     return value;
 }
 
+function modifyPlayerList(playerList, playerID, playerName, playerColor){
+    const existingPlayer = document.getElementById(playerID);
+    if (existingPlayer === null){
+        const player = document.createElement("div");
+        player.id = playerID;
+        player.classList.add("player");
+
+        const playerColorDOM = document.createElement("div");
+        playerColorDOM.classList.add("playerColor");
+        playerColorDOM.style.backgroundColor = playerColor;
+        player.appendChild(playerColorDOM);
+
+        const playerNameDOM = document.createElement("li");
+        playerNameDOM.classList.add("playerName");
+        playerNameDOM.textContent = playerName;
+        player.appendChild(playerNameDOM);
+
+        playerList.append(player);
+
+    }
+    else{
+        console.log(existingPlayer)
+        existingPlayer.children[0].style.backgroundColor = playerColor;
+        existingPlayer.children[1].textContent = playerName;
+    }
+}
+
 ////// DOM MANIPULATION
 const bodyElement = document.body;
 const joinGameButton = document.getElementsByClassName("joinGame")[0];
-// should check to ensure no duplicate names
-// ???????????????????????
 joinGameButton.addEventListener("click", () => {
     let playerName = document.getElementById("playerName").value;
     let playerColor = document.getElementById("playerColor").value;
@@ -47,7 +72,7 @@ socket.on("connect", () => {
 });
 
 socket.on("nameTaken", (duplicateName) => {
-    alert("The name "+duplicateName+" is already being used by another player!");
+    alert("The name \""+duplicateName+"\" is already being used by another player!");
 })
 
 socket.on("joinedLobby", () => {
@@ -67,44 +92,19 @@ socket.on("returningPlayer", (returningPlayer) => {
     joinGameButton.value = "Update"
 })
 
-
 // modifies list of players in lobby
 const playerList = document.getElementById("playerList");
 socket.on("displayExistingPlayers", (players) => {
     for (let i = 0; i < players.length; i++){
-        const player = document.createElement("li");
-        player.id = "name:"+players[i].userID;
-        player.textContent = players[i].name;
-        playerList.appendChild(player);
-
-        const playerColor = document.createElement("div")
-        playerColor.id = "color:"+players[i].userID;
-        playerColor.style.backgroundColor = players[i].color;
-        playerList.appendChild(playerColor);
+        modifyPlayerList(playerList, players[i].userID, players[i].name, players[i].color);
     }
 })
-socket.on("playerJoined", (newPlayerID, newPlayerName, newPlayerColor) => {
-    const newPlayer = document.createElement("li");
-    newPlayer.id = "name:"+newPlayerID;
-    newPlayer.textContent = newPlayerName;
-    playerList.appendChild(newPlayer);
-
-    const playerColor = document.createElement("div")
-    playerColor.id = "color:"+newPlayerID;
-    console.log("color: "+newPlayerColor)
-    playerColor.style.backgroundColor = newPlayerColor;
-    playerList.appendChild(playerColor);
-})
-socket.on("playerModified", (playerID, newPlayerName, newPlayerColor) => {
-    const modifiedPlayer = [document.getElementById("name:"+playerID), document.getElementById("color:"+playerID)];
-    modifiedPlayer[0].textContent = newPlayerName;
-    modifiedPlayer[1].style.backgroundColor = newPlayerColor;
-
+socket.on("playerJoined", (PlayerID, newPlayerName, newPlayerColor) => {
+    modifyPlayerList(playerList, PlayerID, newPlayerName, newPlayerColor);
 })
 socket.on("playerLeft", (playerID) => {
-    const leavingPlayer = [document.getElementById("name:"+playerID), document.getElementById("color:"+playerID)];
-    playerList.removeChild(leavingPlayer[0]);
-    playerList.removeChild(leavingPlayer[1]);
+    const leavingPlayer =document.getElementById(playerID);
+    playerList.removeChild(leavingPlayer);
 })
 
 /////// GAME LOGIC

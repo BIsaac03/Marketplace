@@ -28,7 +28,8 @@ body{
 
 form.playerCustomization{
     display: grid;
-    grid-template: 1fr 1fr 1fr / 1fr 1fr;
+    grid-template: repeat("auto", 3) / auto auto;
+    gap: 20px;
     justify-content: center;
 }
 
@@ -53,26 +54,32 @@ form.playerCustomization input.colorSelect{
 }
 
 form.playerCustomization input.joinGame{
-    width: 100px;
-    height: 100px;
+    width: 300px;
+    height: 75px;
     border-radius: 50px;
+    font-size: 40px;
     background-color: aquamarine;
     grid-area: 3 / 1 / 4 / 3;
+    margin-top: 20px;
 }
 
 ul#playerList{
     list-style-type: none;
     font-size: 50px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     justify-content: center;
 }
 
-#playerList li{
-    font-size:30px;
+#playerList .player{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 30px;
 }
 
-[id ^="color:"]{
+#playerList .player .playerColor{
     width: 50px;
     height: 50px;
 }

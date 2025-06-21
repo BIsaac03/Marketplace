@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
         else{
             existingID.name = playerName;
             existingID.color = playerColor
-            io.emit("playerModified", userID, playerName, playerColor);
+            io.emit("playerJoined", userID, playerName, playerColor);
         }
         
         socket.on("startGame", () => {
