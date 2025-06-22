@@ -83,3 +83,38 @@ ul#playerList{
     width: 50px;
     height: 50px;
 }
+
+
+
+
+.myself{
+    width: 800px;
+    height: 500px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.myself .stats{
+    background-color: rgb(230, 230, 230);
+    font-size: 40px;
+    padding: 20px 0px;
+    display: flex;
+    justify-content: center;
+}
+
+.tableau{
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+}
+
+.fruits{
+    background-color: rgba(234,192,160,0.4);
+}
+
+.crops{
+    background-color: rgba(207,139,77, 0.4);
+}
+
+.trinkets{
+    background-color: rgba(143,168,181,0.4);
+}

@@ -10,7 +10,7 @@ function readCookieValue(name){
     return value;
 }
 
-function modifyPlayerList(playerList, playerID, playerName, playerColor){
+function modifyPlayerList(playerList, playerID, playerName, playerColor, isMe){
     const existingPlayer = document.getElementById(playerID);
     if (existingPlayer === null){
         const player = document.createElement("div");
@@ -27,6 +27,15 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
         playerNameDOM.textContent = playerName;
         player.appendChild(playerNameDOM);
 
+        if (isMe){
+            const leaveLobbyButton = document.createElement("button");
+            leaveLobbyButton.id = "leaveLobbyButton";
+            leaveLobbyButton.addEventListener("click", () => {
+                playerList.removeChild(player);
+            })
+            player.appendChild(leaveLobbyButton);
+        }
+
         playerList.append(player);
 
     }
@@ -36,6 +45,10 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
         existingPlayer.children[1].textContent = playerName;
     }
 }
+
+let thisPlayer = undefined;
+let inLobby = false;
+let inGame = false;
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
@@ -76,6 +89,7 @@ socket.on("nameTaken", (duplicateName) => {
 })
 
 socket.on("joinedLobby", () => {
+    inLobby = true;
     const startGameButton = document.createElement("button");
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
@@ -89,6 +103,15 @@ socket.on("joinedLobby", () => {
 })
 
 socket.on("returningPlayer", (returningPlayer) => {
+    const startGameButton = document.createElement("button");
+    startGameButton.id = "startGame";
+    startGameButton.textContent = "Start Game"
+    startGameButton.addEventListener("click", () => {
+        if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
+            socket.emit("startGame");
+        }
+    })
+
     console.log(returningPlayer.name + " has returned!")
     const joinGameButton = document.getElementsByClassName("joinGame")[0];
     joinGameButton.value = "Update"
@@ -104,35 +127,102 @@ socket.on("displayExistingPlayers", (players) => {
 socket.on("playerJoined", (PlayerID, newPlayerName, newPlayerColor) => {
     modifyPlayerList(playerList, PlayerID, newPlayerName, newPlayerColor);
 })
-socket.on("playerLeft", (playerID) => {
-    const leavingPlayer =document.getElementById(playerID);
-    playerList.removeChild(leavingPlayer);
-})
 
 
 socket.on("gameStart", (players) => {
+    inLobby = false;
+    inGame = true;
     const userID = readCookieValue("userID");
-    const thisPlayer = players.find(player => player.userID == userID)
+    thisPlayer = players.find(player => player.userID == userID)
+
+    bodyElement.innerHTML = "";
+    let opponentDisplay = document.createElement("div");
+    for (let i = 0; i < players.length; i++){
+        let player = document.createElement("div");
+        player.id = "player"+players[i].playerNum;
+        let stats = document.createElement("div");
+        stats.classList.add("stats");
+        let coins = document.createElement("p");
+        coins.classList.add("coins");
+        stats.appendChild(coins);
+        let workers = document.createElement("p");
+        workers.classList.add("workers");
+        stats.appendChild(workers);
+        let VP = document.createElement("p");
+        VP.classList.add("VP");
+        stats.appendChild(VP);
+
+        let tableau = document.createElement("div");
+        let fruits = document.createElement("div");
+        fruits.classList.add("fruits");
+        tableau.appendChild(fruits);
+        let crops = document.createElement("div");
+        crops.classList.add("crops");
+        tableau.appendChild(crops);
+        let trinkets = document.createElement("div");
+        trinkets.classList.add("trinkets");
+        tableau.appendChild(trinkets);
+
+        player.appendChild(stats);
+        player.appendChild(tableau);
+
+        if (players[i] == thisPlayer){
+            player.classList.add("myself");
+            bodyElement.appendChild(player);
+        }
+        else{
+            player.classList.add("opponent");
+            opponentDisplay.appendChild(player);
+        }
+    }
+    bodyElement.appendChild(opponentDisplay);
 })
 
 
 /////// GAME LOGIC
-let price = 3;
-let good = {name: "blueberries"};
-socket.emit("sellGood", price, good)
-
-socket.on("cardOrCoins", (price) => {
-    choice = prompt("Do you want to pay " + price + " coins for " + good.name + "? Otherwise, you will gain " + price + " coins.")
-    if (choice == "y"){
-        socket.emit("cardOrCoins", "card");
+socket.on("nextDraftRound", (cardsToDraft) => {
+    const cardsToChooseFrom = cardsToDraft[thisPlayer.playerNum];
+    // !!!!!!!!!!!!!!!! goods should be displayed during drafting
+    const draftingPopUp = document.createElement("div");
+    draftingPopUp.id = "draftingPopUp";
+    for (let i = 0; i < cardsToChooseFrom.length; i++){
+        const draftingOption = document.createElement("div");
+        draftingOption.classList.add("draftingOption good");
+        draftingOption.addEventListener("click", () => {
+            socket.emit("draftedCard", thisPlayer, draftedCard);
+        })
+        draftingPopUp.appendChild(draftingOption);
     }
-    else{
-        socket.emit("cardOrCoins", "coins");
+    bodyElement.appendChild(draftingPopUp)
+})
+
+socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
+    if (thisPlayer.playerNum == vendorNum){
+        let goodToSell = prompt("What good do you want to sell?");
+        while(!cardsInReserve.some(good => good.name == goodToSell)){
+            goodToSell = prompt("You have not reserved this good. Enter a good you can sell.");
+        }
+        let salePrice = prompt("How many coins do you want to sell your "+goodToSell+" for?")
+        socket.emit("sellGood", goodToSell, salePrice);
+    }
+})
+
+socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
+    if (thisPlayer.playerNum != vendorNum){
+        // !!!!!!!!!! good should be displayed during sale
+
+        choice = prompt("Do you want to pay " + price + " coins for " + goodToBuy + "? Otherwise, you will gain " + price + " coins.")
+        if (choice == "y"){
+            socket.emit("saleResult", "card");
+        }
+        else{
+            socket.emit("saleResult", "coins");
+        }
     }
 })
 
 
-/////// UPDATES
+/////// DISPLAY UPDATES
 function updateHand(thisPlayer){
 
 }
@@ -151,9 +241,8 @@ function updateTableaus(){
 
 function updateCoins(players){
     for (let i = 0; i < players.length; i++){
-        const numCoins = players[i].VP;
-        const displayedCoins = document.getElementById("player"+i+"coins");
-        displayedCoins.textContent = coins;
+        const displayedCoins = document.querySelector(`#player${i} .coins`);
+        displayedCoins.textContent = players[i].numCoins;
     }
 }
 
@@ -163,9 +252,8 @@ function updateActivePlayer(){
 
 function updateScores(players){
     for (let i = 0; i < players.length; i++){
-        const score = players[i].VP;
-        const displayedScore = document.getElementById("player"+i+"score");
-        displayedScore.textContent = score;
+        const displayedScore = document.querySelector(`#player${i} .VP`);
+        displayedScore.textContent = players[i].VP;
     }
 }
 
