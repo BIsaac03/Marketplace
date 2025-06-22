@@ -182,14 +182,15 @@ socket.on("gameStart", (players) => {
 /////// GAME LOGIC
 socket.on("nextDraftRound", (cardsToDraft) => {
     const cardsToChooseFrom = cardsToDraft[thisPlayer.playerNum];
-    // !!!!!!!!!!!!!!!! goods should be displayed during drafting
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
     for (let i = 0; i < cardsToChooseFrom.length; i++){
-        const draftingOption = document.createElement("div");
+        const draftingOption = document.createElement("img");
         draftingOption.classList.add("draftingOption good");
+        draftingOption.src = cardsToChooseFrom[i].image;
         draftingOption.addEventListener("click", () => {
-            socket.emit("draftedCard", thisPlayer, draftedCard);
+            socket.emit("draftedCard", thisPlayer, cardsToChooseFrom[i]);
+            bodyElement.removeChild(draftingPopUp);
         })
         draftingPopUp.appendChild(draftingOption);
     }

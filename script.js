@@ -10,7 +10,6 @@ import { Server } from "socket.io";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-    cookie: true,
     cors: {
         origin: "http://127.0.0.1:5500",
     }
@@ -45,24 +44,51 @@ io.on("connection", (socket) => {
         }
         
         socket.on("startGame", () => {
-            gameSetUp();
-            playGame();
-        })
-    
-        socket.on("sellGood", (price, good) => {
-            socket.broadcast("cardOrCoins", (price, good))
-            socket.on("cardOrCoins", (choice) => {
-                if (choice == "card"){
-    
-                }
-                else if (choice == "coins"){
-    
+            let cardsToDraft = [[1, 2, 3], [4, 5, 6]];
+            io.emit("nextDraftRound", cardsToDraft);
+
+            socket.on("draftedCard", (player, draftedCard) => {
+                player.reserve.push(draftedCard);
+                const indexOfDraftedCard = cardsToDraft[player.playerNum].indexOf(draftedCard);
+                cardsToDraft[player.playerNum].splice(indexOfDraftedCard, 1);
+                player.ready = true;
+                if (!players.some(player => player.ready == false)){
+                    if (cardsToDraft.length == 0){
+                        // !!!!!!! proceed to sales
+                        console.log("All cards drafted; ready for sales.");
+                    }
+
+                    // passes remaining cards
+                    else{
+                        const temp = cardsToDraft[0];
+                        for (let i = 0; i < players.length-1; i++){
+                            cardsToDraft[i] = cardsToDraft[i+1];
+                        }
+                        cardsToDraft[players.length-1] = temp;
+                        io.emit("nextDraftRound", cardsToDraft);
+                    }
+
+                    for (let i = 0; i < players.length; i++){
+                        players[i].ready = false;
+                    }
                 }
             })
+
+            socket.on("sellGood", (goodToSell, salePrice) => {
+                socket.broadcast("resolveSale", (goodToSell, salePrice, vendorNum))
+                socket.on("saleResult", (choice) => {
+                    if (choice == "card"){
+        
+                    }
+                    else if (choice == "coins"){
+        
+                    }
+                })
+            })
+            socket.on("disconnect", (reason) => {
+                console.log(reason);
+            });
         })
-        socket.on("disconnect", (reason) => {
-            console.log(reason);
-        });
     })
 });
 
@@ -84,6 +110,7 @@ function makePlayer(userID, name, color){
     let numFruits = 0;
     let numCrops = 0;
     let numTrinkets = 0;
+    let isReady = true;
 
     const setNeighbors = () => {
         neighbors.push(players[(playerNum+1)%players.length]);
@@ -115,7 +142,7 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, setNeighbors, buyCard, scoreTableau}
+    return {userID, name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, setNeighbors, buyCard, scoreTableau}
 }
 
 function draftCards(deck){
