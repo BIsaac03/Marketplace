@@ -111,7 +111,8 @@ socket.on("returningPlayer", (returningPlayer) => {
             socket.emit("startGame");
         }
     })
-
+    bodyElement.appendChild(startGameButton);
+    
     console.log(returningPlayer.name + " has returned!")
     const joinGameButton = document.getElementsByClassName("joinGame")[0];
     joinGameButton.value = "Update"
@@ -129,7 +130,7 @@ socket.on("playerJoined", (PlayerID, newPlayerName, newPlayerColor) => {
 })
 
 
-socket.on("gameStart", (players) => {
+socket.on("gameStartSetup", (players) => {
     inLobby = false;
     inGame = true;
     const userID = readCookieValue("userID");
@@ -186,7 +187,7 @@ socket.on("nextDraftRound", (cardsToDraft) => {
     draftingPopUp.id = "draftingPopUp";
     for (let i = 0; i < cardsToChooseFrom.length; i++){
         const draftingOption = document.createElement("img");
-        draftingOption.classList.add("draftingOption good");
+        draftingOption.classList.add("draftingOption", "good");
         draftingOption.src = cardsToChooseFrom[i].image;
         draftingOption.addEventListener("click", () => {
             socket.emit("draftedCard", thisPlayer, cardsToChooseFrom[i]);
@@ -224,7 +225,7 @@ socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
 
 
 /////// DISPLAY UPDATES
-function updateHand(thisPlayer){
+function updateDraft(cardsToDraft){
 
 }
 
@@ -259,7 +260,7 @@ function updateScores(players){
 }
 
 function fullUpdate(players, thisPlayer){
-    updateHand(thisPlayer);
+    updateDraft(cardsToDraft);
     updateReserve(thisPlayer);
     updateCurrentOffer();
     updateTableaus(players);

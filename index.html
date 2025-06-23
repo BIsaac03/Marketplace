@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Lobby</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"></script>
+    <script src="client.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        
+    </div>
+    <p class="title">Lobby</p>
+    <div id="lobby">
+        <form class="playerCustomization">
+            <label for="playerName">Player Name:</label>
+            <input class="playerName" type="text" id="playerName" name="playerName">
+            <input class="colorSelect" type="color" id="playerColor" name="playerColor">
+            <input class="joinGame" type="submit" value="Join Game">
+        </form>
+        <ul id="playerList">Joined players:
+        </ul>
+    </div>
+</body>
+</html>

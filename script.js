@@ -42,10 +42,32 @@ io.on("connection", (socket) => {
             existingID.color = playerColor
             io.emit("playerJoined", userID, playerName, playerColor);
         }
-        
+    })
+
         socket.on("startGame", () => {
-            let cardsToDraft = [[1, 2, 3], [4, 5, 6]];
+            io.emit("gameStartSetup", players);
+            console.log("game started")
+
+            let deck = [];
+            for (let i = 0; i < players.length; i++){
+                let randomFruit = fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0];
+                let randomCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+                let randomTrinket = trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0];
+                deck.push(randomFruit, randomCrop, randomTrinket);
+            }
+
+            let cardsToDraft = [];
+            for (let i = 0; i < players.length; i++){
+                let playerHand = [];
+                for(let _ = 0; _ < 3; _++){
+                    let addedCard = deck.splice(Math.floor(Math.random()*(deck.length)), 1)[0];
+                    playerHand.push(addedCard);
+                }
+                cardsToDraft.push(playerHand);
+            }
+
             io.emit("nextDraftRound", cardsToDraft);
+        })
 
             socket.on("draftedCard", (player, draftedCard) => {
                 player.reserve.push(draftedCard);
@@ -88,13 +110,16 @@ io.on("connection", (socket) => {
             socket.on("disconnect", (reason) => {
                 console.log(reason);
             });
-        })
-    })
+        
+    
 });
 
 httpServer.listen(3000);
 
 let players = [];
+let fruitsRemaining = allFruits;
+let cropsRemaining = allCrops;
+let trinketsRemaining = allTrinkets;
 
 ////// UNIMPLEMENTED GAME LOGIC
 function makePlayer(userID, name, color){
