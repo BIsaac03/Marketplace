@@ -46,7 +46,7 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor, isMe){
     }
 }
 
-let thisPlayer = undefined;
+let myPlayerNum = undefined;
 let inLobby = false;
 let inGame = false;
 
@@ -134,7 +134,8 @@ socket.on("gameStartSetup", (players) => {
     inLobby = false;
     inGame = true;
     const userID = readCookieValue("userID");
-    thisPlayer = players.find(player => player.userID == userID)
+    const thisPlayer = players.find(player => player.userID == userID);
+    myPlayerNum = thisPlayer.playerNum;
 
     bodyElement.innerHTML = "";
     let opponentDisplay = document.createElement("div");
@@ -167,7 +168,7 @@ socket.on("gameStartSetup", (players) => {
         player.appendChild(stats);
         player.appendChild(tableau);
 
-        if (players[i] == thisPlayer){
+        if (players[i] == players[myPlayerNum]){
             player.classList.add("myself");
             bodyElement.appendChild(player);
         }
@@ -182,7 +183,7 @@ socket.on("gameStartSetup", (players) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (draftingHands) => {
-    const cardsToChooseFrom = draftingHands[thisPlayer.playerNum];
+    const cardsToChooseFrom = draftingHands[myPlayerNum];
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
     for (let i = 0; i < cardsToChooseFrom.length; i++){
@@ -190,8 +191,7 @@ socket.on("nextDraftRound", (draftingHands) => {
         draftingOption.classList.add("draftingOption", "good");
         draftingOption.src = cardsToChooseFrom[i].image;
         draftingOption.addEventListener("click", () => {
-            socket.emit("draftedCard", thisPlayer, i, draftingHands);
-            bodyElement.removeChild(draftingPopUp);
+            socket.emit("draftedCard", myPlayerNum, i, draftingHands);
         })
         draftingPopUp.appendChild(draftingOption);
     }
@@ -204,7 +204,7 @@ socket.on("clearDraftingPopUp", () => {
 })
 
 socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
-    if (thisPlayer.playerNum == vendorNum){
+    if (myPlayerNum == vendorNum){
         let goodToSell = prompt("What good do you want to sell?");
         while(!cardsInReserve.some(good => good.name == goodToSell)){
             goodToSell = prompt("You have not reserved this good. Enter a good you can sell.");
@@ -215,7 +215,7 @@ socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
 })
 
 socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
-    if (thisPlayer.playerNum != vendorNum){
+    if (myPlayerNum != vendorNum){
         // !!!!!!!!!! good should be displayed during sale
 
         choice = prompt("Do you want to pay " + price + " coins for " + goodToBuy + "? Otherwise, you will gain " + price + " coins.")
