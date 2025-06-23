@@ -48,35 +48,39 @@ io.on("connection", (socket) => {
         io.emit("gameStartSetup", players);
         console.log("game started")
 
-        let deck = createDraftingDeck(players.length);
-        let draftingHands = createDraftingHands(deck, players.length);
-        io.emit("nextDraftRound", draftingHands);
+        let draftingDeck = createDraftingDeck(players.length);
+        createDraftingHands(draftingDeck);
+        io.emit("nextDraftRound", players);
     })
 
-    socket.on("draftedCard", (player, cardChoice, draftingHands) => {
-        let playerHand = draftingHands[player.playerNum];
-        player.reserve.push(playerHand[cardChoice]);
-        playerHand.splice(cardChoice, 1);
-        player.ready = true;
-        if (!players.some(player => player.ready == false)){
+    socket.on("draftedCard", (myPlayerNum, cardChoice) => {
+        const activePlayer = players.find(player => player.playerNum == myPlayerNum)
+        activePlayer.reserve.push(activePlayer.draftingHand[cardChoice]);
+        activePlayer.draftingHand.splice(cardChoice, 1);
+        activePlayer.isReady = true;
+
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
             io.emit("clearDraftingPopUp");
-            if (playerHand.length == 0){
+            if (activePlayer.draftingHand.length == 0){
                 // !!!!!!! proceed to sales
                 console.log("All cards drafted; ready for sales.");
             }
 
             // passes remaining cards
             else{
-                const temp = draftingHands[0];
-                for (let i = 0; i < players.length-1; i++){
-                    draftingHands[i] = draftingHands[i+1];
+                let previousHand = players[players.length-1].draftingHand;
+                let thisHand = undefined
+                for (let i = 0; i < players.length; i++){
+                    thisHand = players[i].draftingHand;
+                    players[i].draftingHand = previousHand;
+                    previousHand = thisHand; 
                 }
-                draftingHands[players.length-1] = temp;
-                io.emit("nextDraftRound", draftingHands);
+                io.emit("nextDraftRound", players);
             }
 
             for (let i = 0; i < players.length; i++){
-                players[i].ready = false;
+                players[i].isReady = false;
             }
         }
     })
@@ -120,24 +124,20 @@ function createDraftingDeck(numPlayers){
     return deck;
 }
 
-function createDraftingHands(draftingDeck, numPlayers){
-    let draftingHands = [];
-    for (let i = 0; i < numPlayers; i++){
-        let playerHand = [];
+function createDraftingHands(draftingDeck){
+    for (let i = 0; i < players.length; i++){
         for(let _ = 0; _ < 3; _++){
-            let addedCard = deck.splice(Math.floor(Math.random()*(deck.length)), 1)[0];
-            playerHand.push(addedCard);
+            let addedCard = draftingDeck.splice(Math.floor(Math.random()*(draftingDeck.length)), 1)[0];
+            players[i].draftingHand.push(addedCard);
         }
-        draftingHands.push(playerHand);
     }
-    return draftingHands;
 }
 
 function makePlayer(userID, name, color){
     let playerNum = players.length;
     let neighbors = [];
     let tableau = [];
-    let hand = [];
+    let draftingHand = [];
     let reserve = [];
     let choice = "";
     let numCoins = 20;
@@ -146,7 +146,7 @@ function makePlayer(userID, name, color){
     let numFruits = 0;
     let numCrops = 0;
     let numTrinkets = 0;
-    let isReady = true;
+    let isReady = false;
 
     const setNeighbors = () => {
         neighbors.push(players[(playerNum+1)%players.length]);
@@ -178,7 +178,7 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, setNeighbors, buyCard, scoreTableau}
+    return {userID, name, color, playerNum, neighbors, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, setNeighbors, buyCard, scoreTableau}
 }
 
 ////// UNIMPLEMENTED GAME LOGIC

@@ -182,8 +182,8 @@ socket.on("gameStartSetup", (players) => {
 
 
 /////// GAME LOGIC
-socket.on("nextDraftRound", (draftingHands) => {
-    const cardsToChooseFrom = draftingHands[myPlayerNum];
+socket.on("nextDraftRound", (players) => {
+    const cardsToChooseFrom = players[myPlayerNum].draftingHand;
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
     for (let i = 0; i < cardsToChooseFrom.length; i++){
@@ -191,7 +191,7 @@ socket.on("nextDraftRound", (draftingHands) => {
         draftingOption.classList.add("draftingOption", "good");
         draftingOption.src = cardsToChooseFrom[i].image;
         draftingOption.addEventListener("click", () => {
-            socket.emit("draftedCard", myPlayerNum, i, draftingHands);
+            socket.emit("draftedCard", myPlayerNum, i);
         })
         draftingPopUp.appendChild(draftingOption);
     }
