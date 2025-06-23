@@ -44,72 +44,58 @@ io.on("connection", (socket) => {
         }
     })
 
-        socket.on("startGame", () => {
-            io.emit("gameStartSetup", players);
-            console.log("game started")
+    socket.on("startGame", () => {
+        io.emit("gameStartSetup", players);
+        console.log("game started")
 
-            let deck = [];
-            for (let i = 0; i < players.length; i++){
-                let randomFruit = fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0];
-                let randomCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
-                let randomTrinket = trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0];
-                deck.push(randomFruit, randomCrop, randomTrinket);
+        let deck = createDraftingDeck(players.length);
+        let draftingHands = createDraftingHands(deck, players.length);
+        io.emit("nextDraftRound", draftingHands);
+    })
+
+    socket.on("draftedCard", (player, cardChoice, draftingHands) => {
+        let playerHand = draftingHands[player.playerNum];
+        player.reserve.push(playerHand[cardChoice]);
+        playerHand.splice(cardChoice, 1);
+        player.ready = true;
+        if (!players.some(player => player.ready == false)){
+            io.emit("clearDraftingPopUp");
+            if (playerHand.length == 0){
+                // !!!!!!! proceed to sales
+                console.log("All cards drafted; ready for sales.");
             }
 
-            let cardsToDraft = [];
-            for (let i = 0; i < players.length; i++){
-                let playerHand = [];
-                for(let _ = 0; _ < 3; _++){
-                    let addedCard = deck.splice(Math.floor(Math.random()*(deck.length)), 1)[0];
-                    playerHand.push(addedCard);
+            // passes remaining cards
+            else{
+                const temp = draftingHands[0];
+                for (let i = 0; i < players.length-1; i++){
+                    draftingHands[i] = draftingHands[i+1];
                 }
-                cardsToDraft.push(playerHand);
+                draftingHands[players.length-1] = temp;
+                io.emit("nextDraftRound", draftingHands);
             }
 
-            io.emit("nextDraftRound", cardsToDraft);
+            for (let i = 0; i < players.length; i++){
+                players[i].ready = false;
+            }
+        }
+    })
+
+    socket.on("sellGood", (goodToSell, salePrice) => {
+        socket.broadcast("resolveSale", (goodToSell, salePrice, vendorNum))
+        socket.on("saleResult", (choice) => {
+            if (choice == "card"){
+        
+            }
+            else if (choice == "coins"){
+        
+            }
         })
+    })
 
-            socket.on("draftedCard", (player, draftedCard) => {
-                player.reserve.push(draftedCard);
-                const indexOfDraftedCard = cardsToDraft[player.playerNum].indexOf(draftedCard);
-                cardsToDraft[player.playerNum].splice(indexOfDraftedCard, 1);
-                player.ready = true;
-                if (!players.some(player => player.ready == false)){
-                    if (cardsToDraft.length == 0){
-                        // !!!!!!! proceed to sales
-                        console.log("All cards drafted; ready for sales.");
-                    }
-
-                    // passes remaining cards
-                    else{
-                        const temp = cardsToDraft[0];
-                        for (let i = 0; i < players.length-1; i++){
-                            cardsToDraft[i] = cardsToDraft[i+1];
-                        }
-                        cardsToDraft[players.length-1] = temp;
-                        io.emit("nextDraftRound", cardsToDraft);
-                    }
-
-                    for (let i = 0; i < players.length; i++){
-                        players[i].ready = false;
-                    }
-                }
-            })
-
-            socket.on("sellGood", (goodToSell, salePrice) => {
-                socket.broadcast("resolveSale", (goodToSell, salePrice, vendorNum))
-                socket.on("saleResult", (choice) => {
-                    if (choice == "card"){
-        
-                    }
-                    else if (choice == "coins"){
-        
-                    }
-                })
-            })
-            socket.on("disconnect", (reason) => {
-                console.log(reason);
-            });
+    socket.on("disconnect", (reason) => {
+        console.log(reason);
+    });
         
     
 });
@@ -121,7 +107,32 @@ let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
 
-////// UNIMPLEMENTED GAME LOGIC
+
+// game-state functions
+function createDraftingDeck(numPlayers){
+    let deck = [];
+    for (let i = 0; i < numPlayers; i++){
+        let randomFruit = fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0];
+        let randomCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+        let randomTrinket = trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0];
+        deck.push(randomFruit, randomCrop, randomTrinket);
+    }
+    return deck;
+}
+
+function createDraftingHands(draftingDeck, numPlayers){
+    let draftingHands = [];
+    for (let i = 0; i < numPlayers; i++){
+        let playerHand = [];
+        for(let _ = 0; _ < 3; _++){
+            let addedCard = deck.splice(Math.floor(Math.random()*(deck.length)), 1)[0];
+            playerHand.push(addedCard);
+        }
+        draftingHands.push(playerHand);
+    }
+    return draftingHands;
+}
+
 function makePlayer(userID, name, color){
     let playerNum = players.length;
     let neighbors = [];
@@ -170,31 +181,7 @@ function makePlayer(userID, name, color){
     return {userID, name, color, playerNum, neighbors, tableau, hand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, setNeighbors, buyCard, scoreTableau}
 }
 
-function draftCards(deck){
-    // deals 3 cards to each player
-    let remainingCards = deck;
-    for (let i = 0; i < players.length; i++){
-        for(let _ = 0; _ < 3; _++){
-            let addedCard = remainingCards.splice(Math.floor(Math.random()*(remainingCards.length)), 1)[0];
-            players[i].hand.push(addedCard);
-        }
-    }
-
-    //!!! CURRENTLY DRAFTS RANDOMLY !!!
-    for (let _ = 0; _ < 3; _++){
-        let previousHand = [];
-        let nextHand = [];
-        for (let i = 0; i < players.length; i++){
-            let cardToReserve = players[i].hand.splice(Math.floor(Math.random()*(players[i].hand.length)), 1)[0];
-            players[i].reserve.push(cardToReserve);
-            nextHand = players[i].hand;
-            players[i].hand = previousHand;
-            previousHand = nextHand;
-        }
-        players[0].hand = previousHand;
-    }
-}
-
+////// UNIMPLEMENTED GAME LOGIC
 function performSale(vendor){
     console.log(vendor.name + " is performing a sale");
 

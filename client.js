@@ -181,8 +181,8 @@ socket.on("gameStartSetup", (players) => {
 
 
 /////// GAME LOGIC
-socket.on("nextDraftRound", (cardsToDraft) => {
-    const cardsToChooseFrom = cardsToDraft[thisPlayer.playerNum];
+socket.on("nextDraftRound", (draftingHands) => {
+    const cardsToChooseFrom = draftingHands[thisPlayer.playerNum];
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
     for (let i = 0; i < cardsToChooseFrom.length; i++){
@@ -190,12 +190,17 @@ socket.on("nextDraftRound", (cardsToDraft) => {
         draftingOption.classList.add("draftingOption", "good");
         draftingOption.src = cardsToChooseFrom[i].image;
         draftingOption.addEventListener("click", () => {
-            socket.emit("draftedCard", thisPlayer, cardsToChooseFrom[i]);
+            socket.emit("draftedCard", thisPlayer, i, draftingHands);
             bodyElement.removeChild(draftingPopUp);
         })
         draftingPopUp.appendChild(draftingOption);
     }
     bodyElement.appendChild(draftingPopUp)
+})
+
+socket.on("clearDraftingPopUp", () => {
+    const draftingPopUp = document.getElementById("draftingPopUp");
+    draftingPopUp.remove();
 })
 
 socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
