@@ -257,6 +257,7 @@ function clearDraftingPopUp() {
 }
 
 function displayReserve(reserve){
+    let shouldEnlarge = true;
     let reserveDOM = document.getElementById("reserve");
     if (reserveDOM == undefined){
         reserveDOM = document.createElement("div");
@@ -266,10 +267,33 @@ function displayReserve(reserve){
     for (let i = 0; i < reserve.length; i++){
         const reservedCard = document.createElement("img");
         reservedCard.src = reserve[i].image;
-        reservedCard.classList.add(reserve[i].name, "reserved")
+        reservedCard.classList.add(reserve[i].name, "icon", "reserved"+i)
+        reservedCard.addEventListener("click", () => {
+            viewDetailedReservedCards(reserve, shouldEnlarge);
+            shouldEnlarge = !shouldEnlarge;
+        })
         reserveDOM.appendChild(reservedCard);
     }
+    
     bodyElement.appendChild(reserveDOM);
+}
+
+function viewDetailedReservedCards(reserve, shouldEnlarge){
+    if (shouldEnlarge){
+        const detailedReserveView = document.createElement("div");
+        detailedReserveView.id = "detailedReserve";
+        for (let i = 0; i < reserve.length; i++){
+            const reservedCard = document.createElement("img");
+            reservedCard.src = reserve[i].image;
+            reservedCard.classList.add(reserve[i].name, "reserved"+i)
+            detailedReserveView.appendChild(reservedCard);
+        }
+        bodyElement.appendChild(detailedReserveView);
+    }
+    else{
+        const detailedReserveView = document.getElementById("detailedReserve");
+        detailedReserveView.remove();
+    }
 }
 
 function updateCurrentOffer(){
