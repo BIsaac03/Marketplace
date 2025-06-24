@@ -122,6 +122,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         displayDraft(returningPlayer.draftingHand);
+        displayReserve(returningPlayer.reserve)
         displayTableaus(players);
     }
 })
@@ -155,6 +156,10 @@ socket.on("nextDraftRound", (players) => {
 
 socket.on("clearDraftingPopUp", () => {
     clearDraftingPopUp();
+})
+
+socket.on("displayReserve", (players) => {
+    displayReserve(players[myPlayerNum].reserve);
 })
 
 socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
@@ -251,8 +256,20 @@ function clearDraftingPopUp() {
     }
 }
 
-function updateReserve(thisPlayer){
-
+function displayReserve(reserve){
+    let reserveDOM = document.getElementById("reserve");
+    if (reserveDOM == undefined){
+        reserveDOM = document.createElement("div");
+        reserveDOM.id = "reserve";
+    }
+    reserveDOM.innerHTML = ""
+    for (let i = 0; i < reserve.length; i++){
+        const reservedCard = document.createElement("img");
+        reservedCard.src = reserve[i].image;
+        reservedCard.classList.add(reserve[i].name, "reserved")
+        reserveDOM.appendChild(reservedCard);
+    }
+    bodyElement.appendChild(reserveDOM);
 }
 
 function updateCurrentOffer(){

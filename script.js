@@ -65,6 +65,7 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
+            io.emit("displayReserve", players);
             if (activePlayer.draftingHand.length == 0){
                 // !!!!!!! proceed to sales
                 io.emit("clearDraftingPopUp");
