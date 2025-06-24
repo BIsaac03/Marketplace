@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
     socket.on("currentID", (currentID) => {
         const existingID = players.find(player => player.userID == currentID);
         if (existingID != undefined) {
-            socket.emit("returningPlayer", existingID);
+            socket.emit("returningPlayer", existingID, players);
         }
         socket.emit("displayExistingPlayers", players);
     })
@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
         else if (existingID == undefined){
             let thisPlayer = makePlayer(userID, playerName, playerColor);
             players.push(thisPlayer);
-            socket.emit("joinedLobby");
+            socket.emit("joinedLobby", thisPlayer);
             io.emit("playerJoined", userID, playerName, playerColor);
         }
         else{
@@ -45,6 +45,10 @@ io.on("connection", (socket) => {
     })
 
     socket.on("startGame", () => {
+        for (let i = 0; i < players.length; i++){
+            players[i].isInLobby = false;
+            players[i].isInGame = true;
+        }
         io.emit("gameStartSetup", players);
         console.log("game started")
 
@@ -61,9 +65,9 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
-            io.emit("clearDraftingPopUp");
             if (activePlayer.draftingHand.length == 0){
                 // !!!!!!! proceed to sales
+                io.emit("clearDraftingPopUp");
                 console.log("All cards drafted; ready for sales.");
             }
 
@@ -147,6 +151,8 @@ function makePlayer(userID, name, color){
     let numCrops = 0;
     let numTrinkets = 0;
     let isReady = false;
+    let isInLobby = true;
+    let isInGame = false;
 
     const setNeighbors = () => {
         neighbors.push(players[(playerNum+1)%players.length]);
@@ -178,7 +184,7 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighbors, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, setNeighbors, buyCard, scoreTableau}
+    return {userID, name, color, playerNum, neighbors, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, isInLobby, isInGame, setNeighbors, buyCard, scoreTableau}
 }
 
 ////// UNIMPLEMENTED GAME LOGIC

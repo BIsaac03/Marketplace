@@ -47,8 +47,6 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor, isMe){
 }
 
 let myPlayerNum = undefined;
-let inLobby = false;
-let inGame = false;
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
@@ -88,8 +86,8 @@ socket.on("nameTaken", (duplicateName) => {
     alert("The name \""+duplicateName+"\" is already being used by another player!");
 })
 
-socket.on("joinedLobby", () => {
-    inLobby = true;
+socket.on("joinedLobby", (player) => {
+    console.log(player.isInLobby)
     const startGameButton = document.createElement("button");
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
@@ -102,20 +100,29 @@ socket.on("joinedLobby", () => {
     joinGameButton.value = "Update"
 })
 
-socket.on("returningPlayer", (returningPlayer) => {
-    const startGameButton = document.createElement("button");
-    startGameButton.id = "startGame";
-    startGameButton.textContent = "Start Game"
-    startGameButton.addEventListener("click", () => {
-        if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
-            socket.emit("startGame");
-        }
-    })
-    bodyElement.appendChild(startGameButton);
-    
+socket.on("returningPlayer", (returningPlayer, players) => {
     console.log(returningPlayer.name + " has returned!")
-    const joinGameButton = document.getElementsByClassName("joinGame")[0];
-    joinGameButton.value = "Update"
+    console.log(returningPlayer)
+    if (returningPlayer.isInLobby){
+        const startGameButton = document.createElement("button");
+        startGameButton.id = "startGame";
+        startGameButton.textContent = "Start Game"
+        startGameButton.addEventListener("click", () => {
+            if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
+                socket.emit("startGame");
+            }
+        })
+        bodyElement.appendChild(startGameButton);
+        
+        const joinGameButton = document.getElementsByClassName("joinGame")[0];
+        joinGameButton.value = "Update"
+    }
+    
+    else if (returningPlayer.isInGame){
+        bodyElement.innerHTML = "";
+        displayDraft(returningPlayer.draftingHand);
+        displayTableaus(players);
+    }
 })
 
 // modifies list of players in lobby
@@ -131,13 +138,48 @@ socket.on("playerJoined", (PlayerID, newPlayerName, newPlayerColor) => {
 
 
 socket.on("gameStartSetup", (players) => {
-    inLobby = false;
-    inGame = true;
     const userID = readCookieValue("userID");
     const thisPlayer = players.find(player => player.userID == userID);
     myPlayerNum = thisPlayer.playerNum;
 
     bodyElement.innerHTML = "";
+    displayTableaus(players);
+})
+
+
+/////// GAME LOGIC
+socket.on("nextDraftRound", (players) => {
+    displayDraft(players[myPlayerNum].draftingHand);
+})
+
+socket.on("clearDraftingPopUp", clearDraftingPopUp())
+
+socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
+    if (myPlayerNum == vendorNum){
+        let goodToSell = prompt("What good do you want to sell?");
+        while(!cardsInReserve.some(good => good.name == goodToSell)){
+            goodToSell = prompt("You have not reserved this good. Enter a good you can sell.");
+        }
+        let salePrice = prompt("How many coins do you want to sell your "+goodToSell+" for?")
+        socket.emit("sellGood", goodToSell, salePrice);
+    }
+})
+
+socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
+    if (myPlayerNum != vendorNum){
+        // !!!!!!!!!! good should be displayed during sale
+
+        choice = prompt("Do you want to pay " + price + " coins for " + goodToBuy + "? Otherwise, you will gain " + price + " coins.")
+        if (choice == "y"){
+            socket.emit("saleResult", "card");
+        }
+        else{
+            socket.emit("saleResult", "coins");
+        }
+    }
+})
+
+function displayTableaus(players){
     let opponentDisplay = document.createElement("div");
     for (let i = 0; i < players.length; i++){
         let player = document.createElement("div");
@@ -178,60 +220,32 @@ socket.on("gameStartSetup", (players) => {
         }
     }
     bodyElement.appendChild(opponentDisplay);
-})
+}
 
 
-/////// GAME LOGIC
-socket.on("nextDraftRound", (players) => {
-    const cardsToChooseFrom = players[myPlayerNum].draftingHand;
+/////// DISPLAY UPDATES
+function displayDraft(draftingHand){
+    clearDraftingPopUp();
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
-    for (let i = 0; i < cardsToChooseFrom.length; i++){
+    for (let i = 0; i < draftingHand.length; i++){
         const draftingOption = document.createElement("img");
         draftingOption.classList.add("draftingOption", "good");
-        draftingOption.src = cardsToChooseFrom[i].image;
+        draftingOption.src = draftingHand[i].image;
         draftingOption.addEventListener("click", () => {
             socket.emit("draftedCard", myPlayerNum, i);
         })
         draftingPopUp.appendChild(draftingOption);
     }
     bodyElement.appendChild(draftingPopUp)
-})
+}
 
-socket.on("clearDraftingPopUp", () => {
+function clearDraftingPopUp() {
+    console.log("cleared")
     const draftingPopUp = document.getElementById("draftingPopUp");
-    draftingPopUp.remove();
-})
-
-socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
-    if (myPlayerNum == vendorNum){
-        let goodToSell = prompt("What good do you want to sell?");
-        while(!cardsInReserve.some(good => good.name == goodToSell)){
-            goodToSell = prompt("You have not reserved this good. Enter a good you can sell.");
-        }
-        let salePrice = prompt("How many coins do you want to sell your "+goodToSell+" for?")
-        socket.emit("sellGood", goodToSell, salePrice);
+    if (draftingPopUp != undefined){
+        draftingPopUp.remove();
     }
-})
-
-socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
-    if (myPlayerNum != vendorNum){
-        // !!!!!!!!!! good should be displayed during sale
-
-        choice = prompt("Do you want to pay " + price + " coins for " + goodToBuy + "? Otherwise, you will gain " + price + " coins.")
-        if (choice == "y"){
-            socket.emit("saleResult", "card");
-        }
-        else{
-            socket.emit("saleResult", "coins");
-        }
-    }
-})
-
-
-/////// DISPLAY UPDATES
-function updateDraft(cardsToDraft){
-
 }
 
 function updateReserve(thisPlayer){
