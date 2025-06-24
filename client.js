@@ -119,6 +119,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
     }
     
     else if (returningPlayer.isInGame){
+        myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         displayDraft(returningPlayer.draftingHand);
         displayTableaus(players);
@@ -152,7 +153,9 @@ socket.on("nextDraftRound", (players) => {
     displayDraft(players[myPlayerNum].draftingHand);
 })
 
-socket.on("clearDraftingPopUp", clearDraftingPopUp())
+socket.on("clearDraftingPopUp", () => {
+    clearDraftingPopUp();
+})
 
 socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
     if (myPlayerNum == vendorNum){
