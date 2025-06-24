@@ -5,8 +5,9 @@
 
 body{
     display: grid;
-    grid-template-rows: repeat("auto", 4);
+    grid-template-rows: repeat(4, "auto");
     gap: 30px;
+    width: 100%;
 }
 
 .header{
@@ -117,4 +118,39 @@ ul#playerList{
 
 .trinkets{
     background-color: rgba(143,168,181,0.4);
+}
+
+#draftingPopUp{
+    position: absolute;
+    justify-self: center;
+    display: flex;
+    gap: 75px;
+    padding: 25px;
+    margin-top: 150px;
+    backdrop-filter: blur(0.3);
+    background-color: rgba(182, 126, 126, 0.4);
+}
+
+#reserve{
+    position: fixed;
+    top: 75vh;
+    left: 2vh;
+    width: 300px;
+    padding: 75px;
+}
+
+#reserve img.icon{
+    position: absolute;
+    width: 100px;
+    z-index: 5;
+}
+
+#reserve img.icon.reserved1{
+    transform: rotate(8deg) translateX(50px) translateY(-5px);
+    z-index: 3;
+}
+
+#reserve img.icon.reserved2{
+    transform: rotate(-8deg) translateX(-50px) translateY(-5px);
+    z-index: 1;
 }
