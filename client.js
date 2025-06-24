@@ -87,7 +87,6 @@ socket.on("nameTaken", (duplicateName) => {
 })
 
 socket.on("joinedLobby", (player) => {
-    console.log(player.isInLobby)
     const startGameButton = document.createElement("button");
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
@@ -102,8 +101,7 @@ socket.on("joinedLobby", (player) => {
 
 socket.on("returningPlayer", (returningPlayer, players) => {
     console.log(returningPlayer.name + " has returned!")
-    console.log(returningPlayer)
-    if (returningPlayer.isInLobby){
+    if (!returningPlayer.isInGame){
         const startGameButton = document.createElement("button");
         startGameButton.id = "startGame";
         startGameButton.textContent = "Start Game"
@@ -118,11 +116,15 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         joinGameButton.value = "Update"
     }
     
-    else if (returningPlayer.isInGame){
+    else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         displayDraft(returningPlayer.draftingHand);
-        displayReserve(returningPlayer.reserve)
+        displayReserve(returningPlayer.reserve);
+        if (returningPlayer.choice == ""){
+            const vendor = players.find(player => player.isVendor == true); 
+            displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
+        }        
         displayTableaus(players);
     }
 })
@@ -154,41 +156,32 @@ socket.on("nextDraftRound", (players) => {
     displayDraft(players[myPlayerNum].draftingHand);
 })
 
-socket.on("clearDraftingPopUp", () => {
-    clearDraftingPopUp();
-})
-
 socket.on("displayReserve", (players) => {
+    clearDraftingPopUp();
     displayReserve(players[myPlayerNum].reserve);
 })
 
 socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
     if (myPlayerNum == vendorNum){
-        let goodToSell = prompt("What good do you want to sell?");
-        while(!cardsInReserve.some(good => good.name == goodToSell)){
-            goodToSell = prompt("You have not reserved this good. Enter a good you can sell.");
+        let nameOfGood = prompt("What good do you want to sell?");
+        while(!cardsInReserve.some(good => good.name == nameOfGood)){
+            nameOfGood = prompt("You have not reserved this good. Enter a good you can sell.");
         }
-        let salePrice = prompt("How many coins do you want to sell your "+goodToSell+" for?")
-        socket.emit("sellGood", goodToSell, salePrice);
+        let salePrice = prompt("How many coins do you want to sell your "+nameOfGood+" for?");
+        const goodToSell = cardsInReserve.find(good => good.name == nameOfGood);
+        socket.emit("sellGood", goodToSell, salePrice, vendorNum);
     }
 })
 
-socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
+socket.on("resolveSale", (goodForSale, price, vendorNum) => {
     if (myPlayerNum != vendorNum){
-        // !!!!!!!!!! good should be displayed during sale
-
-        choice = prompt("Do you want to pay " + price + " coins for " + goodToBuy + "? Otherwise, you will gain " + price + " coins.")
-        if (choice == "y"){
-            socket.emit("saleResult", "card");
-        }
-        else{
-            socket.emit("saleResult", "coins");
-        }
+        displayGoodSale(goodForSale, price, vendorNum);
     }
 })
 
 function displayTableaus(players){
     let opponentDisplay = document.createElement("div");
+    opponentDisplay.id = "opponentDisplay";
     for (let i = 0; i < players.length; i++){
         let player = document.createElement("div");
         player.id = "player"+players[i].playerNum;
@@ -205,6 +198,7 @@ function displayTableaus(players){
         stats.appendChild(VP);
 
         let tableau = document.createElement("div");
+        tableau.classList.add("tableau")
         let fruits = document.createElement("div");
         fruits.classList.add("fruits");
         tableau.appendChild(fruits);
@@ -249,7 +243,6 @@ function displayDraft(draftingHand){
 }
 
 function clearDraftingPopUp() {
-    console.log("cleared")
     const draftingPopUp = document.getElementById("draftingPopUp");
     if (draftingPopUp != undefined){
         draftingPopUp.remove();
@@ -267,7 +260,7 @@ function displayReserve(reserve){
     for (let i = 0; i < reserve.length; i++){
         const reservedCard = document.createElement("img");
         reservedCard.src = reserve[i].image;
-        reservedCard.classList.add(reserve[i].name, "icon", "reserved"+i)
+        reservedCard.classList.add("icon", "reserved"+i)
         reservedCard.addEventListener("click", () => {
             viewDetailedReservedCards(reserve, shouldEnlarge);
             shouldEnlarge = !shouldEnlarge;
@@ -296,8 +289,39 @@ function viewDetailedReservedCards(reserve, shouldEnlarge){
     }
 }
 
-function updateCurrentOffer(){
+function displayGoodSale(goodForSale, price, vendorNum){
+    const currentOffer = document.createElement("div");
+    currentOffer.id = "currentOffer";
 
+    const good = document.createElement("img");
+    good.src = goodForSale.image;
+    good.classList.add("goodForSale");
+    currentOffer.appendChild(good);
+
+    const salePrice = document.createElement("p");
+    salePrice.textContent = price;
+    salePrice.classList.add("goodPrice");
+    currentOffer.appendChild(salePrice);
+   
+    const chooseBuy = document.createElement("button");
+    chooseBuy.textContent = "Buy"
+    chooseBuy.id = "chooseBuy";
+    chooseBuy.addEventListener("click", () => {
+        socket.emit("saleResult", "buy", goodForSale, price, vendorNum);
+        currentOffer.remove();
+    })
+    currentOffer.appendChild(chooseBuy);
+
+    const chooseInvest = document.createElement("button");
+    chooseInvest.textContent = "Invest"
+    chooseInvest.id = "chooseInvest";
+    chooseInvest.addEventListener("click", () => {
+        socket.emit("saleResult", "invest", goodForSale, price, vendorNum);
+        currentOffer.remove();
+    })
+    currentOffer.appendChild(chooseInvest);
+
+    bodyElement.appendChild(currentOffer);
 }
 
 function updateTableaus(){
