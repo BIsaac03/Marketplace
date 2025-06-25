@@ -8,6 +8,7 @@ body{
     grid-template-rows: repeat(4, "auto");
     gap: 30px;
     width: 100%;
+    height: 100vh;
 }
 
 .header{
@@ -89,12 +90,14 @@ ul#playerList{
 
 
 .myself{
-    width: 800px;
-    height: 500px;
+    position: fixed;
+    top: 40vh;
+    left: 30vh;
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-rows: auto 1fr;
 }
-
 .myself .stats{
     background-color: rgb(230, 230, 230);
     font-size: 40px;
@@ -103,20 +106,32 @@ ul#playerList{
     justify-content: center;
 }
 
+#opponentDisplay{
+    display: flex;
+    gap: 30px;
+    justify-self: center;
+
+}
+
 .tableau{
     display: grid;
     grid-template-columns: repeat(3, auto);
 }
-
-.fruits{
+.tableau div{
+    display: grid;
+    grid-template-columns: repeat(min(3, autofill), 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 40px;
+    width: 100%;
+    height: 100%;
+}
+.tableau .fruits{
     background-color: rgba(234,192,160,0.4);
 }
-
-.crops{
+.tableau .crops{
     background-color: rgba(207,139,77, 0.4);
 }
-
-.trinkets{
+.tableau .trinkets{
     background-color: rgba(143,168,181,0.4);
 }
 
@@ -138,19 +153,62 @@ ul#playerList{
     width: 300px;
     padding: 75px;
 }
-
 #reserve img.icon{
     position: absolute;
     width: 100px;
-    z-index: 5;
-}
-
-#reserve img.icon.reserved1{
-    transform: rotate(8deg) translateX(50px) translateY(-5px);
     z-index: 3;
 }
-
 #reserve img.icon.reserved2{
+    transform: rotate(8deg) translateX(50px) translateY(-5px);
+    z-index: 2;
+}
+#reserve img.icon.reserved0{
     transform: rotate(-8deg) translateX(-50px) translateY(-5px);
     z-index: 1;
+}
+#detailedReserve{
+    position: absolute;
+    justify-self: center;
+    display: flex;
+    gap: 75px;
+    padding: 25px;
+    margin-top: 150px;
+    backdrop-filter: blur(0.3);
+    background-color: rgba(182, 126, 126, 0.4);
+}
+
+#currentOffer{
+    justify-self: center;
+    display: grid;
+    grid-template: auto auto auto / auto auto;
+    gap: 20px;
+    justify-items: center;
+}
+#currentOffer .goodForSale{
+    grid-area: 1 / 1 / 2 / 3;
+}
+#currentOffer .goodPrice{
+    grid-area: 2 / 1 / 3 / 3;
+    font-size: 30px;
+    font-weight: bold;
+}
+#currentOffer button{
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+#chooseBuy.Fruit{
+    background-color: rgb(234,192,160);
+}
+#chooseBuy.Crop{
+    background-color: rgb(207,139,77);
+}
+#chooseBuy.Trinket{
+    background-color: rgb(143,168,181);
+}
+#chooseInvest{
+    grid-area: 3 / 1 / 4 / 2;
+    background-color: rgb(196, 180, 92);
+    background-color: rgb(235, 210, 74);;
 }
