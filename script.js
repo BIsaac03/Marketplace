@@ -90,13 +90,12 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("sellGood", (goodToSell, salePrice, vendorNum) => {
-        console.log(players[vendorNum].name+" is selling "+goodToSell.name);
+    socket.on("sellGood", (goodIndex, salePrice, vendorNum) => {
         for(let i = 0; i < players.length; i++){
             players[i].choice = "";
         }
-        players[vendorNum].choice = [goodToSell, salePrice];
-        socket.broadcast.emit("resolveSale", goodToSell, salePrice, vendorNum)
+        players[vendorNum].choice = [goodIndex, salePrice];
+        socket.broadcast.emit("resolveSale", players[vendorNum].reserve[goodIndex], salePrice, vendorNum)
     })
 
     socket.on("saleResult", (choice, goodForSale, price, vendorNum) => {

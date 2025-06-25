@@ -123,7 +123,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         displayReserve(returningPlayer.reserve);
         if (returningPlayer.choice == ""){
             const vendor = players.find(player => player.isVendor == true); 
-            displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
+            displayGoodSale(vendor.reserve[vendor.choice[0]], vendor.choice[1], vendor.playerNum)
         }        
         displayTableaus(players);
     }
@@ -161,15 +161,9 @@ socket.on("displayReserve", (players) => {
     displayReserve(players[myPlayerNum].reserve);
 })
 
-socket.on("setSaleTerms", (cardsInReserve, vendorNum) => {
+socket.on("setSaleTerms", (reserve, vendorNum) => {
     if (myPlayerNum == vendorNum){
-        let nameOfGood = prompt("What good do you want to sell?");
-        while(!cardsInReserve.some(good => good.name == nameOfGood)){
-            nameOfGood = prompt("You have not reserved this good. Enter a good you can sell.");
-        }
-        let salePrice = prompt("How many coins do you want to sell your "+nameOfGood+" for?");
-        const goodToSell = cardsInReserve.find(good => good.name == nameOfGood);
-        socket.emit("sellGood", goodToSell, salePrice, vendorNum);
+        viewDetailedReservedCards(reserve, true, true);
     }
 })
 
@@ -262,7 +256,7 @@ function displayReserve(reserve){
         reservedCard.src = reserve[i].image;
         reservedCard.classList.add("icon", "reserved"+i)
         reservedCard.addEventListener("click", () => {
-            viewDetailedReservedCards(reserve, shouldEnlarge);
+            viewDetailedReservedCards(reserve, shouldEnlarge, false);
             shouldEnlarge = !shouldEnlarge;
         })
         reserveDOM.appendChild(reservedCard);
@@ -271,7 +265,7 @@ function displayReserve(reserve){
     bodyElement.appendChild(reserveDOM);
 }
 
-function viewDetailedReservedCards(reserve, shouldEnlarge){
+function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
     if (shouldEnlarge){
         const detailedReserveView = document.createElement("div");
         detailedReserveView.id = "detailedReserve";
@@ -279,6 +273,13 @@ function viewDetailedReservedCards(reserve, shouldEnlarge){
             const reservedCard = document.createElement("img");
             reservedCard.src = reserve[i].image;
             reservedCard.classList.add(reserve[i].name, "reserved"+i)
+            if (canInteract){
+                reservedCard.addEventListener("click", () => { 
+                    let salePrice = prompt("How many coins do you want to sell your good for?");
+                    socket.emit("sellGood", i, salePrice, myPlayerNum);
+                    viewDetailedReservedCards(reserve, false, false);
+                })
+            }
             detailedReserveView.appendChild(reservedCard);
         }
         bodyElement.appendChild(detailedReserveView);
@@ -306,6 +307,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
     const chooseBuy = document.createElement("button");
     chooseBuy.textContent = "Buy"
     chooseBuy.id = "chooseBuy";
+    chooseBuy.classList.add(goodForSale.type)
     chooseBuy.addEventListener("click", () => {
         socket.emit("saleResult", "buy", goodForSale, price, vendorNum);
         currentOffer.remove();

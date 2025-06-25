@@ -5,7 +5,7 @@
 
 body{
     display: grid;
-    grid-template-rows: repeat(4, "auto");
+    grid-template-rows: repeat(4, auto);
     gap: 30px;
     width: 100%;
     height: 100vh;
@@ -18,8 +18,8 @@ body{
 
 #lobby{
     display: grid;
+    gap: 75px;
     grid-template-columns: 1fr 1fr;
-
 }
 
 .title{
@@ -31,30 +31,27 @@ body{
 form.playerCustomization{
     display: grid;
     grid-template: repeat("auto", 3) / auto auto;
+    width: 100%;
     gap: 20px;
-    justify-content: center;
+    justify-content: right;
 }
-
 form.playerCustomization label{
     font-weight: bold;
     font-size: 40px;
     padding-left: 10px;
     grid-area: 1 / 1 / 2 / 3;
 }
-
 form.playerCustomization input.playerName{
     font-size: 30px;
     border-radius: 15px;
     padding-left: 10px;
     grid-area: 2 / 1 / 3 / 2;
 }
-
 form.playerCustomization input.colorSelect{
     width: 50px;
     height: 50px;
     grid-area: 2 / 2 / 3 / 3;
 }
-
 form.playerCustomization input.joinGame{
     width: 300px;
     height: 75px;
@@ -64,6 +61,16 @@ form.playerCustomization input.joinGame{
     grid-area: 3 / 1 / 4 / 3;
     margin-top: 20px;
 }
+#startGame{
+    justify-self: center;
+    width: 500px;
+    height: 100px;
+    background-color: black;
+    color: white;
+    font-size: 50px;
+    font-weight: bold;;
+    border-radius: 10px;
+}
 
 ul#playerList{
     list-style-type: none;
@@ -71,23 +78,18 @@ ul#playerList{
     display: flex;
     flex-direction: column;
     gap: 10px;
-    justify-content: center;
+    justify-content: left;
 }
-
 #playerList .player{
     display: flex;
     align-items: center;
     gap: 20px;
     font-size: 30px;
 }
-
 #playerList .player .playerColor{
     width: 50px;
     height: 50px;
 }
-
-
-
 
 .myself{
     position: fixed;
@@ -105,7 +107,6 @@ ul#playerList{
     display: flex;
     justify-content: center;
 }
-
 #opponentDisplay{
     display: flex;
     gap: 30px;
@@ -173,7 +174,7 @@ ul#playerList{
     gap: 75px;
     padding: 25px;
     margin-top: 150px;
-    backdrop-filter: blur(0.3);
+    backdrop-filter: blur(0.9);
     background-color: rgba(182, 126, 126, 0.4);
 }
 
@@ -210,5 +211,5 @@ ul#playerList{
 #chooseInvest{
     grid-area: 3 / 1 / 4 / 2;
     background-color: rgb(196, 180, 92);
-    background-color: rgb(235, 210, 74);;
+    background-color: rgb(235, 210, 74);
 }
