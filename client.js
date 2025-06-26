@@ -121,11 +121,21 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         bodyElement.innerHTML = "";
         displayDraft(returningPlayer.draftingHand);
         displayReserve(returningPlayer.reserve);
-        if (returningPlayer.choice == ""){
-            const vendor = players.find(player => player.isVendor == true); 
-            displayGoodSale(vendor.reserve[vendor.choice[0]], vendor.choice[1], vendor.playerNum)
-        }        
-        displayTableaus(players);
+        const vendor = players.find(player => player.isVendor == true);
+        if (returningPlayer == vendor){
+            if (returningPlayer.isReady == false){
+                viewDetailedReservedCards(returningPlayer.reserve, true, true)
+            }
+        } 
+        else{
+            if (vendor.isReady == true && returningPlayer.choice.length == 0){
+                displayGoodSale(vendor.reserve[vendor.choice[0]], vendor.choice[1], vendor.playerNum)
+            }   
+        }
+             
+
+        // !!!!!!!!!!! should ensure duplicate tableaus are not created
+        createTableaus(players);
     }
 })
 
@@ -147,7 +157,7 @@ socket.on("gameStartSetup", (players) => {
     myPlayerNum = thisPlayer.playerNum;
 
     bodyElement.innerHTML = "";
-    displayTableaus(players);
+    createTableaus(players);
 })
 
 
@@ -167,13 +177,22 @@ socket.on("setSaleTerms", (reserve, vendorNum) => {
     }
 })
 
-socket.on("resolveSale", (goodForSale, price, vendorNum) => {
+socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
     if (myPlayerNum != vendorNum){
-        displayGoodSale(goodForSale, price, vendorNum);
+        displayGoodSale(goodToBuy, price, vendorNum);
     }
 })
 
-function displayTableaus(players){
+socket.on("roundUpdate", (goodForSale, players) => {
+    displayReserve(players[myPlayerNum].reserve);
+    updateStats(players);
+    for(let i = 0; i < players.length; i++){
+        addToTableau(goodForSale, i);
+    }
+})
+
+
+function createTableaus(players){
     let opponentDisplay = document.createElement("div");
     opponentDisplay.id = "opponentDisplay";
     for (let i = 0; i < players.length; i++){
@@ -194,13 +213,13 @@ function displayTableaus(players){
         let tableau = document.createElement("div");
         tableau.classList.add("tableau")
         let fruits = document.createElement("div");
-        fruits.classList.add("fruits");
+        fruits.classList.add("Fruits");
         tableau.appendChild(fruits);
         let crops = document.createElement("div");
-        crops.classList.add("crops");
+        crops.classList.add("Crops");
         tableau.appendChild(crops);
         let trinkets = document.createElement("div");
-        trinkets.classList.add("trinkets");
+        trinkets.classList.add("Trinkets");
         tableau.appendChild(trinkets);
 
         player.appendChild(stats);
@@ -249,6 +268,7 @@ function displayReserve(reserve){
     if (reserveDOM == undefined){
         reserveDOM = document.createElement("div");
         reserveDOM.id = "reserve";
+        bodyElement.appendChild(reserveDOM);
     }
     reserveDOM.innerHTML = ""
     for (let i = 0; i < reserve.length; i++){
@@ -261,8 +281,6 @@ function displayReserve(reserve){
         })
         reserveDOM.appendChild(reservedCard);
     }
-    
-    bodyElement.appendChild(reserveDOM);
 }
 
 function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
@@ -272,15 +290,34 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
         for (let i = 0; i < reserve.length; i++){
             const reservedCard = document.createElement("img");
             reservedCard.src = reserve[i].image;
-            reservedCard.classList.add(reserve[i].name, "reserved"+i)
+            reservedCard.classList.add(i, "reserved")
             if (canInteract){
-                reservedCard.addEventListener("click", () => { 
-                    let salePrice = prompt("How many coins do you want to sell your good for?");
-                    socket.emit("sellGood", i, salePrice, myPlayerNum);
-                    viewDetailedReservedCards(reserve, false, false);
+                reservedCard.addEventListener("click", () => {
+                    reservedCard.id = "selectedToSell"; 
                 })
             }
             detailedReserveView.appendChild(reservedCard);
+        }
+
+        if (canInteract){
+            const setPrice = document.createElement("input")
+            setPrice.type = "text";
+            setPrice.id = "setPrice"
+            detailedReserveView.appendChild(setPrice);
+    
+            const confirmSale = document.createElement("button");
+            confirmSale.textContent = "Confirm Sale";
+            confirmSale.id = "confirmSale";
+            confirmSale.addEventListener("click", () => {
+                //  NEEDS TO ACTUALLY SELECT GOOD TO SELL
+                const goodForSaleDOM = document.getElementById("selectedToSell");
+                const indexofGoodForSale = goodForSaleDOM.classList[0]
+                if (goodForSaleDOM != undefined && setPrice.value != ""){
+                    socket.emit("sellGood", reserve[indexofGoodForSale], setPrice.value, myPlayerNum);
+                    detailedReserveView.remove();
+                }
+            })
+            detailedReserveView.appendChild(confirmSale);
         }
         bodyElement.appendChild(detailedReserveView);
     }
@@ -309,7 +346,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseBuy.id = "chooseBuy";
     chooseBuy.classList.add(goodForSale.type)
     chooseBuy.addEventListener("click", () => {
-        socket.emit("saleResult", "buy", goodForSale, price, vendorNum);
+        socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum);
         currentOffer.remove();
     })
     currentOffer.appendChild(chooseBuy);
@@ -318,7 +355,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseInvest.textContent = "Invest"
     chooseInvest.id = "chooseInvest";
     chooseInvest.addEventListener("click", () => {
-        socket.emit("saleResult", "invest", goodForSale, price, vendorNum);
+        socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum);
         currentOffer.remove();
     })
     currentOffer.appendChild(chooseInvest);
@@ -326,34 +363,35 @@ function displayGoodSale(goodForSale, price, vendorNum){
     bodyElement.appendChild(currentOffer);
 }
 
-function updateTableaus(){
+function addToTableau(purchasedGood, playerNum){
+    const newGood = document.createElement("img");
+    newGood.src = purchasedGood.image;
+    newGood.classList.add("good");
 
+    const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
+    tableauSection.appendChild(newGood);
+    console.log(tableauSection)
+    console.log(newGood)
 }
 
-function updateCoins(players){
+function updateStats(players){
     for (let i = 0; i < players.length; i++){
         const displayedCoins = document.querySelector(`#player${i} .coins`);
         displayedCoins.textContent = players[i].numCoins;
+        const displayedWorkers = document.querySelector(`#player${i} .workers`);
+        displayedWorkers.textContent = players[i].numWorkers;
+        const displayedScore = document.querySelector(`#player${i} .VP`);
+        displayedScore.textContent = players[i].VP;
     }
 }
 
 function updateActivePlayer(){
 
 }
-
-function updateScores(players){
-    for (let i = 0; i < players.length; i++){
-        const displayedScore = document.querySelector(`#player${i} .VP`);
-        displayedScore.textContent = players[i].VP;
-    }
-}
-
 function fullUpdate(players, thisPlayer){
     updateDraft(cardsToDraft);
     updateReserve(thisPlayer);
     updateCurrentOffer();
     updateTableaus(players);
-    updateCoins(players);
-    updateActivePlayer();
-    updateScores(players);
+    updateStats(players);
 }

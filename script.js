@@ -83,44 +83,69 @@ io.on("connection", (socket) => {
                 }
                 io.emit("nextDraftRound", players);
             }
-
-            for (let i = 0; i < players.length; i++){
-                players[i].isReady = false;
-            }
+            resetPlayerStates();
         }
     })
 
-    socket.on("sellGood", (goodIndex, salePrice, vendorNum) => {
+    socket.on("sellGood", (goodToBuy, salePrice, vendorNum) => {
         for(let i = 0; i < players.length; i++){
-            players[i].choice = "";
+            players[i].choice.length = 0;
         }
-        players[vendorNum].choice = [goodIndex, salePrice];
-        socket.broadcast.emit("resolveSale", players[vendorNum].reserve[goodIndex], salePrice, vendorNum)
+        players[vendorNum].choice = [goodToBuy, salePrice];
+        players[vendorNum].isReady = true;
+        socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum)
     })
 
-    socket.on("saleResult", (choice, goodForSale, price, vendorNum) => {
+    socket.on("saleResult", (choice, myPlayerNum, goodForSale, price, vendorNum) => {
+        players[myPlayerNum].isReady = true;
         if (choice == "buy"){
-        
+            players[myPlayerNum].choice.push("buy");
         }
         else if (choice == "invest"){
+            players[myPlayerNum].choice.push("invest");
+        }
+
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
+            for (let i = 0; i < players.length; i++){
+                if (players[i].choice[0] == "buy"){                  
+                    if (players[i].coins >= price){
+                        players[i].coins -= price;
+                        players[i].tableau.append(goodForSale);
+                    }
         
-        }
-        // !!!!!!!!! resolve vendor "choice"
+                    // !!!!!!!!!!! cannot afford card
+                    else{
 
-        // move vendor
-        players[vendorNum].isVendor = false;
-        if (vendorNum == players.length-1){
-            players[0].isVendor = true;
-        }
-        else{
-            players[vendorNum+1].isVendor = true;
-        }
+                    }
+                }
+                
+                else if (choice == "invest"){
+                    players[i].coins += price;
+                }
+            }
+            
+            const indexOfSoldGood = players[vendorNum].reserve.indexOf(goodForSale);
+            players[vendorNum].reserve.splice(indexOfSoldGood, 1);
+            io.emit("roundUpdate", goodForSale, players);
+            resetPlayerStates();
 
-        const vendor = players.find(player => player.isVendor == true);
-        if (vendor.reserve.length > 0){
-            io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
+            // moves vendor
+            players[vendorNum].isVendor = false;
+            if (vendorNum == players.length-1){
+                players[0].isVendor = true;
+            }
+            else{
+                players[vendorNum+1].isVendor = true;
+            }
+            const vendor = players.find(player => player.isVendor == true);
+            if (vendor.reserve.length > 0){
+                io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
+            }
         }
     })    
+
+
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);
@@ -137,7 +162,13 @@ let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
 
 
-// game-state functions
+function resetPlayerStates() {
+    for (let i = 0; i < players.length; i++){
+        players[i].isReady = false;
+        players[i].choice.length = 0;
+    } 
+}
+
 function createDraftingDeck(numPlayers){
     let deck = [];
     for (let i = 0; i < numPlayers; i++){
@@ -208,55 +239,12 @@ function makePlayer(userID, name, color){
     return {userID, name, color, playerNum, neighbors, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighbors, buyCard, scoreTableau}
 }
 
-////// UNIMPLEMENTED GAME LOGIC
-function performSale(vendor){
-
-    // !!! CURRENTLY SELLS RANDOMLY !!!
-    let cardToSell = vendor.reserve.splice(Math.floor(Math.random()*(vendor.reserve.length)), 1)[0];
-    let sellingPrice = Math.floor(Math.random()*(10))
-    let vendorAction = 0;
-
-    // resolve choices
-    for (let i = 0; i < players.length; i++){
-        if (players[i] != vendor){
-            players[i].choice = prompt("Choose: Gain " + sellingPrice + " coins, or buy " + cardToSell.name + " for " + sellingPrice + " coins.");
-            if(players[i].choice === "coins"){
-                players[i].numCoins += sellingPrice;
-                vendorAction++;
-            }
-            else if (players[i].choice === "card"){
-                players[i].buyCard(cardToSell, sellingPrice);
-                vendorAction--;
-            }
-            players[i].choice = "";
-        }
-    }
-
-    // resolve vendor action
-    if (vendorAction > 0){
-        vendor.numCoins += sellingPrice;
-    }
-    else if (vendorAction < 0){
-        vendor.buyCard(cardToSell, sellingPrice);
-    }
-    else{
-        vendor.choice = prompt("Choose: Gain " + sellingPrice + " coins, or buy " + cardToSell.name + " for " + sellingPrice + " coins.");
-        if(vendor.choice === "coins"){
-            vendor.numCoins += sellingPrice;
-        }
-        else if (vendor.choice === "card"){
-            vendor.buyCard(cardToSell, sellingPrice);
-        }
-        vendor.choice = "";
-    }
-}
-
 function gameSetUp(){
     for (let i = 0; i < players.length; i++){
         players[i].setNeighbors();
     }
 }
-
+/////////////////////////////
 function playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, scoreModifier, isFinalRound){
     let deck = [];
     for (let i = 0; i < players.length; i++){
