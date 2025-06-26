@@ -183,14 +183,14 @@ socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
     }
 })
 
-socket.on("roundUpdate", (goodForSale, players) => {
+socket.on("roundUpdate", (players) => {
     displayReserve(players[myPlayerNum].reserve);
     updateStats(players);
-    for(let i = 0; i < players.length; i++){
-        addToTableau(goodForSale, i);
-    }
 })
 
+socket.on("goodPurchased", (purchasedGood, playerNum) => {
+    addToTableau(purchasedGood, playerNum)
+})
 
 function createTableaus(players){
     let opponentDisplay = document.createElement("div");
@@ -370,8 +370,6 @@ function addToTableau(purchasedGood, playerNum){
 
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);
-    console.log(tableauSection)
-    console.log(newGood)
 }
 
 function updateStats(players){

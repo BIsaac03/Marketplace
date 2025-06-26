@@ -113,6 +113,9 @@ ul#playerList{
     justify-self: center;
 
 }
+#opponentDisplay .good{
+    width: 100px;
+}
 
 .tableau{
     display: grid;

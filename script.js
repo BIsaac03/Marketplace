@@ -49,11 +49,7 @@ io.on("connection", (socket) => {
             players[i].isInGame = true;
         }
         io.emit("gameStartSetup", players);
-        console.log("game started")
-
-        let draftingDeck = createDraftingDeck(players.length);
-        createDraftingHands(draftingDeck);
-        io.emit("nextDraftRound", players);
+        newRound();
     })
 
     socket.on("draftedCard", (myPlayerNum, cardChoice) => {
@@ -97,6 +93,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("saleResult", (choice, myPlayerNum, goodForSale, price, vendorNum) => {
+        // preserve users' choices
         players[myPlayerNum].isReady = true;
         if (choice == "buy"){
             players[myPlayerNum].choice.push("buy");
@@ -107,11 +104,13 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
+            // apply users' choices
             for (let i = 0; i < players.length; i++){
-                if (players[i].choice[0] == "buy"){                  
-                    if (players[i].coins >= price){
-                        players[i].coins -= price;
-                        players[i].tableau.append(goodForSale);
+                if (players[i].choice[0] == "buy"){   
+                    if (players[i].numCoins >= price){
+                        players[i].numCoins -= price;
+                        players[i].tableau.push(goodForSale);
+                        io.emit("goodPurchased", goodForSale, i)
                     }
         
                     // !!!!!!!!!!! cannot afford card
@@ -121,16 +120,21 @@ io.on("connection", (socket) => {
                 }
                 
                 else if (choice == "invest"){
-                    players[i].coins += price;
+                    players[i].numCoins += price;
                 }
             }
-            
-            const indexOfSoldGood = players[vendorNum].reserve.indexOf(goodForSale);
+            for (let i = 0; i < players.length; i++){
+                players[i].isReady = false;
+            }
+            // round-end updates
+            console.log(players[vendorNum].reserve.indexOf(goodForSale))
+            console.log(players[vendorNum].reserve.findIndex(good => good == goodForSale))
+            const indexOfSoldGood = players[vendorNum].reserve.findIndex(good => good.name == goodForSale.name);
             players[vendorNum].reserve.splice(indexOfSoldGood, 1);
-            io.emit("roundUpdate", goodForSale, players);
+            io.emit("roundUpdate", players);
             resetPlayerStates();
 
-            // moves vendor
+            // proceed to next sale
             players[vendorNum].isVendor = false;
             if (vendorNum == players.length-1){
                 players[0].isVendor = true;
@@ -142,21 +146,22 @@ io.on("connection", (socket) => {
             if (vendor.reserve.length > 0){
                 io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             }
+
+            else{
+                endOfRound();
+            }
         }
     })    
-
-
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });
-        
-    
 });
 
 httpServer.listen(3000);
 
 let players = [];
+let gameRound = 0;
 let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
@@ -167,6 +172,14 @@ function resetPlayerStates() {
         players[i].isReady = false;
         players[i].choice.length = 0;
     } 
+}
+
+function newRound()
+{
+    gameRound += 1;
+    let draftingDeck = createDraftingDeck(players.length);
+    createDraftingHands(draftingDeck);
+    io.emit("nextDraftRound", players);
 }
 
 function createDraftingDeck(numPlayers){
@@ -186,6 +199,20 @@ function createDraftingHands(draftingDeck){
             let addedCard = draftingDeck.splice(Math.floor(Math.random()*(draftingDeck.length)), 1)[0];
             players[i].draftingHand.push(addedCard);
         }
+    }
+}
+
+// !!!!!!!!! should include scoring
+function endOfRound(){
+    // !!!!!!!!!!!!!! should adjust based on player count
+    let totalRounds = 3;
+
+    if (gameRound == totalRounds){
+        console.log("End of Game");
+    }
+
+    else{
+        newRound();
     }
 }
 
