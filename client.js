@@ -119,6 +119,8 @@ socket.on("returningPlayer", (returningPlayer, players) => {
     else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
+        // !!!!!!!!!!! should ensure duplicate tableaus are not created
+        createTableaus(players)
         displayDraft(returningPlayer.draftingHand);
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
@@ -134,8 +136,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         }
              
 
-        // !!!!!!!!!!! should ensure duplicate tableaus are not created
-        createTableaus(players);
+        
     }
 })
 

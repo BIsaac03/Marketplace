@@ -47,8 +47,15 @@ io.on("connection", (socket) => {
     socket.on("startGame", () => {
         for (let i = 0; i < players.length; i++){
             players[i].isInGame = true;
+            players[i].setNeighborNums;
         }
         io.emit("gameStartSetup", players);
+        if (players.length < 5){
+            totalRounds = 3;
+        }
+        else if (players.length >= 5){
+            totalRounds = 2;
+        }
         newRound();
     })
 
@@ -124,9 +131,8 @@ io.on("connection", (socket) => {
                         io.emit("goodPurchased", goodForSale, i)
                     }
         
-                    // !!!!!!!!!!! cannot afford card
                     else{
-
+                        players[i].numCoins += Math.ceil(eval(price)/2);
                     }
                 }
                 
@@ -171,6 +177,7 @@ httpServer.listen(3000);
 
 let players = [];
 let gameRound = 0;
+let totalRounds = 0;
 let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
@@ -212,10 +219,9 @@ function createDraftingHands(draftingDeck){
 }
 
 function endOfRound(){
-    // !!!!!!!!!!!!!! should adjust based on player count
-    let totalRounds = 3;
-
     if (gameRound == totalRounds){
+        // !!!!!!!!!! final crop sale
+        
         for (let i = 0; i < players.length; i++){
             players[i].scoreTableau(1);
         }
@@ -223,16 +229,19 @@ function endOfRound(){
     }
 
     else{
+        console.log("newRound")
         for (let i = 0; i < players.length; i++){
             players[i].scoreTableau(0.5);
         }
         newRound();
+        io.emit("roundUpdate", players);
+
     }
 }
 
 function makePlayer(userID, name, color){
     let playerNum = players.length;
-    let neighbors = [];
+    let neighborNums = [];
     let tableau = [];
     let draftingHand = [];
     let reserve = [];
@@ -247,12 +256,12 @@ function makePlayer(userID, name, color){
     let isInGame = false;
     let isVendor= false;
 
-    const setNeighbors = () => {
-        neighbors.push(players[(playerNum+1)%players.length]);
+    const setNeighborNums = () => {
+        neighborNums.push((playerNum+1)%players.length);
         if (playerNum != 0){
-            neighbors.push(players[playerNum-1]);
+            neighborNums.push(playerNum-1);
         }
-        else {neighbors.push(players[players.length-1])};
+        else {neighborNums.push(players.length-1)};
     }
     const buyCard = (card, cost) => {
         if (card.type === "Fruit"){
@@ -277,48 +286,5 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighbors, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighbors, buyCard, scoreTableau}
-}
-
-function gameSetUp(){
-    for (let i = 0; i < players.length; i++){
-        players[i].setNeighbors();
-    }
-}
-/////////////////////////////
-function playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, scoreModifier, isFinalRound){
-    let deck = [];
-    for (let i = 0; i < players.length; i++){
-        let randomFruit = fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0];
-        let randomCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
-        let randomTrinket = trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0];
-        deck.push(randomFruit, randomCrop, randomTrinket);
-    }
-    draftCards(deck);
-    for (let i = 0; i < players.length*2; i++){
-        performSale(players[i%players.length]);
-    }
-
-    if (isFinalRound){
-        // FINAL CROP SALE
-    }
-
-    for (let i = 0; i < players.length; i++){
-        players[i].scoreTableau(scoreModifier)
-    }
-}
-
-function playGame(){
-    let fruitsRemaining = allFruits;
-    let cropsRemaining = allCrops;
-    let trinketsRemaining = allTrinkets;
-
-    //let run = prompt("Run through the game?");
-    //if (run === "y"){
-        if (players.length < 5){
-            playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
-        }
-        playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 0.5, false)
-        playRound(fruitsRemaining, cropsRemaining, trinketsRemaining, 1, true)
-    //}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighborNums, buyCard, scoreTableau}
 }
