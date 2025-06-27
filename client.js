@@ -315,7 +315,7 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
             detailedReserveView.appendChild(setPrice);
     
             const confirmSale = document.createElement("button");
-            confirmSale.textContent = "Confirm Sale";
+            confirmSale.textContent = "Sell";
             confirmSale.id = "confirmSale";
             confirmSale.addEventListener("click", () => {
                 //  NEEDS TO ACTUALLY SELECT GOOD TO SELL
