@@ -122,7 +122,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         displayDraft(returningPlayer.draftingHand);
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
-        if (returningPlayer == vendor){
+        if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false){
                 viewDetailedReservedCards(returningPlayer.reserve, true, true)
             }
@@ -288,15 +288,24 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
         const detailedReserveView = document.createElement("div");
         detailedReserveView.id = "detailedReserve";
         for (let i = 0; i < reserve.length; i++){
+            const reservedCardDiv = document.createElement("div");
             const reservedCard = document.createElement("img");
             reservedCard.src = reserve[i].image;
             reservedCard.classList.add(i, "reserved")
             if (canInteract){
-                reservedCard.addEventListener("click", () => {
-                    reservedCard.id = "selectedToSell"; 
+                reservedCardDiv.addEventListener("click", () => {
+                    const previouslyReservedCard = document.getElementById("selectedToSell");
+                    if (previouslyReservedCard != undefined){
+                        previouslyReservedCard.removeAttribute("id");
+                        const previousDiv = document.getElementById("selectedDiv")
+                        previousDiv.removeAttribute("id");
+                    }
+                    reservedCard.id = "selectedToSell";
+                    reservedCardDiv.id = "selectedDiv";
                 })
             }
-            detailedReserveView.appendChild(reservedCard);
+            reservedCardDiv.appendChild(reservedCard)
+            detailedReserveView.appendChild(reservedCardDiv);
         }
 
         if (canInteract){
