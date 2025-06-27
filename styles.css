@@ -100,12 +100,18 @@ ul#playerList{
     display: grid;
     grid-template-rows: auto 1fr;
 }
+.myself .stats img{
+    width: 100px;
+}
 .stats{
     display: grid;
     grid-template-columns: repeat(6, auto);
     gap: 40px;
     background-color: rgb(134, 133, 133);
     font-weight: bold;    
+}
+#opponentDisplay .stats img{
+    width: 40px;
 }
 #opponentDisplay{
     display: flex;
@@ -153,7 +159,6 @@ ul#playerList{
     gap: 75px;
     padding: 25px;
     margin-top: 150px;
-    backdrop-filter: blur(0.3);
     background-color: rgba(182, 126, 126, 0.4);
 }
 
@@ -187,7 +192,6 @@ ul#playerList{
     gap: 75px;
     padding: 25px;
     margin-top: 150px;
-    backdrop-filter: blur(0.9);
     background-color: rgba(182, 126, 126, 0.4);
 }
 
