@@ -60,6 +60,7 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
+            io.emit("roundUpdate", players);
             io.emit("displayReserve", players);
             if (activePlayer.draftingHand.length == 0){
                 console.log("All cards drafted; ready for sales.");
@@ -108,8 +109,18 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 if (players[i].choice[0] == "buy"){   
                     if (players[i].numCoins >= price){
-                        players[i].numCoins -= price;
+                        players[i].numCoins -= eval(price);
                         players[i].tableau.push(goodForSale);
+
+                        if (goodForSale.type === "Fruit"){
+                            players[i].numFruits++;
+                        }
+                        if (goodForSale.type === "Crop"){
+                            players[i].numCrops++;
+                        }
+                        if (goodForSale.type === "Trinket"){
+                            players[i].numTrinkets++;
+                        }
                         io.emit("goodPurchased", goodForSale, i)
                     }
         
@@ -119,16 +130,14 @@ io.on("connection", (socket) => {
                     }
                 }
                 
-                else if (choice == "invest"){
-                    players[i].numCoins += price;
+                else if (players[i].choice[0] == "invest"){
+                    players[i].numCoins += eval(price);
                 }
             }
             for (let i = 0; i < players.length; i++){
                 players[i].isReady = false;
             }
             // round-end updates
-            console.log(players[vendorNum].reserve.indexOf(goodForSale))
-            console.log(players[vendorNum].reserve.findIndex(good => good == goodForSale))
             const indexOfSoldGood = players[vendorNum].reserve.findIndex(good => good.name == goodForSale.name);
             players[vendorNum].reserve.splice(indexOfSoldGood, 1);
             io.emit("roundUpdate", players);
@@ -143,7 +152,7 @@ io.on("connection", (socket) => {
                 players[vendorNum+1].isVendor = true;
             }
             const vendor = players.find(player => player.isVendor == true);
-            if (vendor.reserve.length > 0){
+            if (vendor.reserve.length > 1){
                 io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             }
 
@@ -202,16 +211,21 @@ function createDraftingHands(draftingDeck){
     }
 }
 
-// !!!!!!!!! should include scoring
 function endOfRound(){
     // !!!!!!!!!!!!!! should adjust based on player count
     let totalRounds = 3;
 
     if (gameRound == totalRounds){
+        for (let i = 0; i < players.length; i++){
+            players[i].scoreTableau(1);
+        }
         console.log("End of Game");
     }
 
     else{
+        for (let i = 0; i < players.length; i++){
+            players[i].scoreTableau(0.5);
+        }
         newRound();
     }
 }

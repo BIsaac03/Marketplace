@@ -368,6 +368,16 @@ function addToTableau(purchasedGood, playerNum){
     newGood.src = purchasedGood.image;
     newGood.classList.add("good");
 
+    if (playerNum != myPlayerNum){
+        newGood.addEventListener("mouseover", () => {
+            newGood.classList.add("blownUpGood");
+        })
+
+        newGood.addEventListener("mouseout", () => {
+            newGood.classList.remove("blownUpGood");
+        })
+    }
+
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);
 }
