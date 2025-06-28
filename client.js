@@ -411,7 +411,7 @@ function updateStats(players){
         const displayedWorkers = document.querySelector(`#player${i} .workers`);
         displayedWorkers.textContent = players[i].numWorkers;
         const displayedScore = document.querySelector(`#player${i} .VP`);
-        displayedScore.textContent = players[i].VP;
+        displayedScore.textContent = players[i].numVP;
     }
 }
 

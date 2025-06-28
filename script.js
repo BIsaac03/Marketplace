@@ -114,11 +114,10 @@ io.on("connection", (socket) => {
         if (keepWaiting == undefined){
             // apply users' choices
             for (let i = 0; i < players.length; i++){
-                if (players[i].choice[0] == "buy"){   
-                    if (players[i].numCoins >= price){
-                        players[i].numCoins -= eval(price);
-                        players[i].tableau.push(goodForSale);
-
+                if (players[i].choice[0] == "buy"){  
+                    const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale.type)
+                     if (players[i].numCoins >= modifiedCost){
+                        players[i].numGoods++;
                         if (goodForSale.type === "Fruit"){
                             players[i].numFruits++;
                         }
@@ -129,6 +128,12 @@ io.on("connection", (socket) => {
                             players[i].numTrinkets++;
                         }
                         io.emit("goodPurchased", goodForSale, i)
+                        players[i].numCoins -= modifiedCost;
+                        players[i].tableau.push(goodForSale);
+                        console.log(players[i].tableau)
+                        if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
+                            eval(goodForSale.onPlay);
+                        }
                     }
         
                     else{
@@ -218,12 +223,29 @@ function createDraftingHands(draftingDeck){
     }
 }
 
+function checkDiscount(tableau, goodType){
+    const discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT:"));
+
+    //!!!!!!!!!!!! should discount based on ongoing effects
+    const discount = 0;
+
+    return discount;
+}
+
+function scoreTableau(player, modifier){
+    let addedScore = 0;
+    for (let i = 0; i < player.tableau.length; i++){
+        addedScore += eval(player.tableau[i].VP);
+    }
+    let adjustedScore = addedScore * modifier;
+    player.numVP += adjustedScore;
+}
+
 function endOfRound(){
     if (gameRound == totalRounds){
         // !!!!!!!!!! final crop sale
-        
         for (let i = 0; i < players.length; i++){
-            players[i].scoreTableau(1);
+            scoreTableau(players[i], 1);
         }
         console.log("End of Game");
     }
@@ -231,7 +253,7 @@ function endOfRound(){
     else{
         console.log("newRound")
         for (let i = 0; i < players.length; i++){
-            players[i].scoreTableau(0.5);
+            scoreTableau(players[i], 0.5);
         }
         newRound();
         io.emit("roundUpdate", players);
@@ -248,10 +270,11 @@ function makePlayer(userID, name, color){
     let choice = [];
     let numCoins = 20;
     let numWorkers = 1;
-    let VP = 0;
+    let numVP = 0;
     let numFruits = 0;
     let numCrops = 0;
     let numTrinkets = 0;
+    let numGoods = 0;
     let isReady = false;
     let isInGame = false;
     let isVendor= false;
@@ -286,5 +309,5 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, VP, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighborNums, buyCard, scoreTableau}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, numGoods, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighborNums, buyCard, scoreTableau}
 }
