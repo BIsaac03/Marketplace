@@ -1,11 +1,11 @@
 export const allCrops = [
-    {
+ /*   {
         "name": "Beans",
         "type": "Crop",
         "image": "./Images/Beans.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "2*numPlayers"
+        "VP": "2*players.length"
     },
     {
         "name": "Cacao",
@@ -13,7 +13,7 @@ export const allCrops = [
         "image": "./Images/Cacao.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "numGoods"
+        "VP": "players[i].numGoods"
     },
     {
         "name": "Coffee",
@@ -21,7 +21,7 @@ export const allCrops = [
         "image": "./Images/Coffee.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "(2-hasCoffee)*numCrops"
+        "VP": "2*(players[i].numCrops - players[i].tableau.some(good -> good.name == "Coffee"))
     },
     {
         "name": "Corn",
@@ -29,15 +29,15 @@ export const allCrops = [
         "image": "./Images/Corn.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "2*numFruits"
+        "VP": "2*players[i].numFruits"
     },
     {
         "name": "Cotton",
         "type": "Crop",
         "image": "./Images/Cotton.png",
         "onPlay": "none",
-        "ongoing": "TRINKET COST -1",
-        "VP": "2*numTrinkets"
+        "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
+        "VP": "2*players[i].numTrinkets"
     },
     {
         "name": "Mint",
@@ -45,7 +45,7 @@ export const allCrops = [
         "image": "./Images/Mint.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "HIGHEST SCORING FRUIT"
+        "VP": "!!! HIGHEST SCORING FRUIT"
     },
     {
         "name": "Oats",
@@ -53,31 +53,31 @@ export const allCrops = [
         "image": "./Images/Oats.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "2*(Math.abs(numCrops - (numFruits+numTrinkets)))"
+        "VP": "2*(Math.abs(players[i].numCrops - (players[i].numFruits+players[i].numTrinkets)))"
     },
-    {
+ */   {
         "name": "Peanuts",
         "type": "Crop",
         "image": "./Images/Peanuts.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "5*Math.min(numFruits, numCrops, numTrinkets)"
+        "VP": "5*Math.min(players[i].numFruits, players[i].numCrops, players[i].numTrinkets)"
     },
     {
         "name": "Peppers",
         "type": "Crop",
         "image": "./Images/Peppers.png",
-        "onPlay": "loseGood()",
+        "onPlay": "loseGood",
         "ongoing": "none",
-        "VP": "Math.ceil((numFruits + numTrinkets)/2)"
+        "VP": "Math.ceil((players[i].numFruits + players[i].numTrinkets)/2)"
     },
-    {
+/*   {
         "name": "Potatoes",
         "type": "Crop",
         "image": "./Images/Potatoes.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "3*GOOD HERE NOT NEIGHBORING"
+        "VP": "!!! 3*GOOD HERE NOT NEIGHBORING"
     },
     {
         "name": "Rice",
@@ -85,7 +85,7 @@ export const allCrops = [
         "image": "./Images/Rice.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(numFruits, numCrops)"
+        "VP": "3*Math.min(players[i].numFruits, players[i].numCrops)"
     },
     {
         "name": "Sugarcane",
@@ -93,7 +93,7 @@ export const allCrops = [
         "image": "./Images/Sugarcane.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "neighbors[0].numFruits+neighbors[0].numTrinkets+neighbors[1].numGoods+neighbors[1].numTrinkets"
+        "VP": "players[players[i].neighborNums[0]].numFruits+players[players[i].neighborNums[0]].numTrinkets+players[players[i].neighborNums[1]].numGoods+players[players[i].neighborNums[1]].numTrinkets"
     },
     {
         "name": "Tobacco",
@@ -101,22 +101,22 @@ export const allCrops = [
         "image": "./Images/Tobacco.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "3*numTrinkets-numCrops"
+        "VP": "3*players[i].numTrinkets-players[i].numCrops"
     },
     {
         "name": "Tomatoes",
         "type": "Crop",
         "image": "./Images/Tomatoes.png",
         "onPlay": "none",
-        "ongoing": "CHANGE TYPE",
-        "VP": "Math.ceil(3/2*numCrops)"
+        "ongoing": "!!! CHANGE TYPE",
+        "VP": "Math.ceil(3/2*players[i].numCrops)"
     },
     {
         "name": "Wheat",
         "type": "Crop",
         "image": "./Images/Wheat.png",
-        "onPlay": "numWorkers+=3",
+        "onPlay": "players[i].numWorkers+=3",
         "ongoing": "none",
         "VP": "4"
-    }
-]
+    }*/
+] 

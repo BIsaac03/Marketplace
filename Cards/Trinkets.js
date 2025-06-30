@@ -1,18 +1,18 @@
 export const allTrinkets = [
-    {
+/*    {
         "name": "Artwork",
         "type": "Trinket",
         "image": "./Images/Artwork.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "(numTrinkets >= 2)*1 + (numTrinkets >= 4)*4 + (numTrinkets >= 6)*5 + (numTrinkets >= 8)*10"
+        "VP": "(players[i].numTrinkets >= 2)*1 + (players[i].numTrinkets >= 4)*4 + (players[i].numTrinkets >= 6)*5 + (players[i].numTrinkets >= 8)*10"
     },
     {
         "name": "Bracelets",
         "type": "Trinket",
         "image": "./Images/Bracelets.png",
         "onPlay": "none",
-        "ongoing": "GET COINS WHEN SKIP SALE",
+        "ongoing": "!!! GET COINS WHEN SKIP SALE",
         "VP": "0"
     },
     {
@@ -21,14 +21,14 @@ export const allTrinkets = [
         "image": "./Images/Carvings.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "4*NUM PLAYERS LESS COINS"
+        "VP": "!!! 4*NUM PLAYERS LESS COINS"
     },
-    {
+       {
         "name": "Charms",
         "type": "Trinket",
         "image": "./Images/Charms.png",
         "onPlay": "none",
-        "ongoing": "MINORITY BONUS",
+        "ongoing": "!!! MINORITY BONUS",
         "VP": "0"
     },
     {
@@ -36,23 +36,23 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "./Images/Earrings.png",
         "onPlay": "none",
-        "ongoing": "CARDS COST 1 LESS",
-        "VP": "NOT HERE, BOTH NEIGHBORING"
+        "ongoing": "DISCOUNT: 1",
+        "VP": "players[players[i].neighborNums[0]].tableau.filter(good => players[players[i].neighborNums[1]].tableau.includes(good) && !players[i].tableau.includes(good)).lenght"
     },
-    {
+       {
         "name": "Fabrics",
         "type": "Trinket",
         "image": "./Images/Fabrics.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(numFruits, numTrinkets)"
+        "VP": "3*Math.min(players[i].numFruits, players[i].numTrinkets)"
     },
     {
         "name": "Figurines",
         "type": "Trinket",
         "image": "./Images/Figurines.png",
-        "onPlay": "numWorkers+=5",
-        "ongoing": "TWO WORKERS PER TURN",
+        "onPlay": "players[i].numWorkers+=5",
+        "ongoing": "!!! TWO WORKERS PER TURN",
         "VP": "0"
     },
     {
@@ -60,7 +60,7 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "./Images/Lanterns.png",
         "onPlay": "none",
-        "ongoing": "POINTS FOR UNIQUENESS",
+        "ongoing": "!!! POINTS FOR UNIQUENESS",
         "VP": "0"
     },
     {
@@ -68,7 +68,7 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "./Images/Masks.png",
         "onPlay": "none",
-        "ongoing": "ADAPT TYPE BASED ON DISCARDED COINS",
+        "ongoing": "!!! ADAPT TYPE BASED ON DISCARDED COINS",
         "VP": "0"
     },
     {
@@ -84,31 +84,31 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "./Images/Perfume.png",
         "onPlay": "none",
-        "ongoing": "DISCARD GOOD FOR VP",
+        "ongoing": "!!! DISCARD GOOD FOR VP",
         "VP": "0"
     },
-    {
+*/    {
         "name": "Pins",
         "type": "Trinket",
         "image": "./Images/Pins.png",
-        "onPlay": "ALONGSIDE ANOTHER",
+        "onPlay": "none",
         "ongoing": "none",
-        "VP": "2*numFruits-numTrinkets"
+        "VP": "2*players[i].numFruits-players[i].numTrinkets"
     },
     {
         "name": "Postcards",
         "type": "Trinket",
         "image": "./Images/Postcards.png",
-        "onPlay": "score(self, 0.5, -4)",
+        "onPlay": "scoreTableau(players[i], 0.5);players[i].numVP -= 5",
         "ongoing": "none",
         "VP": "0"
     },
-    {
+/*    {
         "name": "Pouches",
         "type": "Trinket",
         "image": "./Images/Pouches.png",
         "onPlay": "none",
-        "ongoing": "CAN BUY WORKERS",
+        "ongoing": "!!! CAN BUY WORKERS",
         "VP": "2"
     },
     {
@@ -116,7 +116,7 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "./Images/Shells.png",
         "onPlay": "none",
-        "ongoing": "RECEIVE COINS IF CANNOT BUY",
-        "VP": "numCoins/5"
-    }
+        "ongoing": "!!! RECEIVE COINS IF CANNOT BUY",
+        "VP": "players[i].numCoins/5"
+    }*/
 ]

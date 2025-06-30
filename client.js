@@ -120,7 +120,8 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         // !!!!!!!!!!! should ensure duplicate tableaus are not created
-        createTableaus(players)
+        createTableaus(players);
+        displayTableaus(players);
         displayDraft(returningPlayer.draftingHand);
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
@@ -131,7 +132,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         } 
         else{
             if (vendor.isReady == true && returningPlayer.choice.length == 0){
-                displayGoodSale(vendor.reserve[vendor.choice[0]], vendor.choice[1], vendor.playerNum)
+                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
             }   
         }
              
@@ -192,6 +193,37 @@ socket.on("roundUpdate", (players) => {
 socket.on("goodPurchased", (purchasedGood, playerNum) => {
     addToTableau(purchasedGood, playerNum)
 })
+
+socket.on("chooseLostGood", (player) => {
+    if (myPlayerNum == player.playerNum){
+        const goodToLose = selectGoodInTableau(player.tableau);
+        socket.emit("removeGood", goodToLose, player);
+    }
+})
+
+socket.on("removeGoodDOM", (goodToRemove, players) => {
+    for (let i = 0; i < players.length; i++){
+        const goodElement = document.querySelector("#player"+i+" .tableau ."+goodToRemove.name);
+        goodElement.remove();
+    }
+})
+
+socket.on("pineappleTarget", (playerNum, players) => {
+    if (myPlayerNum == playerNum){
+        // !!! should select from neighboring tableau
+        const goodToCopy = undefined
+    }
+    socket.emit("copyGood", goodToCopy);
+})
+
+function selectGoodInTableau(tableau){
+    for (let i = 0; i < tableau.length; i++){
+        let goodInTableau = document.getElementsByClassName(tableau[i].name)[0];
+        goodInTableau.addEventListener("click", () => {
+            return goodInTableau
+        })
+    }
+}
 
 function createTableaus(players){
     let opponentDisplay = document.createElement("div");
@@ -313,8 +345,22 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
                         const previousDiv = document.getElementById("selectedDiv")
                         previousDiv.removeAttribute("id");
                     }
-                    reservedCard.id = "selectedToSell";
-                    reservedCardDiv.id = "selectedDiv";
+
+                    if (reserve[i].name == "Pins"){
+                        if (reservedCard.id == "selectedPins"){
+                            reservedCard.removeAttribute("id");
+                            reservedCardDiv.removeAttribute("selectedPinsDiv");
+                        }
+                        else{
+                            reservedCard.id = "selectedPins";
+                            reservedCardDiv.id = "selecedPinsDiv";
+                        }
+                    }
+
+                    else{
+                        reservedCard.id = "selectedToSell";
+                        reservedCardDiv.id = "selectedDiv";
+                    }
                 })
             }
             reservedCardDiv.appendChild(reservedCard)
@@ -331,11 +377,16 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
             confirmSale.textContent = "Sell";
             confirmSale.id = "confirmSale";
             confirmSale.addEventListener("click", () => {
-                //  NEEDS TO ACTUALLY SELECT GOOD TO SELL
                 const goodForSaleDOM = document.getElementById("selectedToSell");
                 const indexofGoodForSale = goodForSaleDOM.classList[0]
                 if (goodForSaleDOM != undefined && setPrice.value != ""){
-                    socket.emit("sellGood", reserve[indexofGoodForSale], setPrice.value, myPlayerNum);
+                    let goodForSale = [reserve[indexofGoodForSale]];
+                    const pins = document.getElementById("selecedPins");
+                    if (pins != undefined){
+                        pinsIndex = pins.classList[0];
+                        goodForSale.push(reserve[pinsIndex]);
+                    } 
+                    socket.emit("sellGood", goodForSale, setPrice.value, myPlayerNum);
                     detailedReserveView.remove();
                 }
             })
@@ -353,8 +404,15 @@ function displayGoodSale(goodForSale, price, vendorNum){
     const currentOffer = document.createElement("div");
     currentOffer.id = "currentOffer";
 
+    if (goodForSale.length == 2) {
+        const good = document.createElement("img");
+        good.src = goodForSale[1].image;
+        good.classList.add("goodForSale");
+        currentOffer.appendChild(good);
+    }
+
     const good = document.createElement("img");
-    good.src = goodForSale.image;
+    good.src = goodForSale[0].image;
     good.classList.add("goodForSale");
     currentOffer.appendChild(good);
 
@@ -388,7 +446,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
 function addToTableau(purchasedGood, playerNum){
     const newGood = document.createElement("img");
     newGood.src = purchasedGood.image;
-    newGood.classList.add("good");
+    newGood.classList.add("good", purchasedGood.name);
 
     if (playerNum != myPlayerNum){
         newGood.addEventListener("mouseover", () => {
@@ -415,7 +473,15 @@ function updateStats(players){
     }
 }
 
-function updateActivePlayer(){
+function displayTableaus(players){
+    for (let i = 0; i < players.length; i++){
+        for (let j = 0; j < players[i].tableau.length; j++){
+            const goodAlreadyDisplayed = document.getElementsByClassName(players[i].tableau[j].name)[0];
+            if (goodAlreadyDisplayed == undefined){
+                addToTableau(purchasedGood, i);
+            }
+        }
+    }
 
 }
 function fullUpdate(players, thisPlayer){

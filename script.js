@@ -96,6 +96,7 @@ io.on("connection", (socket) => {
             players[i].choice.length = 0;
         }
         players[vendorNum].choice = [goodToBuy, salePrice];
+
         players[vendorNum].isReady = true;
         socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum)
     })
@@ -112,11 +113,12 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
+            // !!!!! results need to run again if pins are sold (only pay/invest once) 
             // apply users' choices
             for (let i = 0; i < players.length; i++){
                 if (players[i].choice[0] == "buy"){  
                     const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale.type)
-                     if (players[i].numCoins >= modifiedCost){
+                    if (players[i].numCoins >= modifiedCost){
                         players[i].numGoods++;
                         if (goodForSale.type === "Fruit"){
                             players[i].numFruits++;
@@ -130,19 +132,23 @@ io.on("connection", (socket) => {
                         io.emit("goodPurchased", goodForSale, i)
                         players[i].numCoins -= modifiedCost;
                         players[i].tableau.push(goodForSale);
-                        console.log(players[i].tableau)
                         if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
                             eval(goodForSale.onPlay);
                         }
                     }
         
                     else{
+                        players[i].choice[0] = "invest";
                         players[i].numCoins += Math.ceil(eval(price)/2);
                     }
                 }
                 
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
+                }bgoogle.com/chrome
+
+                if (goodForSale.onPlay == "loseGood" && players[i].choice[0] == "invest"){
+                    io.emit("chooseLostGood", players[i]);
                 }
             }
             for (let i = 0; i < players.length; i++){
@@ -171,7 +177,13 @@ io.on("connection", (socket) => {
                 endOfRound();
             }
         }
-    })    
+    })   
+    
+    socket.on("removeGood", (goodToRemove, player) => {
+        const indexOfRemovedGood = player.tableau.findIndex(good => good.name == goodToRemove.name);
+        player.tableau.splice(indexOfRemovedGood, 1);
+        io.emit("removeGoodDOM", goodToRemove, players);
+    })
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);
@@ -224,11 +236,12 @@ function createDraftingHands(draftingDeck){
 }
 
 function checkDiscount(tableau, goodType){
-    const discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT:"));
-
-    //!!!!!!!!!!!! should discount based on ongoing effects
-    const discount = 0;
-
+    let discount = 0;
+    let discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT: "));
+    discountEffects = discountEffects.map(item => item.replace("DISCOUNT: ", ""));
+    for (let i = 0; i < discountEffects.length; i++){
+        eval(discountEffects[i]);
+    }
     return discount;
 }
 

@@ -13,13 +13,13 @@ export const allFruits = [
         "image": "./Images/Bananas.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*numFruits)"
+        "VP": "Math.ceil(3/2*players[i].numFruits)"
     },
     {
         "name": "Blackberries",
         "type": "Fruit",
         "image": "./Images/Blackberries.png",
-        "onPlay": "score(self, 0.25)",
+        "onPlay": "scoreTableau(players[i], 0.25)",
         "ongoing": "none",
         "VP": "0"
     },
@@ -29,7 +29,7 @@ export const allFruits = [
         "image": "./Images/Cherries.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(numCoins/4, numFruits)"
+        "VP": "3*Math.min(players[i].numCoins/4, players[i].numFruits)"
     },
     {
         "name": "Coconuts",
@@ -37,7 +37,7 @@ export const allFruits = [
         "image": "./Images/Coconuts.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "11-numFruits"
+        "VP": "11-players[i].numFruits"
     },
     {
         "name": "Grapes",
@@ -45,7 +45,7 @@ export const allFruits = [
         "image": "./Images/Grapes.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "neighbors[0].numFruits+neighbors[1].numFruits"
+        "VP": "players[players[i].neighborNums[0]].numFruits+players[players[i].neighborNums[1].numFruits]"
     },
     {
         "name": "Guavas",
@@ -55,7 +55,7 @@ export const allFruits = [
         "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
         "VP": "0"
     },
-    {
+ /*   {
         "name": "Kiwis",
         "type": "Fruit",
         "image": "./Images/Kiwis.png",
@@ -63,27 +63,27 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "3*KIWIS IN PLAY"
     },
-    {
+ */   {
         "name": "Mangoes",
         "type": "Fruit",
         "image": "./Images/Mangoes.png",
         "onPlay": "none",
-        "ongoing": "TRIPLE LOWEST SCORING CROP",
+        "ongoing": "!!! TRIPLE LOWEST SCORING CROP",
         "VP": "0"
     },
     {
         "name": "Oranges",
         "type": "Fruit",
         "image": "./Images/Oranges.png",
-        "onPlay": "numCoins += 4",
+        "onPlay": "players[i].numCoins += 4",
         "ongoing": "none",
-        "VP": "numTrinkets"
+        "VP": "players[i].numTrinkets"
     },
     {
         "name": "Papayas",
         "type": "Fruit",
         "image": "./Images/Papayas.png",
-        "onPlay": "numCoins += 10; numWorkers += 2",
+        "onPlay": "players[i].numCoins += 10; players[i].numWorkers += 2",
         "ongoing": "none",
         "VP": "0"
     },
@@ -92,31 +92,31 @@ export const allFruits = [
         "type": "Fruit",
         "image": "./Images/Passion_Fruit.png",
         "onPlay": "none",
-        "ongoing": "KEEP FINAL DRAFT",
+        "ongoing": "!!! KEEP FINAL DRAFT",
         "VP": "0"
     },
-    {
+ /*   {
         "name": "Pears",
         "type": "Fruit",
         "image": "./Images/Pears.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "2*NUM GOOD IN exactly one neighboring tableau"
+        "VP": "2*(players[players[i].neighborNums[0]].tableau.filter(good => !players[players[i].neighborNums[1]].tableau.includes(good)).lenght)"
     },
     {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "./Images/Pineapples.png",
-        "onPlay": "pineappleTarget()",
+        "onPlay": "io.emit("pineappleTarget", players[i].playerNum, players)",
         "ongoing": "none",
-        "VP": "pineappleTarget.VP"
+        "VP": "!!! pineappleTarget.VP"
     },
-    {
+*/    {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "./Images/Strawberries.png",
         "onPlay": "none",
         "ongoing": "none",
-        "VP": "numCoins/3"
+        "VP": "players[i].numCoins/3"
     }
 ]
