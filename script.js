@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
                 
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
-                }bgoogle.com/chrome
+                }
 
                 if (goodForSale.onPlay == "loseGood" && players[i].choice[0] == "invest"){
                     io.emit("chooseLostGood", players[i]);
