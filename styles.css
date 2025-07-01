@@ -133,6 +133,7 @@ ul#playerList{
 }
 #opponentDisplay .good.blownUpGood{
     width:300px;
+    z-index: 10;
 }
 .myself .tableau div{
     display: grid;
@@ -195,16 +196,16 @@ ul#playerList{
     background-color: rgba(182, 126, 126, 0.4);
 }
 
-#selectedToSell{
+#detailedReserve [id^="selected"]{
     width: 407px;
 }
 
-#detailedReserve div#selectedDiv {
+#detailedReserve div[id^="selected"] {
     background-color: rgb(173, 224, 125);
     padding: 20px;
 }
 
-#detailedReserve div:not(#selectedDiv){
+#detailedReserve div:not([id^="selected"]){
     padding: 30px;
 }
 

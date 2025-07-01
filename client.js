@@ -339,25 +339,26 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
             reservedCard.classList.add(i, "reserved")
             if (canInteract){
                 reservedCardDiv.addEventListener("click", () => {
-                    const previouslyReservedCard = document.getElementById("selectedToSell");
-                    if (previouslyReservedCard != undefined){
-                        previouslyReservedCard.removeAttribute("id");
-                        const previousDiv = document.getElementById("selectedDiv")
-                        previousDiv.removeAttribute("id");
-                    }
-
+                    // Pins cannot be sold by itself
                     if (reserve[i].name == "Pins"){
                         if (reservedCard.id == "selectedPins"){
                             reservedCard.removeAttribute("id");
-                            reservedCardDiv.removeAttribute("selectedPinsDiv");
+                            reservedCardDiv.removeAttribute("id");
                         }
                         else{
                             reservedCard.id = "selectedPins";
-                            reservedCardDiv.id = "selecedPinsDiv";
+                            reservedCardDiv.id = "selectedPinsDiv";
                         }
                     }
-
+    
                     else{
+                        const previouslyReservedCard = document.getElementById("selectedToSell");
+                        if (previouslyReservedCard != undefined){
+                            previouslyReservedCard.removeAttribute("id");
+                            const previousDiv = document.getElementById("selectedDiv")
+                            previousDiv.removeAttribute("id");
+                        }
+
                         reservedCard.id = "selectedToSell";
                         reservedCardDiv.id = "selectedDiv";
                     }
@@ -447,17 +448,16 @@ function addToTableau(purchasedGood, playerNum){
     const newGood = document.createElement("img");
     newGood.src = purchasedGood.image;
     newGood.classList.add("good", purchasedGood.name);
-
+    
     if (playerNum != myPlayerNum){
         newGood.addEventListener("mouseover", () => {
             newGood.classList.add("blownUpGood");
         })
-
+    
         newGood.addEventListener("mouseout", () => {
             newGood.classList.remove("blownUpGood");
         })
     }
-
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);
 }

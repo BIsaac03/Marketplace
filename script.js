@@ -113,50 +113,39 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
-            // !!!!! results need to run again if pins are sold (only pay/invest once) 
             // apply users' choices
             for (let i = 0; i < players.length; i++){
-                if (players[i].choice[0] == "buy"){  
-                    const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale.type)
-                    if (players[i].numCoins >= modifiedCost){
-                        players[i].numGoods++;
-                        if (goodForSale.type === "Fruit"){
-                            players[i].numFruits++;
-                        }
-                        if (goodForSale.type === "Crop"){
-                            players[i].numCrops++;
-                        }
-                        if (goodForSale.type === "Trinket"){
-                            players[i].numTrinkets++;
-                        }
-                        io.emit("goodPurchased", goodForSale, i)
-                        players[i].numCoins -= modifiedCost;
-                        players[i].tableau.push(goodForSale);
-                        if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
-                            eval(goodForSale.onPlay);
-                        }
-                    }
-        
+                const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale[0].type)
+                if (players[i].choice[0] == "buy"){
+                    if (players[i].numCoins >= modifiedCost){ 
+                        if (goodForSale.length == 2){
+                                resolvePurchase(i, goodForSale[1]);
+                            }
+                            resolvePurchase(i, goodForSale[0]);
+                            players[i].numCoins -= modifiedCost;
+
+                        } 
                     else{
                         players[i].choice[0] = "invest";
-                        players[i].numCoins += Math.ceil(eval(price)/2);
+                        players[i].numCoins += Math.ceil(eval(price) / 2);
                     }
                 }
-                
+            
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
                 }
 
-                if (goodForSale.onPlay == "loseGood" && players[i].choice[0] == "invest"){
+                if (goodForSale[0].onPlay == "loseGood" && players[i].choice[0] == "invest"){
                     io.emit("chooseLostGood", players[i]);
                 }
             }
-            for (let i = 0; i < players.length; i++){
-                players[i].isReady = false;
+
+            for (let i = 0; i < goodForSale.length; i++){
+                const indexOfSoldGood = players[vendorNum].reserve.findIndex(good => good.name == goodForSale[i].name);
+                players[vendorNum].reserve.splice(indexOfSoldGood, 1);
             }
+
             // round-end updates
-            const indexOfSoldGood = players[vendorNum].reserve.findIndex(good => good.name == goodForSale.name);
-            players[vendorNum].reserve.splice(indexOfSoldGood, 1);
             io.emit("roundUpdate", players);
             resetPlayerStates();
 
@@ -237,12 +226,30 @@ function createDraftingHands(draftingDeck){
 
 function checkDiscount(tableau, goodType){
     let discount = 0;
-    let discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT: "));
+    let discountEffects = tableau.filter(good => good.onPlay.startsWith("DISCOUNT: "));
     discountEffects = discountEffects.map(item => item.replace("DISCOUNT: ", ""));
     for (let i = 0; i < discountEffects.length; i++){
         eval(discountEffects[i]);
     }
     return discount;
+}
+
+function resolvePurchase(i, goodForSale){
+    players[i].numGoods++;
+    if (goodForSale.type === "Fruit"){
+        players[i].numFruits++;
+    }
+    if (goodForSale.type === "Crop"){
+        players[i].numCrops++;
+    }
+    if (goodForSale.type === "Trinket"){
+        players[i].numTrinkets++;
+    }
+    io.emit("goodPurchased", goodForSale, i)
+    players[i].tableau.push(goodForSale);
+    if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
+        eval(goodForSale.onPlay);
+    }
 }
 
 function scoreTableau(player, modifier){
