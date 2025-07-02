@@ -59,10 +59,11 @@ io.on("connection", (socket) => {
         newRound();
     })
 
-    socket.on("draftedCard", (myPlayerNum, cardChoice) => {
+    /// FUTURE FIX: Draft image does does appear, as this function expects an index, while selectGood returns the name of the selected good
+    socket.on("draftedCard", (myPlayerNum, goodIndex) => {
         const activePlayer = players.find(player => player.playerNum == myPlayerNum)
-        activePlayer.reserve.push(activePlayer.draftingHand[cardChoice]);
-        activePlayer.draftingHand.splice(cardChoice, 1);
+        activePlayer.reserve.push(activePlayer.draftingHand[goodIndex]);
+        activePlayer.draftingHand.splice(goodIndex, 1);
         activePlayer.isReady = true;
 
         let keepWaiting = players.find(player => player.isReady == false)
@@ -79,7 +80,7 @@ io.on("connection", (socket) => {
             // passes remaining cards
             else{
                 let previousHand = players[players.length-1].draftingHand;
-                let thisHand = undefined
+                let thisHand = [];
                 for (let i = 0; i < players.length; i++){
                     thisHand = players[i].draftingHand;
                     players[i].draftingHand = previousHand;
@@ -158,7 +159,7 @@ io.on("connection", (socket) => {
                 players[vendorNum+1].isVendor = true;
             }
             const vendor = players.find(player => player.isVendor == true);
-            if (players.every(player => player.reserve.length <= 1)){
+            if (players.some(player => player.reserve.length > 1)){
                 io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             }
 
@@ -168,12 +169,12 @@ io.on("connection", (socket) => {
         }
     })   
     
-    socket.on("removeGood", (goodToRemove, player) => {
-        const indexOfRemovedGood = player.tableau.findIndex(good => good.name == goodToRemove.name);
+    socket.on("removeGood", (nameOfGoodToRemove, playerNum) => {
+        const player = players.find(player => player.playerNum == playerNum);
+        const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
-        io.emit("removeGoodDOM", goodToRemove, players);
+        io.emit("removeGoodDOM", nameOfGoodToRemove, players);
     })
-
 
     socket.on("activeAbility", (abilityType, player) => {
         if (abilityType == "perfumeAction"){
@@ -194,6 +195,12 @@ io.on("connection", (socket) => {
             }
         }
      })
+
+    socket.on("copyGood", (copiedGood, playerNum) => {
+        const pineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
+        pineapples.VP = copiedGood.VP;
+        socket.emit("PineappleToken", copiedGood.image, playerNum);
+    })
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);
