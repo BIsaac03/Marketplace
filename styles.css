@@ -196,6 +196,50 @@ ul#playerList{
     background-color: rgba(182, 126, 126, 0.4);
 }
 
+#goodSelectionDiv{
+    position: absolute;
+    justify-self: center;
+    justify-items: center;
+    align-items: center;
+    display: grid;
+    grid-template: repeat(3, auto) / repeat(3, auto);
+    padding: 25px;
+    margin-top: 150px;
+    background-color: rgba(182, 126, 126, 0.4);
+}
+
+#goodSelectionDiv #message{
+    grid-area: 1 / 1 / 2 / 4;
+    font-size: 40px;
+    margin-bottom: 30px;
+}
+
+#goodSelectionDiv div[id^="selected"] {
+    background-color: rgb(173, 224, 125);
+    padding: 20px;
+}
+
+#goodSelectionDiv img[id^="selected"]{
+    width: 407px;
+}
+
+
+#goodSelectionDiv div:not([id^="selected"]){
+    padding: 30px;
+}
+
+
+#goodSelectionDiv button{
+    grid-area: 3 / 1 / 4 / 4;
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+    margin-top: 30px;
+}
+
+
+
 #detailedReserve [id^="selected"]{
     width: 407px;
 }

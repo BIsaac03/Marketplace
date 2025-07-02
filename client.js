@@ -196,12 +196,9 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
 
 socket.on("chooseLostGood", (player) => {
     if (myPlayerNum == player.playerNum){
-        const loseGoodNotificaion = document.createElement("p");
-        loseGoodNotificaion.textContent = "Select a good to lose.";
-        bodyElement.append(loseGoodNotificaion);
         let goodToLose = undefined;
         while (goodToLose == undefined){
-            goodToLose = selectGoodInTableau(player.tableau);
+            goodToLose = selectGood(player.tableau, false, "Select good to lose");
         }
         socket.emit("removeGood", goodToLose, player);
     }
@@ -218,17 +215,66 @@ socket.on("pineappleTarget", (playerNum, players) => {
     if (myPlayerNum == playerNum){
         // !!! should select from neighboring tableau
         const goodToCopy = undefined
+        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]] ,...players[players[playerNum].neighborNums[1]]])];
+        selectGood(potentialCopies, false, "Select good to copy");
     }
     socket.emit("copyGood", goodToCopy);
 })
 
-function selectGoodInTableau(tableau){
-    for (let i = 0; i < tableau.length; i++){
-        let goodInTableau = document.getElementsByClassName(tableau[i].name)[0];
-        goodInTableau.addEventListener("click", () => {
-            return goodInTableau
-        })
+function selectGood(goodsToSelectFrom, draftOrSale, message){
+    const goodSelectionDiv = document.createElement("div");
+    goodSelectionDiv.id = "goodSelectionDiv";
+    const contextMessage = document.createElement("p");
+    contextMessage.textContent = message;
+    contextMessage.id = "message";
+    goodSelectionDiv.append(contextMessage);
+
+    if(!draftOrSale){
+        const fruitsDiv = document.createElement("div");
+        fruitsDiv.classList.add("Fruits");
+        goodSelectionDiv.appendChild(fruitsDiv);
+        const cropsDiv = document.createElement("div");
+        cropsDiv.classList.add("Crops");
+        goodSelectionDiv.appendChild(cropsDiv);
+        const trinketsDiv = document.createElement("div");
+        trinketsDiv.classList.add("Trinkets");
+        goodSelectionDiv.appendChild(trinketsDiv);
     }
+
+    for (let i = 0; i < goodsToSelectFrom.length; i++){
+        const selectedDiv = document.createElement("div");
+        const selectedGood = document.createElement("img");
+        selectedGood.src = goodsToSelectFrom[i].image;
+        selectedGood.classList.add(goodsToSelectFrom[i].name);
+        selectedGood.classList.add(i);
+        selectedGood.addEventListener("click", () => {
+            const previouslySelectedGood = document.getElementById("selectedGood");
+            if (previouslySelectedGood != undefined){
+                previouslySelectedGood.removeAttribute("id");
+                const previousDiv = document.getElementById("selectedDiv")
+                previousDiv.removeAttribute("id");
+            }
+
+            selectedGood.id = "selectedGood";
+            selectedDiv.id = "selectedDiv";
+        })
+        selectedDiv.appendChild(selectedGood);
+        goodSelectionDiv.appendChild(selectedDiv);
+    }
+
+    const confirmSelection = document.createElement("button");
+    confirmSelection.textContent = "Confirm";
+    confirmSelection.id = "confirmGood";
+    confirmSelection.addEventListener("click", () => {
+        const selectedGoodDOM = document.getElementById("selectedGood");
+        if (selectedGoodDOM != undefined){
+            goodSelectionDiv.remove();
+            socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1]);
+            return [selectedGoodDOM.classList[0], selectedGoodDOM.classList[1]];
+        }
+    })
+    goodSelectionDiv.appendChild(confirmSelection);
+    bodyElement.appendChild(goodSelectionDiv);
 }
 
 function createTableaus(players){
@@ -291,6 +337,9 @@ function createTableaus(players){
 
 /////// DISPLAY UPDATES
 function displayDraft(draftingHand){
+   selectGood(draftingHand, true, "Select good to draft");
+
+    /*
     clearDraftingPopUp();
     const draftingPopUp = document.createElement("div");
     draftingPopUp.id = "draftingPopUp";
@@ -304,6 +353,7 @@ function displayDraft(draftingHand){
         draftingPopUp.appendChild(draftingOption);
     }
     bodyElement.appendChild(draftingPopUp)
+    */
 }
 
 function clearDraftingPopUp() {
@@ -498,7 +548,6 @@ function displayTableaus(players){
             }
         }
     }
-
 }
 function fullUpdate(players, thisPlayer){
     updateDraft(cardsToDraft);
