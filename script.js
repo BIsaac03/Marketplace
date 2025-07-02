@@ -158,7 +158,7 @@ io.on("connection", (socket) => {
                 players[vendorNum+1].isVendor = true;
             }
             const vendor = players.find(player => player.isVendor == true);
-            if (vendor.reserve.length > 1){
+            if (players.every(player => player.reserve.length <= 1)){
                 io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             }
 
@@ -173,6 +173,27 @@ io.on("connection", (socket) => {
         player.tableau.splice(indexOfRemovedGood, 1);
         io.emit("removeGoodDOM", goodToRemove, players);
     })
+
+
+    socket.on("activeAbility", (abilityType, player) => {
+        if (abilityType == "perfumeAction"){
+            socket.emit("chooseLostGood");
+            player.numVP += 5;
+        }
+        else if (abilityType == "tomatoAction"){
+            const tomatoes = player.tableau.find(good => good.name == "Tomatoes")
+            if (tomatoes.type == "Fruit"){
+                tomatoes.type = "Crop";
+            } 
+            else {tomatoes.type = "Fruit";} 
+        }
+        else if (abilityType == "pouchesAction"){
+            if (player.numCoins >= 3){
+                player.numCoins -= 3;
+                player.numWorkers += 2;
+            }
+        }
+     })
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);

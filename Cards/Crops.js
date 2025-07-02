@@ -4,6 +4,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Beans.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "2*players.length"
     },
@@ -12,6 +13,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Cacao.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "players[i].numGoods"
     },
@@ -20,6 +22,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Coffee.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "2*(players[i].numCrops - players[i].tableau.some(good -> good.name == "Coffee"))
     },
@@ -28,6 +31,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Corn.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "2*players[i].numFruits"
     },
@@ -36,6 +40,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Cotton.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
         "VP": "2*players[i].numTrinkets"
     },
@@ -44,6 +49,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Mint.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "!!! HIGHEST SCORING FRUIT"
     },
@@ -52,6 +58,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Oats.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "2*(Math.abs(players[i].numCrops - (players[i].numFruits+players[i].numTrinkets)))"
     },
@@ -60,6 +67,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Peanuts.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "5*Math.min(players[i].numFruits, players[i].numCrops, players[i].numTrinkets)"
     },
@@ -68,6 +76,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Peppers.png",
         "onPlay": "loseGood",
+        "active": "none",
         "ongoing": "none",
         "VP": "Math.ceil((players[i].numFruits + players[i].numTrinkets)/2)"
     },
@@ -76,6 +85,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Potatoes.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "!!! 3*GOOD HERE NOT NEIGHBORING"
     },
@@ -84,6 +94,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Rice.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "3*Math.min(players[i].numFruits, players[i].numCrops)"
     },
@@ -92,6 +103,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Sugarcane.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "players[players[i].neighborNums[0]].numFruits+players[players[i].neighborNums[0]].numTrinkets+players[players[i].neighborNums[1]].numGoods+players[players[i].neighborNums[1]].numTrinkets"
     },
@@ -100,6 +112,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Tobacco.png",
         "onPlay": "none",
+        "active": "none",
         "ongoing": "none",
         "VP": "3*players[i].numTrinkets-players[i].numCrops"
     },
@@ -108,7 +121,8 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Tomatoes.png",
         "onPlay": "none",
-        "ongoing": "!!! CHANGE TYPE",
+        "active": "socket.emit("activeAbility", "tomatoAction", player);",
+        "ongoing": "none",
         "VP": "Math.ceil(3/2*players[i].numCrops)"
     },
     {
@@ -116,6 +130,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "./Images/Wheat.png",
         "onPlay": "players[i].numWorkers+=3",
+        "active": "none",
         "ongoing": "none",
         "VP": "4"
     }*/

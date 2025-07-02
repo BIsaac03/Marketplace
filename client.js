@@ -196,7 +196,13 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
 
 socket.on("chooseLostGood", (player) => {
     if (myPlayerNum == player.playerNum){
-        const goodToLose = selectGoodInTableau(player.tableau);
+        const loseGoodNotificaion = document.createElement("p");
+        loseGoodNotificaion.textContent = "Select a good to lose.";
+        bodyElement.append(loseGoodNotificaion);
+        let goodToLose = undefined;
+        while (goodToLose == undefined){
+            goodToLose = selectGoodInTableau(player.tableau);
+        }
         socket.emit("removeGood", goodToLose, player);
     }
 })
@@ -382,7 +388,7 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
                 const indexofGoodForSale = goodForSaleDOM.classList[0]
                 if (goodForSaleDOM != undefined && setPrice.value != ""){
                     let goodForSale = [reserve[indexofGoodForSale]];
-                    const pins = document.getElementById("selecedPins");
+                    const pins = document.getElementById("selectedPins");
                     if (pins != undefined){
                         pinsIndex = pins.classList[0];
                         goodForSale.push(reserve[pinsIndex]);
@@ -425,7 +431,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
     const chooseBuy = document.createElement("button");
     chooseBuy.textContent = "Buy"
     chooseBuy.id = "chooseBuy";
-    chooseBuy.classList.add(goodForSale.type)
+    chooseBuy.classList.add(goodForSale[0].type)
     chooseBuy.addEventListener("click", () => {
         socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum);
         currentOffer.remove();
@@ -449,6 +455,7 @@ function addToTableau(purchasedGood, playerNum){
     newGood.src = purchasedGood.image;
     newGood.classList.add("good", purchasedGood.name);
     
+    //opponent's good
     if (playerNum != myPlayerNum){
         newGood.addEventListener("mouseover", () => {
             newGood.classList.add("blownUpGood");
@@ -457,6 +464,15 @@ function addToTableau(purchasedGood, playerNum){
         newGood.addEventListener("mouseout", () => {
             newGood.classList.remove("blownUpGood");
         })
+    }
+
+    //player's good
+    else{
+        if (purchasedGood.active != "none"){
+            newGood.addEventListener("click", () => {
+                purchasedGood.active;
+            })
+        }
     }
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);
