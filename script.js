@@ -15,8 +15,7 @@ const io = new Server(httpServer, {
         //origin: "http://127.0.0.1:5500",
         //origin: "https://bisaac03.github.io"
         origin: "http://marketplace-pfci.onrender.com",
-        methods: ["GET", "POST"],
-    }
+}
 });
 
 /////////// SERVER EVENTS
