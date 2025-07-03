@@ -28,8 +28,8 @@ app.use("/static", express.static('./static/'));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
-    res.sendFile(__dirname + 'static/styles.css');
-    res.sendFile(__dirname + 'static/client.js');
+    res.sendFile(__dirname + '/static/styles.css');
+    res.sendFile(__dirname + '/static/client.js');
   });
 
 /////////// SERVER EVENTS
