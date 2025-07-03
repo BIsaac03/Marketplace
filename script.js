@@ -9,14 +9,19 @@ import { Server } from "socket.io";
 /////// SOCKETIO SETUP
 const app = express();
 const httpServer = createServer(app);
+const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
         //origin: "http://127.0.0.1:5500",
         //origin: "https://bisaac03.github.io"
-        origin: "https://marketplace-pfci.onrender.com/",
+        origin: "http://marketplace-pfci.onrender.com",
         methods: ["GET", "POST"],
     }
 });
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
+  });
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
@@ -210,7 +215,7 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(3000);
+httpServer.listen(port);
 
 let players = [];
 let gameRound = 0;
