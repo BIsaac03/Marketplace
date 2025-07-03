@@ -3,12 +3,12 @@ import {allCrops} from "./Cards/Crops.js";
 import {allTrinkets} from "./Cards/Trinkets.js";
 
 import express from "express";
-import { createServer } from "http";
+import { http } from "http";
 import { Server } from "socket.io";
 
 /////// SOCKETIO SETUP
 const app = express();
-const httpServer = createServer(app);
+const httpServer = http.createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
@@ -17,6 +17,10 @@ const io = new Server(httpServer, {
         origin: "http://marketplace-pfci.onrender.com",
 }
 });
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+  });
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
