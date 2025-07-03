@@ -120,7 +120,7 @@ export const allFruits = [
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": `io.emit("pineappleTarget", players[i].playerNum, players)`,
+        "onPlay": "io.emit('pineappleTarget', players[i].playerNum, players)",
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten"

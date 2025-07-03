@@ -167,7 +167,6 @@ socket.on("gameStartSetup", (players) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    console.log(players)
     selectGood(players[myPlayerNum].draftingHand, "draft");
 })
 

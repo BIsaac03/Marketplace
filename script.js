@@ -247,9 +247,6 @@ function newRound()
     gameRound += 1;
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
-    for (let i = 0; i < players.length; i++){
-        console.log(players[i].draftingHand)
-    }
     io.emit("nextDraftRound", players);
 }
 
@@ -265,7 +262,6 @@ function createDraftingDeck(numPlayers){
 }
 
 function createDraftingHands(draftingDeck){
-    console.log(draftingDeck)
     for (let i = 0; i < players.length; i++){
         for(let _ = 0; _ < 3; _++){
             let addedCard = draftingDeck.splice(Math.floor(Math.random()*(draftingDeck.length)), 1)[0];
