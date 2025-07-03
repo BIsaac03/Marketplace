@@ -1,6 +1,6 @@
-import {allFruits} from "./Cards/Fruits.js";
-import {allCrops} from "./Cards/Crops.js";
-import {allTrinkets} from "./Cards/Trinkets.js";
+import {allFruits} from "./static/Cards/Fruits.js";
+import {allCrops} from "./static/Cards/Crops.js";
+import {allTrinkets} from "./static/Cards/Trinkets.js";
 
 import express from "express";
 import { createServer } from "http";
@@ -17,13 +17,10 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        //origin: "http://127.0.0.1:5500",
-        //origin: "https://bisaac03.github.io"
         origin: "http://marketplace-pfci.onrender.com",
 }
 });
 
-//app.use(express.static(__dirname + '/index.html'));
 app.use("/static", express.static('./static/'));
 
 app.get('/', (req, res) => {
