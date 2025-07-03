@@ -5,6 +5,11 @@ import {allTrinkets} from "./Cards/Trinkets.js";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /////// SOCKETIO SETUP
 const app = express();
