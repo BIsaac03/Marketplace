@@ -11,7 +11,10 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://127.0.0.1:5500",
+        //origin: "http://127.0.0.1:5500",
+        //origin: "https://bisaac03.github.io"
+        origin: "https://marketplace-pfci.onrender.com/",
+        methods: ["GET", "POST"],
     }
 });
 

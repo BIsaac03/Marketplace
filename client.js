@@ -1,4 +1,5 @@
-const socket = io("http://localhost:3000");
+//const socket = io("http://localhost:3000");
+const socket = io("https://marketplace-pfci.onrender.com/");
 
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');
@@ -165,7 +166,8 @@ socket.on("gameStartSetup", (players) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    displayDraft(players[myPlayerNum].draftingHand);
+    console.log(players)
+    selectGood(players[myPlayerNum].draftingHand, "draft");
 })
 
 socket.on("displayReserve", (players) => {
@@ -196,48 +198,55 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
 
 socket.on("chooseLostGood", (player) => {
     if (myPlayerNum == player.playerNum){
-        let goodToLose = undefined;
-        while (goodToLose == undefined){
-            goodToLose = selectGood(player.tableau, false, "Select good to lose");
+        if (player.tableau.length > 0){
+            selectGood(player.tableau, "lose");
         }
-        socket.emit("removeGood", goodToLose, player);
     }
 })
 
-socket.on("removeGoodDOM", (goodToRemove, players) => {
+socket.on("removeGoodDOM", (nameOfGoodToRemove, players) => {
     for (let i = 0; i < players.length; i++){
-        const goodElement = document.querySelector("#player"+i+" .tableau ."+goodToRemove.name);
+        const goodElement = document.querySelector("#player"+i+" .tableau ."+nameOfGoodToRemove);
         goodElement.remove();
     }
 })
 
 socket.on("pineappleTarget", (playerNum, players) => {
     if (myPlayerNum == playerNum){
-        // !!! should select from neighboring tableau
-        const goodToCopy = undefined
         const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]] ,...players[players[playerNum].neighborNums[1]]])];
-        selectGood(potentialCopies, false, "Select good to copy");
+        selectGood(potentialCopies, "copy");
     }
-    socket.emit("copyGood", goodToCopy);
 })
 
-function selectGood(goodsToSelectFrom, draftOrSale, message){
+socket.on("pineappleToken", (image, playerNum) => {
+    const pineapples = document.querySelector(`#player${playerNum} .Pineapples`)
+    pineapples.addEventListener("mouseover", () => {
+        pineapples.src = image;
+    })
+    pineapples.addEventListener("mouseout", () => {
+        pineapples.src = "./Images/Pineapples.png";
+    })
+})
+
+function selectGood(goodsToSelectFrom, typeOfSelection){
+    console.log(goodsToSelectFrom)
     const goodSelectionDiv = document.createElement("div");
     goodSelectionDiv.id = "goodSelectionDiv";
-    const contextMessage = document.createElement("p");
-    contextMessage.textContent = message;
-    contextMessage.id = "message";
-    goodSelectionDiv.append(contextMessage);
+    const message = document.createElement("p");
+    message.textContent = "Selet a good to "+typeOfSelection;
+    message.id = "message";
+    goodSelectionDiv.append(message);
 
-    if(!draftOrSale){
-        const fruitsDiv = document.createElement("div");
-        fruitsDiv.classList.add("Fruits");
+    const fruitsDiv = document.createElement("div");
+    fruitsDiv.classList.add("Fruits");
+    const cropsDiv = document.createElement("div");
+    cropsDiv.classList.add("Crops");
+    const trinketsDiv = document.createElement("div");
+    trinketsDiv.classList.add("Trinkets");
+
+    if(typeOfSelection == "lose" || typeOfSelection == "copy"){
         goodSelectionDiv.appendChild(fruitsDiv);
-        const cropsDiv = document.createElement("div");
-        cropsDiv.classList.add("Crops");
         goodSelectionDiv.appendChild(cropsDiv);
-        const trinketsDiv = document.createElement("div");
-        trinketsDiv.classList.add("Trinkets");
         goodSelectionDiv.appendChild(trinketsDiv);
     }
 
@@ -259,18 +268,41 @@ function selectGood(goodsToSelectFrom, draftOrSale, message){
             selectedDiv.id = "selectedDiv";
         })
         selectedDiv.appendChild(selectedGood);
-        goodSelectionDiv.appendChild(selectedDiv);
+
+        if (typeOfSelection == "lose" || typeOfSelection == "copy"){
+            if (goodsToSelectFrom[i].type == "Fruit"){
+                fruitsDiv.appendChild(selectedDiv);
+            }
+            if (goodsToSelectFrom[i].type == "Crop"){
+                cropsDiv.appendChild(selectedDiv);
+            }
+            else if (goodsToSelectFrom[i].type == "Trinket"){
+                trinketsDiv.appendChild(selectedDiv);
+            }
+        }
+        else{goodSelectionDiv.appendChild(selectedDiv);
+        }
     }
 
     const confirmSelection = document.createElement("button");
     confirmSelection.textContent = "Confirm";
-    confirmSelection.id = "confirmGood";
     confirmSelection.addEventListener("click", () => {
         const selectedGoodDOM = document.getElementById("selectedGood");
         if (selectedGoodDOM != undefined){
             goodSelectionDiv.remove();
-            socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1]);
-            return [selectedGoodDOM.classList[0], selectedGoodDOM.classList[1]];
+            if(typeOfSelection == "draft"){
+                socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1]);
+            }
+            else if (typeOfSelection == "sell"){
+                return 1;
+            }
+            else if (typeOfSelection == "lose"){
+                socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
+            }
+            else if (typeOfSelection == "copy"){
+                const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
+                socket.emit("copyGood", goodToCopy, myPlayerNum);
+            }
         }
     })
     goodSelectionDiv.appendChild(confirmSelection);
@@ -336,25 +368,6 @@ function createTableaus(players){
 
 
 /////// DISPLAY UPDATES
-function displayDraft(draftingHand){
-   selectGood(draftingHand, true, "Select good to draft");
-
-    /*
-    clearDraftingPopUp();
-    const draftingPopUp = document.createElement("div");
-    draftingPopUp.id = "draftingPopUp";
-    for (let i = 0; i < draftingHand.length; i++){
-        const draftingOption = document.createElement("img");
-        draftingOption.classList.add("draftingOption", "good");
-        draftingOption.src = draftingHand[i].image;
-        draftingOption.addEventListener("click", () => {
-            socket.emit("draftedCard", myPlayerNum, i);
-        })
-        draftingPopUp.appendChild(draftingOption);
-    }
-    bodyElement.appendChild(draftingPopUp)
-    */
-}
 
 function clearDraftingPopUp() {
     const draftingPopUp = document.getElementById("draftingPopUp");
