@@ -28,6 +28,8 @@ app.use("/static", express.static('./static/'));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + 'static/styles.css');
+    res.sendFile(__dirname + 'static/client.js');
   });
 
 /////////// SERVER EVENTS
@@ -222,7 +224,11 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(port);
+httpServer.listen(port, function () {
+    var host = httpServer.address().address
+  var port = httpServer.address().port
+  console.log('App listening at https://%s:%s', host, port)
+});
 
 let players = [];
 let gameRound = 0;
