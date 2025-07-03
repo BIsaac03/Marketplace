@@ -1,5 +1,5 @@
 export const allFruits = [
- /*   {
+    {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -8,7 +8,7 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "7"
     },
-    {
+ /*   {
         "name": "Bananas",
         "type": "Fruit",
         "image": "static/Images/Bananas.png",

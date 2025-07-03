@@ -1,5 +1,5 @@
 export const allCrops = [
- /*   {
+    {
         "name": "Beans",
         "type": "Crop",
         "image": "static/Images/Beans.png",
@@ -8,7 +8,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "2*players.length"
     },
-    {
+/*    {
         "name": "Cacao",
         "type": "Crop",
         "image": "static/Images/Cacao.png",

@@ -116,16 +116,16 @@ export const allTrinkets = [
         "ongoing": "none",
         "VP": "0"
     },
-/*    {
+    {
         "name": "Pouches",
         "type": "Trinket",
         "image": "static/Images/Pouches.png",
         "onPlay": "none",
-        "active": "socket.emit("activeAbility", "pouchesAction", player);",
+        "active": `socket.emit("activeAbility", "pouchesAction", player);`,
         "ongoing": "none",
         "VP": "2"
     },
-    {
+/*    {
         "name": "Shells",
         "type": "Trinket",
         "image": "static/Images/Shells.png",
