@@ -23,6 +23,8 @@ const io = new Server(httpServer, {
 }
 });
 
+app.use(express.static('Marketplace'));
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
