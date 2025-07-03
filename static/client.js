@@ -122,7 +122,9 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         // !!!!!!!!!!! should ensure duplicate tableaus are not created
         createTableaus(players);
         displayTableaus(players);
-        displayDraft(returningPlayer.draftingHand);
+        if(returningPlayer.draftingHand.length >0){
+            selectGood(returningPlayer.draftingHand, "draft");
+        }
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
         if (returningPlayer.name == vendor.name){
@@ -170,7 +172,6 @@ socket.on("nextDraftRound", (players) => {
 })
 
 socket.on("displayReserve", (players) => {
-    clearDraftingPopUp();
     displayReserve(players[myPlayerNum].reserve);
 })
 
@@ -367,13 +368,6 @@ function createTableaus(players){
 
 
 /////// DISPLAY UPDATES
-
-function clearDraftingPopUp() {
-    const draftingPopUp = document.getElementById("draftingPopUp");
-    if (draftingPopUp != undefined){
-        draftingPopUp.remove();
-    }
-}
 
 function displayReserve(reserve){
     let shouldEnlarge = true;
