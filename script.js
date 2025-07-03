@@ -24,7 +24,7 @@ const io = new Server(httpServer, {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index');
   });
 
 /////////// SERVER EVENTS
