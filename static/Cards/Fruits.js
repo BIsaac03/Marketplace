@@ -1,5 +1,5 @@
 export const allFruits = [
-    {
+ /*   {
         "name": "Apples",
         "type": "Fruit",
         "image": "./Images/Apples.png",
@@ -62,7 +62,7 @@ export const allFruits = [
         "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
         "VP": "0"
     },
- /*   {
+    {
         "name": "Kiwis",
         "type": "Fruit",
         "image": "./Images/Kiwis.png",
@@ -71,7 +71,7 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "3*KIWIS IN PLAY"
     },
- */   {
+    {
         "name": "Mangoes",
         "type": "Fruit",
         "image": "./Images/Mangoes.png",
@@ -99,7 +99,7 @@ export const allFruits = [
         "VP": "0"
     },
     {
-        "name": "Passion Fruit",
+        "name": "Passion_Fruit",
         "type": "Fruit",
         "image": "./Images/Passion_Fruit.png",
         "onPlay": "none",
@@ -107,7 +107,7 @@ export const allFruits = [
         "ongoing": "!!! KEEP FINAL DRAFT",
         "VP": "0"
     },
- /*   {
+    {
         "name": "Pears",
         "type": "Fruit",
         "image": "./Images/Pears.png",
@@ -116,16 +116,16 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "2*(players[players[i].neighborNums[0]].tableau.filter(good => !players[players[i].neighborNums[1]].tableau.includes(good)).lenght)"
     },
-    {
+ */   {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "./Images/Pineapples.png",
-        "onPlay": "io.emit("pineappleTarget", players[i].playerNum, players)",
+        "onPlay": `io.emit("pineappleTarget", players[i].playerNum, players)`,
         "active": "none",
         "ongoing": "none",
-        "VP": "!!! pineappleTarget.VP"
+        "VP": "overwritten"
     },
-*/    {
+    {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "./Images/Strawberries.png",
