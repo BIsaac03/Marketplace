@@ -20,8 +20,8 @@ const io = new Server(httpServer, {
 });
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html');
-  });
+    res.render('index', {});
+});
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
