@@ -2,7 +2,7 @@ export const allFruits = [
  /*   {
         "name": "Apples",
         "type": "Fruit",
-        "image": "./Images/Apples.png",
+        "image": "static/Images/Apples.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -11,7 +11,7 @@ export const allFruits = [
     {
         "name": "Bananas",
         "type": "Fruit",
-        "image": "./Images/Bananas.png",
+        "image": "static/Images/Bananas.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -20,7 +20,7 @@ export const allFruits = [
     {
         "name": "Blackberries",
         "type": "Fruit",
-        "image": "./Images/Blackberries.png",
+        "image": "static/Images/Blackberries.png",
         "onPlay": "scoreTableau(players[i], 0.25)",
         "active": "none",
         "ongoing": "none",
@@ -29,7 +29,7 @@ export const allFruits = [
     {
         "name": "Cherries",
         "type": "Fruit",
-        "image": "./Images/Cherries.png",
+        "image": "static/Images/Cherries.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -38,7 +38,7 @@ export const allFruits = [
     {
         "name": "Coconuts",
         "type": "Fruit",
-        "image": "./Images/Coconuts.png",
+        "image": "static/Images/Coconuts.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -47,7 +47,7 @@ export const allFruits = [
     {
         "name": "Grapes",
         "type": "Fruit",
-        "image": "./Images/Grapes.png",
+        "image": "static/Images/Grapes.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -56,7 +56,7 @@ export const allFruits = [
     {
         "name": "Guavas",
         "type": "Fruit",
-        "image": "./Images/Guavas.png",
+        "image": "static/Images/Guavas.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
@@ -65,7 +65,7 @@ export const allFruits = [
     {
         "name": "Kiwis",
         "type": "Fruit",
-        "image": "./Images/Kiwis.png",
+        "image": "static/Images/Kiwis.png",
         "onPlay": "vendor.numCoins++",
         "active": "none",
         "ongoing": "none",
@@ -74,7 +74,7 @@ export const allFruits = [
     {
         "name": "Mangoes",
         "type": "Fruit",
-        "image": "./Images/Mangoes.png",
+        "image": "static/Images/Mangoes.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! TRIPLE LOWEST SCORING CROP",
@@ -83,7 +83,7 @@ export const allFruits = [
     {
         "name": "Oranges",
         "type": "Fruit",
-        "image": "./Images/Oranges.png",
+        "image": "static/Images/Oranges.png",
         "onPlay": "players[i].numCoins += 4",
         "active": "none",
         "ongoing": "none",
@@ -92,7 +92,7 @@ export const allFruits = [
     {
         "name": "Papayas",
         "type": "Fruit",
-        "image": "./Images/Papayas.png",
+        "image": "static/Images/Papayas.png",
         "onPlay": "players[i].numCoins += 10; players[i].numWorkers += 2",
         "active": "none",
         "ongoing": "none",
@@ -101,7 +101,7 @@ export const allFruits = [
     {
         "name": "Passion_Fruit",
         "type": "Fruit",
-        "image": "./Images/Passion_Fruit.png",
+        "image": "static/Images/Passion_Fruit.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! KEEP FINAL DRAFT",
@@ -110,7 +110,7 @@ export const allFruits = [
     {
         "name": "Pears",
         "type": "Fruit",
-        "image": "./Images/Pears.png",
+        "image": "static/Images/Pears.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -119,7 +119,7 @@ export const allFruits = [
  */   {
         "name": "Pineapples",
         "type": "Fruit",
-        "image": "./Images/Pineapples.png",
+        "image": "static/Images/Pineapples.png",
         "onPlay": `io.emit("pineappleTarget", players[i].playerNum, players)`,
         "active": "none",
         "ongoing": "none",
@@ -128,7 +128,7 @@ export const allFruits = [
     {
         "name": "Strawberries",
         "type": "Fruit",
-        "image": "./Images/Strawberries.png",
+        "image": "static/Images/Strawberries.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",

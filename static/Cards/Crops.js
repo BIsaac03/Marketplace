@@ -2,7 +2,7 @@ export const allCrops = [
  /*   {
         "name": "Beans",
         "type": "Crop",
-        "image": "./Images/Beans.png",
+        "image": "static/Images/Beans.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -11,7 +11,7 @@ export const allCrops = [
     {
         "name": "Cacao",
         "type": "Crop",
-        "image": "./Images/Cacao.png",
+        "image": "static/Images/Cacao.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -20,7 +20,7 @@ export const allCrops = [
     {
         "name": "Coffee",
         "type": "Crop",
-        "image": "./Images/Coffee.png",
+        "image": "static/Images/Coffee.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -29,7 +29,7 @@ export const allCrops = [
     {
         "name": "Corn",
         "type": "Crop",
-        "image": "./Images/Corn.png",
+        "image": "static/Images/Corn.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -38,7 +38,7 @@ export const allCrops = [
     {
         "name": "Cotton",
         "type": "Crop",
-        "image": "./Images/Cotton.png",
+        "image": "static/Images/Cotton.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
@@ -47,7 +47,7 @@ export const allCrops = [
     {
         "name": "Mint",
         "type": "Crop",
-        "image": "./Images/Mint.png",
+        "image": "static/Images/Mint.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -56,7 +56,7 @@ export const allCrops = [
     {
         "name": "Oats",
         "type": "Crop",
-        "image": "./Images/Oats.png",
+        "image": "static/Images/Oats.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -65,7 +65,7 @@ export const allCrops = [
  */   {
         "name": "Peanuts",
         "type": "Crop",
-        "image": "./Images/Peanuts.png",
+        "image": "static/Images/Peanuts.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -74,7 +74,7 @@ export const allCrops = [
     {
         "name": "Peppers",
         "type": "Crop",
-        "image": "./Images/Peppers.png",
+        "image": "static/Images/Peppers.png",
         "onPlay": "loseGood",
         "active": "none",
         "ongoing": "none",
@@ -83,7 +83,7 @@ export const allCrops = [
 /*   {
         "name": "Potatoes",
         "type": "Crop",
-        "image": "./Images/Potatoes.png",
+        "image": "static/Images/Potatoes.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -92,7 +92,7 @@ export const allCrops = [
     {
         "name": "Rice",
         "type": "Crop",
-        "image": "./Images/Rice.png",
+        "image": "static/Images/Rice.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -101,7 +101,7 @@ export const allCrops = [
     {
         "name": "Sugarcane",
         "type": "Crop",
-        "image": "./Images/Sugarcane.png",
+        "image": "static/Images/Sugarcane.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -110,7 +110,7 @@ export const allCrops = [
     {
         "name": "Tobacco",
         "type": "Crop",
-        "image": "./Images/Tobacco.png",
+        "image": "static/Images/Tobacco.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -119,7 +119,7 @@ export const allCrops = [
     {
         "name": "Tomatoes",
         "type": "Crop",
-        "image": "./Images/Tomatoes.png",
+        "image": "static/Images/Tomatoes.png",
         "onPlay": "none",
         "active": "socket.emit("activeAbility", "tomatoAction", player);",
         "ongoing": "none",
@@ -128,7 +128,7 @@ export const allCrops = [
     {
         "name": "Wheat",
         "type": "Crop",
-        "image": "./Images/Wheat.png",
+        "image": "static/Images/Wheat.png",
         "onPlay": "players[i].numWorkers+=3",
         "active": "none",
         "ongoing": "none",

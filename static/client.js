@@ -223,7 +223,7 @@ socket.on("pineappleToken", (image, playerNum) => {
         pineapples.src = image;
     })
     pineapples.addEventListener("mouseout", () => {
-        pineapples.src = "./Images/Pineapples.png";
+        pineapples.src = "static/Images/Pineapples.png";
     })
 })
 
@@ -320,21 +320,21 @@ function createTableaus(players){
         coins.classList.add("coins");
         stats.appendChild(coins);
         let coinIcon = document.createElement("img");
-        coinIcon.src = "./Icons/coins.png";
+        coinIcon.src = "static/Icons/coins.png";
         coinIcon.classList.add("coinIcon")
         stats.appendChild(coinIcon);
         let workers = document.createElement("p");
         workers.classList.add("workers");
         stats.appendChild(workers);
         let workerIcon = document.createElement("img");
-        workerIcon.src = "./Icons/workers.png";
+        workerIcon.src = "static/Icons/workers.png";
         workerIcon.classList.add("workerIcon");
         stats.appendChild(workerIcon);
         let VP = document.createElement("p");
         VP.classList.add("VP");
         stats.appendChild(VP);
         let VPIcon = document.createElement("img");
-        VPIcon.src = "./Icons/VPIcon.png";
+        VPIcon.src = "static/Icons/VPIcon.png";
         VPIcon.classList.add("VPIcon");
         stats.appendChild(VPIcon);
 

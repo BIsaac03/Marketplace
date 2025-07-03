@@ -2,7 +2,7 @@ export const allTrinkets = [
 /*    {
         "name": "Artwork",
         "type": "Trinket",
-        "image": "./Images/Artwork.png",
+        "image": "static/Images/Artwork.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -11,7 +11,7 @@ export const allTrinkets = [
     {
         "name": "Bracelets",
         "type": "Trinket",
-        "image": "./Images/Bracelets.png",
+        "image": "static/Images/Bracelets.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! GET COINS WHEN SKIP SALE",
@@ -20,7 +20,7 @@ export const allTrinkets = [
     {
         "name": "Carvings",
         "type": "Trinket",
-        "image": "./Images/Carvings.png",
+        "image": "static/Images/Carvings.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -29,7 +29,7 @@ export const allTrinkets = [
        {
         "name": "Charms",
         "type": "Trinket",
-        "image": "./Images/Charms.png",
+        "image": "static/Images/Charms.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! MINORITY BONUS",
@@ -38,7 +38,7 @@ export const allTrinkets = [
     {
         "name": "Earrings",
         "type": "Trinket",
-        "image": "./Images/Earrings.png",
+        "image": "static/Images/Earrings.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: 1",
@@ -47,7 +47,7 @@ export const allTrinkets = [
        {
         "name": "Fabrics",
         "type": "Trinket",
-        "image": "./Images/Fabrics.png",
+        "image": "static/Images/Fabrics.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -56,7 +56,7 @@ export const allTrinkets = [
     {
         "name": "Figurines",
         "type": "Trinket",
-        "image": "./Images/Figurines.png",
+        "image": "static/Images/Figurines.png",
         "onPlay": "players[i].numWorkers+=5",
         "active": "none",
         "ongoing": "!!! TWO WORKERS PER TURN",
@@ -65,7 +65,7 @@ export const allTrinkets = [
     {
         "name": "Lanterns",
         "type": "Trinket",
-        "image": "./Images/Lanterns.png",
+        "image": "static/Images/Lanterns.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! POINTS FOR UNIQUENESS",
@@ -74,7 +74,7 @@ export const allTrinkets = [
     {
         "name": "Masks",
         "type": "Trinket",
-        "image": "./Images/Masks.png",
+        "image": "static/Images/Masks.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! ADAPT TYPE BASED ON DISCARDED COINS",
@@ -83,7 +83,7 @@ export const allTrinkets = [
     {
         "name": "Necklaces",
         "type": "Trinket",
-        "image": "./Images/Necklaces.png",
+        "image": "static/Images/Necklaces.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -92,7 +92,7 @@ export const allTrinkets = [
     {
         "name": "Perfume",
         "type": "Trinket",
-        "image": "./Images/Perfume.png",
+        "image": "static/Images/Perfume.png",
         "onPlay": "none",
         "active": "socket.emit("activeAbility", "perfumeAction", player);",
         "ongoing": "none",
@@ -101,7 +101,7 @@ export const allTrinkets = [
 */    {
         "name": "Pins",
         "type": "Trinket",
-        "image": "./Images/Pins.png",
+        "image": "static/Images/Pins.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
@@ -110,7 +110,7 @@ export const allTrinkets = [
     {
         "name": "Postcards",
         "type": "Trinket",
-        "image": "./Images/Postcards.png",
+        "image": "static/Images/Postcards.png",
         "onPlay": "scoreTableau(players[i], 0.5);players[i].numVP -= 4",
         "active": "none",
         "ongoing": "none",
@@ -119,7 +119,7 @@ export const allTrinkets = [
 /*    {
         "name": "Pouches",
         "type": "Trinket",
-        "image": "./Images/Pouches.png",
+        "image": "static/Images/Pouches.png",
         "onPlay": "none",
         "active": "socket.emit("activeAbility", "pouchesAction", player);",
         "ongoing": "none",
@@ -128,7 +128,7 @@ export const allTrinkets = [
     {
         "name": "Shells",
         "type": "Trinket",
-        "image": "./Images/Shells.png",
+        "image": "static/Images/Shells.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! RECEIVE COINS IF CANNOT BUY",
