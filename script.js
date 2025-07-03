@@ -24,7 +24,7 @@ const io = new Server(httpServer, {
 });
 
 //app.use(express.static(__dirname + '/index.html'));
-//app.use("/static", express.static('./static/'));
+app.use("/static", express.static('./static/'));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
