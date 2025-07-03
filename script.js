@@ -3,12 +3,12 @@ import {allCrops} from "./Cards/Crops.js";
 import {allTrinkets} from "./Cards/Trinkets.js";
 
 import express from "express";
-import { http } from "http";
+import { createServer } from "http";
 import { Server } from "socket.io";
 
 /////// SOCKETIO SETUP
 const app = express();
-const httpServer = http.createServer(app);
+const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
