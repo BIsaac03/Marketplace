@@ -17,7 +17,8 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://marketplace-pfci.onrender.com",
+        //origin: "http://marketplace-pfci.onrender.com",
+        origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -190,22 +191,22 @@ io.on("connection", (socket) => {
         io.emit("removeGoodDOM", nameOfGoodToRemove, players);
     })
 
-    socket.on("activeAbility", (abilityType, player) => {
+    socket.on("activeAbility", (abilityType, playerNum) => {
         if (abilityType == "perfumeAction"){
             socket.emit("chooseLostGood");
-            player.numVP += 5;
+            players[playerNum].numVP += 5;
         }
         else if (abilityType == "tomatoAction"){
-            const tomatoes = player.tableau.find(good => good.name == "Tomatoes")
+            const tomatoes = players[playerNum].tableau.find(good => good.name == "Tomatoes")
             if (tomatoes.type == "Fruit"){
                 tomatoes.type = "Crop";
             } 
             else {tomatoes.type = "Fruit";} 
         }
         else if (abilityType == "pouchesAction"){
-            if (player.numCoins >= 3){
-                player.numCoins -= 3;
-                player.numWorkers += 2;
+            if (players[playerNum].numCoins >= 3){
+                players[playerNum].numCoins -= 3;
+                players[playerNum].numWorkers += 2;
             }
         }
      })

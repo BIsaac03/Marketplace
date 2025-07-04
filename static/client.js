@@ -1,4 +1,5 @@
-const socket = io("https://marketplace-pfci.onrender.com/");
+//const socket = io("https://marketplace-pfci.onrender.com/");
+const socket = io("http://localhost:3000");
 
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');
@@ -525,7 +526,27 @@ function addToTableau(purchasedGood, playerNum){
     else{
         if (purchasedGood.active != "none"){
             newGood.addEventListener("click", () => {
-                purchasedGood.active;
+                const abilityConfirmationDiv = document.createElement("div");
+                abilityConfirmationDiv.id = "abilityConfirmation";
+                const confirmationText = document.createElement("p");
+                confirmationText.textContent = "Are you sure you want to activate "+purchasedGood.name+"?";
+                abilityConfirmationDiv.appendChild(confirmationText);
+                const activateButton = document.createElement("button");
+                activateButton.textContent = "Activate";
+                activateButton.id = "activateAbility";
+                activateButton.addEventListener("click", () => {
+                    eval(purchasedGood.active);
+                    abilityConfirmationDiv.remove();
+                })
+                abilityConfirmationDiv.appendChild(activateButton);
+                const cancelButton = document.createElement("button");
+                cancelButton.textContent = "Cancel";
+                cancelButton.id = "cancelAbility";
+                cancelButton.addEventListener("click", () => {
+                    abilityConfirmationDiv.remove();
+                })
+                abilityConfirmationDiv.appendChild(cancelButton);
+                bodyElement.appendChild(abilityConfirmationDiv);
             })
         }
     }

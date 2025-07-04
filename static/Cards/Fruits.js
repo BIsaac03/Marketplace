@@ -107,16 +107,16 @@ export const allFruits = [
         "ongoing": "!!! KEEP FINAL DRAFT",
         "VP": "0"
     },
-    {
+ */   {
         "name": "Pears",
         "type": "Fruit",
         "image": "static/Images/Pears.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(players[players[i].neighborNums[0]].tableau.filter(good => !players[players[i].neighborNums[1]].tableau.includes(good)).lenght)"
+        "VP": "2*(players[players[i].neighborNums[0]].tableau.filter(good => !players[players[i].neighborNums[1]].tableau.includes(good)).length)"
     },
- */   {
+    {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",

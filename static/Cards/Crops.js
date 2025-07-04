@@ -53,7 +53,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "!!! HIGHEST SCORING FRUIT"
     },
-    {
+ */   {
         "name": "Oats",
         "type": "Crop",
         "image": "static/Images/Oats.png",
@@ -62,7 +62,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "2*(Math.abs(players[i].numCrops - (players[i].numFruits+players[i].numTrinkets)))"
     },
- */   {
+    {
         "name": "Peanuts",
         "type": "Crop",
         "image": "static/Images/Peanuts.png",
@@ -121,7 +121,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "static/Images/Tomatoes.png",
         "onPlay": "none",
-        "active": "socket.emit("activeAbility", "tomatoAction", player);",
+        "active": "socket.emit("activeAbility", "tomatoAction", playerNum);",
         "ongoing": "none",
         "VP": "Math.ceil(3/2*players[i].numCrops)"
     },
