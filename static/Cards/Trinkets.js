@@ -94,7 +94,7 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "static/Images/Perfume.png",
         "onPlay": "none",
-        "active": "socket.emit('activeAbility', 'perfumeAction', playerNum);",
+        "active": "socket.emit('activeAbility', 'perfumeAction', myPlayerNum);",
         "ongoing": "none",
         "VP": "0"
     },
@@ -121,7 +121,7 @@ export const allTrinkets = [
         "type": "Trinket",
         "image": "static/Images/Pouches.png",
         "onPlay": "none",
-        "active": `socket.emit("activeAbility", "pouchesAction", playerNum);`,
+        "active": "socket.emit('activeAbility', 'pouchesAction', myPlayerNum);",
         "ongoing": "none",
         "VP": "2"
     },

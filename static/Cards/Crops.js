@@ -121,7 +121,7 @@ export const allCrops = [
         "type": "Crop",
         "image": "static/Images/Tomatoes.png",
         "onPlay": "none",
-        "active": "socket.emit("activeAbility", "tomatoAction", playerNum);",
+        "active": "socket.emit('activeAbility', 'tomatoAction', myPlayerNum);",
         "ongoing": "none",
         "VP": "Math.ceil(3/2*players[i].numCrops)"
     },

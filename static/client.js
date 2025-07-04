@@ -229,7 +229,6 @@ socket.on("pineappleToken", (image, playerNum) => {
 })
 
 function selectGood(goodsToSelectFrom, typeOfSelection){
-    console.log(goodsToSelectFrom)
     const goodSelectionDiv = document.createElement("div");
     goodSelectionDiv.id = "goodSelectionDiv";
     const message = document.createElement("p");
@@ -297,6 +296,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
                 return 1;
             }
             else if (typeOfSelection == "lose"){
+                console.log("remove "+ selectedGoodDOM.classList[0]);
                 socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
             }
             else if (typeOfSelection == "copy"){
@@ -535,7 +535,9 @@ function addToTableau(purchasedGood, playerNum){
                 activateButton.textContent = "Activate";
                 activateButton.id = "activateAbility";
                 activateButton.addEventListener("click", () => {
+                    console.log(purchasedGood.active)
                     eval(purchasedGood.active);
+                    socket.emit("activeAbility", "pouchesAction", myPlayerNum);
                     abilityConfirmationDiv.remove();
                 })
                 abilityConfirmationDiv.appendChild(activateButton);
@@ -570,7 +572,8 @@ function displayTableaus(players){
         for (let j = 0; j < players[i].tableau.length; j++){
             const goodAlreadyDisplayed = document.getElementsByClassName(players[i].tableau[j].name)[0];
             if (goodAlreadyDisplayed == undefined){
-                addToTableau(purchasedGood, i);
+                console.log("attempt to add good")
+                addToTableau(players[i].tableau[j], i);
             }
         }
     }

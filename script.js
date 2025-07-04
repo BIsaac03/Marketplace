@@ -188,6 +188,8 @@ io.on("connection", (socket) => {
         const player = players.find(player => player.playerNum == playerNum);
         const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
+        console.log(player.tableau)
+        console.log(nameOfGoodToRemove)
         io.emit("removeGoodDOM", nameOfGoodToRemove, players);
     })
 
@@ -246,6 +248,9 @@ function resetPlayerStates() {
 function newRound()
 {
     gameRound += 1;
+    for (let i = 0; i < players.length; i++){
+        players[i].reserve.length = 0;
+    }
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
     io.emit("nextDraftRound", players);
