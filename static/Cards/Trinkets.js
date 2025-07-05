@@ -6,7 +6,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(players[i].numTrinkets >= 2)*1 + (players[i].numTrinkets >= 4)*4 + (players[i].numTrinkets >= 6)*5 + (players[i].numTrinkets >= 8)*10"
+        "VP": "(players[i].getNumTrinkets >= 2)*1 + (players[i].getNumTrinkets >= 4)*4 + (players[i].getNumTrinkets >= 6)*5 + (players[i].getNumTrinkets >= 8)*10"
     },
     {
         "name": "Bracelets",
@@ -42,7 +42,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: 1",
-        "VP": "players[players[i].neighborNums[0]].tableau.filter(good => players[players[i].neighborNums[1]].tableau.includes(good) && !players[i].tableau.includes(good)).lenght"
+        "VP": "players[players[i].neighborNums[0]].tableau.filter(good => players[players[i].neighborNums[1]].tableau.includes(good) && !players[i].tableau.includes(good)).length"
     },
        {
         "name": "Fabrics",
@@ -51,7 +51,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].numFruits, players[i].numTrinkets)"
+        "VP": "3*Math.min(players[i].getNumFruits, players[i].getNumTrinkets)"
     },
     {
         "name": "Figurines",
@@ -105,7 +105,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*players[i].numFruits-players[i].numTrinkets"
+        "VP": "2*players[i].getNumFruits-players[i].getNumTrinkets"
     },
     {
         "name": "Postcards",

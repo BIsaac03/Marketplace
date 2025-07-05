@@ -188,8 +188,6 @@ io.on("connection", (socket) => {
         const player = players.find(player => player.playerNum == playerNum);
         const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
-        console.log(player.tableau)
-        console.log(nameOfGoodToRemove)
         io.emit("removeGoodDOM", nameOfGoodToRemove, players);
     })
 
@@ -202,8 +200,13 @@ io.on("connection", (socket) => {
             const tomatoes = players[playerNum].tableau.find(good => good.name == "Tomatoes")
             if (tomatoes.type == "Fruit"){
                 tomatoes.type = "Crop";
+                io.emit("changeTomatoType", "crop", players, playerNum)
+
             } 
-            else {tomatoes.type = "Fruit";} 
+            else {
+                tomatoes.type = "Fruit";
+                io.emit("changeTomatoType", "fruit", playerNum)
+            }
         }
         else if (abilityType == "pouchesAction"){
             if (players[playerNum].numCoins >= 3){
@@ -211,6 +214,7 @@ io.on("connection", (socket) => {
                 players[playerNum].numWorkers += 2;
             }
         }
+        io.emit("updateStats", players);
      })
 
     socket.on("copyGood", (copiedGood, playerNum) => {
@@ -287,16 +291,6 @@ function checkDiscount(tableau, goodType){
 }
 
 function resolvePurchase(i, goodForSale){
-    players[i].numGoods++;
-    if (goodForSale.type === "Fruit"){
-        players[i].numFruits++;
-    }
-    if (goodForSale.type === "Crop"){
-        players[i].numCrops++;
-    }
-    if (goodForSale.type === "Trinket"){
-        players[i].numTrinkets++;
-    }
     io.emit("goodPurchased", goodForSale, i)
     players[i].tableau.push(goodForSale);
     if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
@@ -343,10 +337,6 @@ function makePlayer(userID, name, color){
     let numCoins = 20;
     let numWorkers = 1;
     let numVP = 0;
-    let numFruits = 0;
-    let numCrops = 0;
-    let numTrinkets = 0;
-    let numGoods = 0;
     let isReady = false;
     let isInGame = false;
     let isVendor= false;
@@ -358,20 +348,7 @@ function makePlayer(userID, name, color){
         }
         else {neighborNums.push(players.length-1)};
     }
-    const buyCard = (card, cost) => {
-        if (card.type === "Fruit"){
-            numFruits++;
-        }
-        if (card.type === "Crop"){
-            numCrops++;
-        }
-        if (card.type === "Trinket"){
-            numTrinkets++;
-        }
-        // !!! SHOULD CHECK FOR DISCOUNTS !!!
-        numCoins -= cost;
-        tableau.push(card);
-    }
+    
     const scoreTableau = (modifier) => {
         let totalScore = 0;
         for (let i = 0; i < tableau.length; i++){
@@ -381,5 +358,35 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, numGoods, numFruits, numCrops, numTrinkets, isReady, isInGame, isVendor, setNeighborNums, buyCard, scoreTableau}
+    const getNumFruits = () => {
+        let numFruits = 0
+        for (let i = 0; i < tableau.length; i++){
+            if (tableau[i].type = "Fruit"){
+                numFruits += 1;
+            }
+        }
+        return numFruits;
+    }
+
+    const getNumCrops = () => {
+        let numCrops = 0
+        for (let i = 0; i < tableau.length; i++){
+            if (tableau[i].type = "Crop"){
+                numCrops += 1;
+            }
+        }
+        return numCrops;
+    }
+
+    const getNumTrinkets = () => {
+        let numTrinkets = 0
+        for (let i = 0; i < tableau.length; i++){
+            if (tableau[i].type = "Trinket"){
+                numTrinkets += 1;
+            }
+        }
+        return numTrinkets;
+    }
+
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, setNeighborNums, scoreTableau, getNumFruits, getNumCrops, getNumTrinkets}
 }

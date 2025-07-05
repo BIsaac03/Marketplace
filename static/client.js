@@ -138,9 +138,6 @@ socket.on("returningPlayer", (returningPlayer, players) => {
                 displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
             }   
         }
-             
-
-        
     }
 })
 
@@ -192,6 +189,10 @@ socket.on("roundUpdate", (players) => {
     updateStats(players);
 })
 
+socket.on("updateStats", (players) => {
+    updateStats(players);
+})
+
 socket.on("goodPurchased", (purchasedGood, playerNum) => {
     addToTableau(purchasedGood, playerNum)
 })
@@ -206,7 +207,7 @@ socket.on("chooseLostGood", (player) => {
 
 socket.on("removeGoodDOM", (nameOfGoodToRemove, players) => {
     for (let i = 0; i < players.length; i++){
-        const goodElement = document.querySelector("#player"+i+" .tableau ."+nameOfGoodToRemove);
+        const goodElement = document.querySelector(`#player${i} .tableau .${nameOfGoodToRemove}`);
         goodElement.remove();
     }
 })
@@ -226,6 +227,22 @@ socket.on("pineappleToken", (image, playerNum) => {
     pineapples.addEventListener("mouseout", () => {
         pineapples.src = "static/Images/Pineapples.png";
     })
+})
+
+socket.on("changeTomatoType", (newType, playerNum) => {
+    const tomatoes = document.querySelector(`#player${playerNum} .Tomatoes`);
+    const fruitDiv = document.querySelector(`#player${playerNum} .Fruits`);
+    const cropDiv = document.querySelector(`#player${playerNum} .Crops`);
+    if (newType == "crop"){
+        cropDiv.appendChild(tomatoes);
+        fruitDiv.removeChild(tomatoes);
+        tomatoes.src = "static/Images/Tomatoes.png";
+    }
+    else if (newType == "fruit"){
+        fruitDiv.appendChild(tomatoes);
+        cropDiv.removeChild(tomatoes);
+        tomatoes.src = "static/Images/Tomatoes-fruit.png"
+    }
 })
 
 function selectGood(goodsToSelectFrom, typeOfSelection){
@@ -535,9 +552,7 @@ function addToTableau(purchasedGood, playerNum){
                 activateButton.textContent = "Activate";
                 activateButton.id = "activateAbility";
                 activateButton.addEventListener("click", () => {
-                    console.log(purchasedGood.active)
                     eval(purchasedGood.active);
-                    socket.emit("activeAbility", "pouchesAction", myPlayerNum);
                     abilityConfirmationDiv.remove();
                 })
                 abilityConfirmationDiv.appendChild(activateButton);

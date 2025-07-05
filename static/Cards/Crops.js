@@ -15,7 +15,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[i].numGoods"
+        "VP": "players[i].getNumGoods"
     },
     {
         "name": "Coffee",
@@ -24,7 +24,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(players[i].numCrops - players[i].tableau.some(good -> good.name == "Coffee"))
+        "VP": "2*(players[i].getNumCrops - players[i].tableau.some(good -> good.name == "Coffee"))
     },
     {
         "name": "Corn",
@@ -33,7 +33,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*players[i].numFruits"
+        "VP": "2*players[i].getNumFruits"
     },
     {
         "name": "Cotton",
@@ -42,7 +42,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
-        "VP": "2*players[i].numTrinkets"
+        "VP": "2*players[i].getNumTrinkets"
     },
     {
         "name": "Mint",
@@ -53,14 +53,14 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "!!! HIGHEST SCORING FRUIT"
     },
- */   {
+    {
         "name": "Oats",
         "type": "Crop",
         "image": "static/Images/Oats.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(Math.abs(players[i].numCrops - (players[i].numFruits+players[i].numTrinkets)))"
+        "VP": "2*(Math.abs(players[i].getNumCrops - (players[i].getNumFruits+players[i].getNumTrinkets)))"
     },
     {
         "name": "Peanuts",
@@ -69,16 +69,16 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "5*Math.min(players[i].numFruits, players[i].numCrops, players[i].numTrinkets)"
+        "VP": "5*Math.min(players[i].getNumFruits, players[i].getNumCrops, players[i].getNumTrinkets)"
     },
-    {
+ */   {
         "name": "Peppers",
         "type": "Crop",
         "image": "static/Images/Peppers.png",
         "onPlay": "loseGood",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.ceil((players[i].numFruits + players[i].numTrinkets)/2)"
+        "VP": "Math.ceil((players[i].getNumFruits + players[i].getNumTrinkets)/2)"
     },
 /*   {
         "name": "Potatoes",
@@ -96,7 +96,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].numFruits, players[i].numCrops)"
+        "VP": "3*Math.min(players[i].getNumFruits, players[i].getNumCrops)"
     },
     {
         "name": "Sugarcane",
@@ -105,7 +105,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[players[i].neighborNums[0]].numFruits+players[players[i].neighborNums[0]].numTrinkets+players[players[i].neighborNums[1]].numGoods+players[players[i].neighborNums[1]].numTrinkets"
+        "VP": "Math.floor((players[players[i].neighborNums[0]].getNumFruits+players[players[i].neighborNums[0]].getNumTrinkets+players[players[i].neighborNums[1]].getNumFruits+players[players[i].neighborNums[1]].getNumTrinkets) / 2)"
     },
     {
         "name": "Tobacco",
@@ -114,16 +114,16 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*players[i].numTrinkets-players[i].numCrops"
+        "VP": "3*players[i].getNumTrinkets-players[i].getNumCrops"
     },
-    {
+*/    {
         "name": "Tomatoes",
         "type": "Crop",
         "image": "static/Images/Tomatoes.png",
         "onPlay": "none",
         "active": "socket.emit('activeAbility', 'tomatoAction', myPlayerNum);",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*players[i].numCrops)"
+        "VP": "Math.ceil(3/2*players[i].getNumCrops)"
     },
     {
         "name": "Wheat",
@@ -133,5 +133,5 @@ export const allCrops = [
         "active": "none",
         "ongoing": "none",
         "VP": "4"
-    }*/
+    }
 ] 

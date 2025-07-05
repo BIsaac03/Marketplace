@@ -15,7 +15,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*players[i].numFruits)"
+        "VP": "Math.ceil(3/2*players[i].getNumFruits)"
     },
     {
         "name": "Blackberries",
@@ -33,7 +33,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].numCoins/4, players[i].numFruits)"
+        "VP": "3*Math.min(players[i].numCoins/4, players[i].getNumFruits)"
     },
     {
         "name": "Coconuts",
@@ -42,7 +42,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "11-players[i].numFruits"
+        "VP": "11-players[i].getNumFruits"
     },
     {
         "name": "Grapes",
@@ -51,7 +51,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[players[i].neighborNums[0]].numFruits+players[players[i].neighborNums[1].numFruits]"
+        "VP": "players[players[i].neighborNums[0]].getNumFruits+players[players[i].neighborNums[1].getNumFruits]"
     },
     {
         "name": "Guavas",
@@ -87,7 +87,7 @@ export const allFruits = [
         "onPlay": "players[i].numCoins += 4",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[i].numTrinkets"
+        "VP": "players[i].getNumTrinkets"
     },
     {
         "name": "Papayas",
