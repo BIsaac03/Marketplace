@@ -197,39 +197,52 @@ ul#playerList{
 }
 
 #goodSelectionDiv{
+    display: grid;
+    grid-template-rows: repeat(3, auto);
+    font-size: 40px;
+    margin-bottom: 30px;
+    background-color: #e1cbcb;
     position: absolute;
+    justify-self: center;
+    justify-items: center;
+    align-items: center;
+    margin-top: 150px;
+    padding: 25px;
+}
+
+#goodSelectionDiv img.icon{
+    grid-row: 1 / 2; 
+    width: 50px;
+}
+
+#goodSelectionDiv #message{
+    grid-row: 2 / 3;
+}
+
+#selectionPopUp{
+    grid-row: 3 / 4;
     justify-self: center;
     justify-items: center;
     align-items: center;
     display: grid;
     grid-template: repeat(3, auto) / repeat(3, auto);
     padding: 25px;
-    margin-top: 150px;
-    background-color: rgba(182, 126, 126, 0.4);
 }
 
-#goodSelectionDiv #message{
-    grid-area: 1 / 1 / 2 / 4;
-    font-size: 40px;
-    margin-bottom: 30px;
-}
-
-#goodSelectionDiv div[id^="selected"] {
+#selectionPopUp div[id^="selected"] {
     background-color: rgb(173, 224, 125);
     padding: 20px;
 }
 
-#goodSelectionDiv img[id^="selected"]{
+#selectionPopUp img[id^="selected"]{
     width: 407px;
 }
 
-
-#goodSelectionDiv div:not([id^="selected"]){
+#selectionPopUp div:not([id^="selected"]){
     padding: 30px;
 }
 
-
-#goodSelectionDiv button{
+#selectionPopUp button{
     grid-area: 3 / 1 / 4 / 4;
     width: 100px;
     height: 50px;

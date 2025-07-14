@@ -249,9 +249,27 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
     const goodSelectionDiv = document.createElement("div");
     goodSelectionDiv.id = "goodSelectionDiv";
     const message = document.createElement("p");
-    message.textContent = "Selet a good to "+typeOfSelection;
+    message.textContent = "Select a good to "+typeOfSelection;
     message.id = "message";
     goodSelectionDiv.append(message);
+
+    const visibilityToggle = document.createElement("img");
+    const selectionPopUp = document.createElement("div");
+    selectionPopUp.id = "selectionPopUp";
+    goodSelectionDiv.appendChild(selectionPopUp);
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            selectionPopUp.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            selectionPopUp.style.display = "grid";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+    goodSelectionDiv.appendChild(visibilityToggle);
 
     const fruitsDiv = document.createElement("div");
     fruitsDiv.classList.add("Fruits");
@@ -261,9 +279,9 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
     trinketsDiv.classList.add("Trinkets");
 
     if(typeOfSelection == "lose" || typeOfSelection == "copy"){
-        goodSelectionDiv.appendChild(fruitsDiv);
-        goodSelectionDiv.appendChild(cropsDiv);
-        goodSelectionDiv.appendChild(trinketsDiv);
+        selectionPopUp.appendChild(fruitsDiv);
+        selectionPopUp.appendChild(cropsDiv);
+        selectionPopUp.appendChild(trinketsDiv);
     }
 
     for (let i = 0; i < goodsToSelectFrom.length; i++){
@@ -296,7 +314,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
                 trinketsDiv.appendChild(selectedDiv);
             }
         }
-        else{goodSelectionDiv.appendChild(selectedDiv);
+        else{selectionPopUp.appendChild(selectedDiv);
         }
     }
 
@@ -322,7 +340,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
             }
         }
     })
-    goodSelectionDiv.appendChild(confirmSelection);
+    selectionPopUp.appendChild(confirmSelection);
     bodyElement.appendChild(goodSelectionDiv);
 }
 
