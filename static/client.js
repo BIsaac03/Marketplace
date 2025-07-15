@@ -122,6 +122,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         bodyElement.innerHTML = "";
         // !!!!!!!!!!! should ensure duplicate tableaus are not created
         createTableaus(players);
+        updateStats(players);
         displayTableaus(players);
         if(returningPlayer.draftingHand.length >0){
             selectGood(returningPlayer.draftingHand, "draft");
@@ -160,6 +161,7 @@ socket.on("gameStartSetup", (players) => {
 
     bodyElement.innerHTML = "";
     createTableaus(players);
+    updateStats(players);
 })
 
 
@@ -352,27 +354,27 @@ function createTableaus(players){
         player.id = "player"+players[i].playerNum;
         let stats = document.createElement("div");
         stats.classList.add("stats");
-        let coins = document.createElement("p");
-        coins.classList.add("coins");
-        stats.appendChild(coins);
         let coinIcon = document.createElement("img");
         coinIcon.src = "static/Icons/coins.png";
         coinIcon.classList.add("coinIcon")
         stats.appendChild(coinIcon);
-        let workers = document.createElement("p");
-        workers.classList.add("workers");
-        stats.appendChild(workers);
+        let coins = document.createElement("p");
+        coins.classList.add("coins");
+        stats.appendChild(coins);
         let workerIcon = document.createElement("img");
         workerIcon.src = "static/Icons/workers.png";
         workerIcon.classList.add("workerIcon");
         stats.appendChild(workerIcon);
-        let VP = document.createElement("p");
-        VP.classList.add("VP");
-        stats.appendChild(VP);
+        let workers = document.createElement("p");
+        workers.classList.add("workers");
+        stats.appendChild(workers);
         let VPIcon = document.createElement("img");
         VPIcon.src = "static/Icons/VPIcon.png";
         VPIcon.classList.add("VPIcon");
         stats.appendChild(VPIcon);
+        let VP = document.createElement("p");
+        VP.classList.add("VP");
+        stats.appendChild(VP);        
 
         let tableau = document.createElement("div");
         tableau.classList.add("tableau")
@@ -410,7 +412,8 @@ function displayReserve(reserve){
     if (reserveDOM == undefined){
         reserveDOM = document.createElement("div");
         reserveDOM.id = "reserve";
-        bodyElement.appendChild(reserveDOM);
+        let myself = document.getElementsByClassName("myself")[0];
+        myself.appendChild(reserveDOM);
     }
     reserveDOM.innerHTML = ""
     for (let i = 0; i < reserve.length; i++){

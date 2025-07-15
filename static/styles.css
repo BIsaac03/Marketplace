@@ -2,7 +2,6 @@
     padding: 0px;
     margin: 0px;
 }
-
 body{
     display: grid;
     grid-template-rows: repeat(4, auto);
@@ -10,23 +9,23 @@ body{
     width: 100%;
     height: 100vh;
 }
-
 .header{
     background-color: rgb(223, 179, 98);
     height: 75px;
 }
+
 
 #lobby{
     display: grid;
     gap: 75px;
     grid-template-columns: 1fr 1fr;
 }
-
 .title{
     padding: 20px;
     font-size: 80px;
     text-align: center;
 }
+
 
 form.playerCustomization{
     display: grid;
@@ -72,6 +71,7 @@ form.playerCustomization input.joinGame{
     border-radius: 10px;
 }
 
+
 ul#playerList{
     list-style-type: none;
     font-size: 50px;
@@ -91,24 +91,28 @@ ul#playerList{
     height: 50px;
 }
 
+
 .myself{
     position: fixed;
     top: 40vh;
-    left: 30vh;
     width: 100%;
     height: 100%;
+    font-size: 38px;
+    text-align: center;
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template: auto 1fr / 250px 1fr;
 }
 .myself .stats img{
     width: 100px;
 }
 .stats{
     display: grid;
-    grid-template-columns: repeat(6, auto);
-    gap: 40px;
-    background-color: rgb(134, 133, 133);
-    font-weight: bold;    
+    grid-template: repeat(3, auto) / auto auto;
+    gap: 10px;
+    align-items: center;
+    background-color: rgb(180, 180, 180);
+    font-weight: bold;  
+    padding: 10px;  
 }
 #opponentDisplay .stats img{
     width: 40px;
@@ -119,6 +123,7 @@ ul#playerList{
     justify-self: center;
 }
 .tableau{
+    grid-area: 1 / 2 / 3 / 3;
     display: grid;
     grid-template-columns: repeat(3, auto);
 }
@@ -153,6 +158,7 @@ ul#playerList{
     background-color: rgba(143,168,181,0.4);
 }
 
+
 #draftingPopUp{
     position: absolute;
     justify-self: center;
@@ -163,12 +169,15 @@ ul#playerList{
     background-color: rgba(182, 126, 126, 0.4);
 }
 
+
 #reserve{
     position: fixed;
-    top: 75vh;
-    left: 2vh;
-    width: 300px;
-    padding: 75px;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    top: 80vh;
+    width: 250px;
+    height: 200px;
 }
 #reserve img.icon{
     position: absolute;
@@ -196,6 +205,7 @@ ul#playerList{
     background-color: rgba(182, 126, 126, 0.4);
 }
 
+
 #goodSelectionDiv{
     display: grid;
     grid-template-rows: repeat(3, auto);
@@ -206,19 +216,17 @@ ul#playerList{
     justify-self: center;
     justify-items: center;
     align-items: center;
-    margin-top: 150px;
+    margin-top: 200px;
     padding: 25px;
+    z-index: 5;
 }
-
 #goodSelectionDiv img.icon{
     grid-row: 1 / 2; 
     width: 50px;
 }
-
 #goodSelectionDiv #message{
     grid-row: 2 / 3;
 }
-
 #selectionPopUp{
     grid-row: 3 / 4;
     justify-self: center;
@@ -228,20 +236,16 @@ ul#playerList{
     grid-template: repeat(3, auto) / repeat(3, auto);
     padding: 25px;
 }
-
 #selectionPopUp div[id^="selected"] {
     background-color: rgb(173, 224, 125);
     padding: 20px;
 }
-
 #selectionPopUp img[id^="selected"]{
     width: 407px;
 }
-
 #selectionPopUp div:not([id^="selected"]){
     padding: 30px;
 }
-
 #selectionPopUp button{
     grid-area: 3 / 1 / 4 / 4;
     width: 100px;
@@ -251,21 +255,19 @@ ul#playerList{
     margin-top: 30px;
 }
 
-
-
+#detailedReserve{
+    z-index: 4;
+}
 #detailedReserve [id^="selected"]{
     width: 407px;
 }
-
 #detailedReserve div[id^="selected"] {
     background-color: rgb(173, 224, 125);
     padding: 20px;
 }
-
 #detailedReserve div:not([id^="selected"]){
     padding: 30px;
 }
-
 #detailedReserve #setPrice{
     grid-column: 1 / 4;
     width: 75px;
@@ -280,6 +282,7 @@ ul#playerList{
     font-size: 30px;
 }
 
+
 #currentOffer{
     z-index: 5;
     justify-self: center;
@@ -288,7 +291,6 @@ ul#playerList{
     gap: 20px;
     justify-items: center;
 }
-
 #currentOffer .goodPrice{
     grid-area: 2 / 1 / 3 / 3;
     justify-self: center;
@@ -301,12 +303,10 @@ ul#playerList{
     border-radius: 10px;
     font-size: 16px;
 }
-
 #currentOffer #chooseBuy{
     justify-self: left;
     margin-left: 20px;
 }
-
 #chooseBuy.Fruit{
     background-color: rgb(234,192,160);
 }
