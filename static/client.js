@@ -131,7 +131,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         const vendor = players.find(player => player.isVendor == true);
         if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false){
-                viewDetailedReservedCards(returningPlayer.reserve, true, true)
+                selectGood(returningPlayer.reserve, "sell");
             }
         } 
         else{
@@ -176,7 +176,7 @@ socket.on("displayReserve", (players) => {
 
 socket.on("setSaleTerms", (reserve, vendorNum) => {
     if (myPlayerNum == vendorNum){
-        viewDetailedReservedCards(reserve, true, true);
+        selectGood(reserve, "sell")
     }
 })
 
@@ -261,6 +261,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
     goodSelectionDiv.appendChild(selectionPopUp);
     visibilityToggle.src = "static/Icons/visibility-off.svg";
     visibilityToggle.classList.add("icon");
+    visibilityToggle.id = "visibilityToggle";
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             selectionPopUp.style.display = "none";
@@ -293,15 +294,28 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
         selectedGood.classList.add(goodsToSelectFrom[i].name);
         selectedGood.classList.add(i);
         selectedGood.addEventListener("click", () => {
-            const previouslySelectedGood = document.getElementById("selectedGood");
-            if (previouslySelectedGood != undefined){
-                previouslySelectedGood.removeAttribute("id");
-                const previousDiv = document.getElementById("selectedDiv")
-                previousDiv.removeAttribute("id");
+            if (typeOfSelection == "sell" && goodsToSelectFrom[i].name == "Pins"){
+                if (selectedGood.id == "selectedPins"){
+                    selectedGood.removeAttribute("id");
+                    selectedDiv.removeAttribute("id");
+                }
+                else{
+                    selectedGood.id = "selectedPins";
+                    selectedDiv.id = "selectedPinsDiv";
+                }
             }
 
-            selectedGood.id = "selectedGood";
-            selectedDiv.id = "selectedDiv";
+            else{
+                const previouslySelectedGood = document.getElementById("selectedGood");
+                if (previouslySelectedGood != undefined){
+                    previouslySelectedGood.removeAttribute("id");
+                    const previousDiv = document.getElementById("selectedDiv")
+                    previousDiv.removeAttribute("id");
+                }
+    
+                selectedGood.id = "selectedGood";
+                selectedDiv.id = "selectedDiv";
+            }
         })
         selectedDiv.appendChild(selectedGood);
 
@@ -320,26 +334,40 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
         }
     }
 
+    if (typeOfSelection == "sell"){
+        const setPrice = document.createElement("input")
+        setPrice.type = "text";
+        setPrice.id = "setPrice"
+        selectionPopUp.appendChild(setPrice);
+
+    }
     const confirmSelection = document.createElement("button");
     confirmSelection.textContent = "Confirm";
     confirmSelection.addEventListener("click", () => {
         const selectedGoodDOM = document.getElementById("selectedGood");
-        if (selectedGoodDOM != undefined){
-            goodSelectionDiv.remove();
+        const setPrice = document.getElementById("setPrice");
+        if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || setPrice.value != "")){
             if(typeOfSelection == "draft"){
                 socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1]);
             }
             else if (typeOfSelection == "sell"){
-                return 1;
+                const indexofGoodForSale = selectedGoodDOM.classList[1]
+                let goodsForSale = [goodsToSelectFrom[indexofGoodForSale]];
+                const pins = document.getElementById("selectedPins");
+                if (pins != undefined){
+                    pinsIndex = pins.classList[1];
+                    goodsForSale.push(goodsToSelectFrom[pinsIndex]);
+                } 
+                socket.emit("sellGood", goodsForSale, setPrice.value, myPlayerNum);
             }
             else if (typeOfSelection == "lose"){
-                console.log("remove "+ selectedGoodDOM.classList[0]);
                 socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
             }
             else if (typeOfSelection == "copy"){
                 const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
                 socket.emit("copyGood", goodToCopy, myPlayerNum);
             }
+            goodSelectionDiv.remove();
         }
     })
     selectionPopUp.appendChild(confirmSelection);
@@ -421,14 +449,14 @@ function displayReserve(reserve){
         reservedCard.src = reserve[i].image;
         reservedCard.classList.add("icon", "reserved"+i)
         reservedCard.addEventListener("click", () => {
-            viewDetailedReservedCards(reserve, shouldEnlarge, false);
+            viewDetailedReservedCards(reserve, shouldEnlarge);
             shouldEnlarge = !shouldEnlarge;
         })
         reserveDOM.appendChild(reservedCard);
     }
 }
 
-function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
+function viewDetailedReservedCards(reserve, shouldEnlarge){
     if (shouldEnlarge){
         const detailedReserveView = document.createElement("div");
         detailedReserveView.id = "detailedReserve";
@@ -437,61 +465,8 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
             const reservedCard = document.createElement("img");
             reservedCard.src = reserve[i].image;
             reservedCard.classList.add(i, "reserved")
-            if (canInteract){
-                reservedCardDiv.addEventListener("click", () => {
-                    // Pins cannot be sold by itself
-                    if (reserve[i].name == "Pins"){
-                        if (reservedCard.id == "selectedPins"){
-                            reservedCard.removeAttribute("id");
-                            reservedCardDiv.removeAttribute("id");
-                        }
-                        else{
-                            reservedCard.id = "selectedPins";
-                            reservedCardDiv.id = "selectedPinsDiv";
-                        }
-                    }
-    
-                    else{
-                        const previouslyReservedCard = document.getElementById("selectedToSell");
-                        if (previouslyReservedCard != undefined){
-                            previouslyReservedCard.removeAttribute("id");
-                            const previousDiv = document.getElementById("selectedDiv")
-                            previousDiv.removeAttribute("id");
-                        }
-
-                        reservedCard.id = "selectedToSell";
-                        reservedCardDiv.id = "selectedDiv";
-                    }
-                })
-            }
             reservedCardDiv.appendChild(reservedCard)
             detailedReserveView.appendChild(reservedCardDiv);
-        }
-
-        if (canInteract){
-            const setPrice = document.createElement("input")
-            setPrice.type = "text";
-            setPrice.id = "setPrice"
-            detailedReserveView.appendChild(setPrice);
-    
-            const confirmSale = document.createElement("button");
-            confirmSale.textContent = "Sell";
-            confirmSale.id = "confirmSale";
-            confirmSale.addEventListener("click", () => {
-                const goodForSaleDOM = document.getElementById("selectedToSell");
-                const indexofGoodForSale = goodForSaleDOM.classList[0]
-                if (goodForSaleDOM != undefined && setPrice.value != ""){
-                    let goodForSale = [reserve[indexofGoodForSale]];
-                    const pins = document.getElementById("selectedPins");
-                    if (pins != undefined){
-                        pinsIndex = pins.classList[0];
-                        goodForSale.push(reserve[pinsIndex]);
-                    } 
-                    socket.emit("sellGood", goodForSale, setPrice.value, myPlayerNum);
-                    detailedReserveView.remove();
-                }
-            })
-            detailedReserveView.appendChild(confirmSale);
         }
         bodyElement.appendChild(detailedReserveView);
     }
@@ -502,6 +477,9 @@ function viewDetailedReservedCards(reserve, shouldEnlarge, canInteract){
 }
 
 function displayGoodSale(goodForSale, price, vendorNum){
+
+
+
     const currentOffer = document.createElement("div");
     currentOffer.id = "currentOffer";
 
@@ -541,7 +519,30 @@ function displayGoodSale(goodForSale, price, vendorNum){
     })
     currentOffer.appendChild(chooseInvest);
 
-    bodyElement.appendChild(currentOffer);
+
+    const visibilityToggle = document.createElement("img");
+    const offerContainer = document.createElement("div");
+    offerContainer.id = "offerContainer";
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.id = "visibilityToggle";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            currentOffer.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            currentOffer.style.display = "grid";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+    offerContainer.appendChild(visibilityToggle);
+    offerContainer.appendChild(currentOffer);
+
+    bodyElement.appendChild(offerContainer);
+
+
+    //bodyElement.appendChild(currentOffer);
 }
 
 function addToTableau(purchasedGood, playerNum){
@@ -608,7 +609,6 @@ function displayTableaus(players){
         for (let j = 0; j < players[i].tableau.length; j++){
             const goodAlreadyDisplayed = document.getElementsByClassName(players[i].tableau[j].name)[0];
             if (goodAlreadyDisplayed == undefined){
-                console.log("attempt to add good")
                 addToTableau(players[i].tableau[j], i);
             }
         }

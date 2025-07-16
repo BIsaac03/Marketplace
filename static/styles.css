@@ -203,8 +203,12 @@ ul#playerList{
     padding: 25px;
     margin-top: 150px;
     background-color: rgba(182, 126, 126, 0.4);
+    z-index: 4;
 }
 
+#visibilityToggle{
+    width: 50px;
+}
 
 #goodSelectionDiv{
     display: grid;
@@ -220,7 +224,7 @@ ul#playerList{
     padding: 25px;
     z-index: 5;
 }
-#goodSelectionDiv img.icon{
+#goodSelectionDiv #visibilityToggle{
     grid-row: 1 / 2; 
     width: 50px;
 }
@@ -237,6 +241,7 @@ ul#playerList{
     padding: 25px;
 }
 #selectionPopUp div[id^="selected"] {
+    display: grid;
     background-color: rgb(173, 224, 125);
     padding: 20px;
 }
@@ -245,6 +250,14 @@ ul#playerList{
 }
 #selectionPopUp div:not([id^="selected"]){
     padding: 30px;
+}
+#selectionPopUp #setPrice{
+    grid-column: 1 / 4;
+    width: 75px;
+    height: 75px;
+    margin: 20px;
+    text-align: center;
+    font-size: 40px;
 }
 #selectionPopUp button{
     grid-area: 3 / 1 / 4 / 4;
@@ -255,45 +268,30 @@ ul#playerList{
     margin-top: 30px;
 }
 
-#detailedReserve{
-    z-index: 4;
-}
-#detailedReserve [id^="selected"]{
-    width: 407px;
-}
-#detailedReserve div[id^="selected"] {
-    background-color: rgb(173, 224, 125);
-    padding: 20px;
-}
-#detailedReserve div:not([id^="selected"]){
-    padding: 30px;
-}
-#detailedReserve #setPrice{
-    grid-column: 1 / 4;
-    width: 75px;
-    height: 75px;
-    text-align: center;
-    font-size: 40px;
-}
-#detailedReserve #confirmSale{
-    grid-column: 1 / 4;
-    width: 150px;
-    height: 40px;
-    font-size: 30px;
-}
 
-
+#offerContainer{
+    display: grid;
+    justify-self: center;
+    background-color: rgba(160, 160, 160, 0.7);
+    justify-items: center;
+    height: fit-content;
+    grid-template-rows: auto auto;
+}
 #currentOffer{
     z-index: 5;
-    justify-self: center;
     display: grid;
     grid-template: auto auto auto / auto auto;
-    gap: 20px;
+    padding: 20px;
+    column-gap: 20px;
     justify-items: center;
+}
+#currentOffer img{
+    grid-row: 1 / 2;
 }
 #currentOffer .goodPrice{
     grid-area: 2 / 1 / 3 / 3;
     justify-self: center;
+    background-color: aliceblue;
     font-size: 30px;
     font-weight: bold;
 }
@@ -304,6 +302,7 @@ ul#playerList{
     font-size: 16px;
 }
 #currentOffer #chooseBuy{
+    grid-area: 3 / 1 / 4 / 2;
     justify-self: left;
     margin-left: 20px;
 }
@@ -317,7 +316,7 @@ ul#playerList{
     background-color: rgb(143,168,181);
 }
 #currentOffer #chooseInvest{
-    grid-area: 3 / 1 / 4 / 2;
+    grid-area: 3 / 2 / 4 / 3;
     background-color: rgb(196, 180, 92);
     background-color: rgb(235, 210, 74);
     justify-self: right;
