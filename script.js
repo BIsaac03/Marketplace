@@ -67,19 +67,22 @@ io.on("connection", (socket) => {
     })
 
     socket.on("startGame", () => {
-        for (let i = 0; i < players.length; i++){
-            players[i].playerNum = i;
-            players[i].isInGame = true;
-            players[i].setNeighborNums;
+        const alreadyStarted = players.find(player => player.isInGame == true)
+        if (alreadyStarted == undefined){
+            for (let i = 0; i < players.length; i++){
+                players[i].playerNum = i;
+                players[i].isInGame = true;
+                players[i].setNeighborNums;
+            }
+            io.emit("gameStartSetup", players);
+            if (players.length < 5){
+                totalRounds = 3;
+            }
+            else if (players.length >= 5){
+                totalRounds = 2;
+            }
+            newRound();
         }
-        io.emit("gameStartSetup", players);
-        if (players.length < 5){
-            totalRounds = 3;
-        }
-        else if (players.length >= 5){
-            totalRounds = 2;
-        }
-        newRound();
     })
 
     socket.on("draftedCard", (myPlayerNum, goodIndex) => {

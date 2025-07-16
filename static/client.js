@@ -94,7 +94,7 @@ socket.on("joinedLobby", (player) => {
     startGameButton.id = "startGame";
     startGameButton.textContent = "Start Game"
     startGameButton.addEventListener("click", () => {
-        if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
+        if (confirm("Are you sure you want to start the game? New players will not be able to join an in-progress game.")){
             socket.emit("startGame");
         }
     })
