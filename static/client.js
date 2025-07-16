@@ -393,6 +393,10 @@ function createTableaus(players){
         player.id = "player"+players[i].playerNum;
         let stats = document.createElement("div");
         stats.classList.add("stats");
+        let playerName = document.createElement("p");
+        playerName.textContent = players[i].name;
+        playerName.classList.add("playerName");
+        stats.appendChild(playerName);
         let coinIcon = document.createElement("img");
         coinIcon.src = "static/Icons/coins.png";
         coinIcon.classList.add("coinIcon")
@@ -413,7 +417,8 @@ function createTableaus(players){
         stats.appendChild(VPIcon);
         let VP = document.createElement("p");
         VP.classList.add("VP");
-        stats.appendChild(VP);        
+        stats.appendChild(VP);
+        stats.style.backgroundColor = players[i].color;        
 
         let tableau = document.createElement("div");
         tableau.classList.add("tableau")
