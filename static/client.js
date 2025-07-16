@@ -107,7 +107,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         startGameButton.id = "startGame";
         startGameButton.textContent = "Start Game"
         startGameButton.addEventListener("click", () => {
-            if (confirm("Are you sure you want to start the game? New player will not be able to join an in-progress game.")){
+            if (confirm("Are you sure you want to start the game? New players will not be able to join an in-progress game.")){
                 socket.emit("startGame");
             }
         })
@@ -237,12 +237,12 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     const cropDiv = document.querySelector(`#player${playerNum} .Crops`);
     if (newType == "crop"){
         cropDiv.appendChild(tomatoes);
-        fruitDiv.removeChild(tomatoes);
+        //fruitDiv.removeChild(tomatoes);
         tomatoes.src = "static/Images/Tomatoes.png";
     }
     else if (newType == "fruit"){
         fruitDiv.appendChild(tomatoes);
-        cropDiv.removeChild(tomatoes);
+        //cropDiv.removeChild(tomatoes);
         tomatoes.src = "static/Images/Tomatoes-fruit.png"
     }
 })
@@ -478,7 +478,8 @@ function viewDetailedReservedCards(reserve, shouldEnlarge){
 
 function displayGoodSale(goodForSale, price, vendorNum){
 
-
+    const offerContainer = document.createElement("div");
+    offerContainer.id = "offerContainer";
 
     const currentOffer = document.createElement("div");
     currentOffer.id = "currentOffer";
@@ -506,7 +507,7 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseBuy.classList.add(goodForSale[0].type)
     chooseBuy.addEventListener("click", () => {
         socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum);
-        currentOffer.remove();
+        offerContainer.remove();
     })
     currentOffer.appendChild(chooseBuy);
 
@@ -515,14 +516,12 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseInvest.id = "chooseInvest";
     chooseInvest.addEventListener("click", () => {
         socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum);
-        currentOffer.remove();
+        offerContainer.remove();
     })
     currentOffer.appendChild(chooseInvest);
 
 
     const visibilityToggle = document.createElement("img");
-    const offerContainer = document.createElement("div");
-    offerContainer.id = "offerContainer";
     visibilityToggle.src = "static/Icons/visibility-off.svg";
     visibilityToggle.id = "visibilityToggle";
     visibilityToggle.classList.add("icon");

@@ -74,7 +74,6 @@ io.on("connection", (socket) => {
         newRound();
     })
 
-    /// FUTURE FIX: Draft image does does appear, as this function expects an index, while selectGood returns the name of the selected good
     socket.on("draftedCard", (myPlayerNum, goodIndex) => {
         const activePlayer = players.find(player => player.playerNum == myPlayerNum)
         activePlayer.reserve.push(activePlayer.draftingHand[goodIndex]);
@@ -200,7 +199,7 @@ io.on("connection", (socket) => {
             const tomatoes = players[playerNum].tableau.find(good => good.name == "Tomatoes")
             if (tomatoes.type == "Fruit"){
                 tomatoes.type = "Crop";
-                io.emit("changeTomatoType", "crop", players, playerNum)
+                io.emit("changeTomatoType", "crop", playerNum)
 
             } 
             else {
