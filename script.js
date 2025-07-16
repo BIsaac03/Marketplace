@@ -59,6 +59,13 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on("leftLobby", (playerID) => {
+        const leavingPlayer = players.find(player => player.userID == playerID);
+        const index = players.indexOf(leavingPlayer);
+        players.splice(index, 1);
+        io.emit("playerKicked", playerID);
+    })
+
     socket.on("startGame", () => {
         for (let i = 0; i < players.length; i++){
             players[i].isInGame = true;

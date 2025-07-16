@@ -11,7 +11,7 @@ function readCookieValue(name){
     return value;
 }
 
-function modifyPlayerList(playerList, playerID, playerName, playerColor, isMe){
+function modifyPlayerList(playerList, playerID, playerName, playerColor){
     const existingPlayer = document.getElementById(playerID);
     if (existingPlayer === null){
         const player = document.createElement("div");
@@ -28,16 +28,18 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor, isMe){
         playerNameDOM.textContent = playerName;
         player.appendChild(playerNameDOM);
 
-        if (isMe){
             const leaveLobbyButton = document.createElement("button");
             leaveLobbyButton.id = "leaveLobbyButton";
+            leaveLobbyButton.textContent = "X";
             leaveLobbyButton.addEventListener("click", () => {
-                playerList.removeChild(player);
+                socket.emit("leftLobby", playerID);
             })
-            player.appendChild(leaveLobbyButton);
-        }
+            player.appendChild(leaveLobbyButton)
 
         playerList.append(player);
+
+    }
+    else if (removePlayer == true){
 
     }
     else{
@@ -149,8 +151,19 @@ socket.on("displayExistingPlayers", (players) => {
         modifyPlayerList(playerList, players[i].userID, players[i].name, players[i].color);
     }
 })
-socket.on("playerJoined", (PlayerID, newPlayerName, newPlayerColor) => {
-    modifyPlayerList(playerList, PlayerID, newPlayerName, newPlayerColor);
+socket.on("playerJoined", (playerID, newPlayerName, newPlayerColor) => {
+    modifyPlayerList(playerList, playerID, newPlayerName, newPlayerColor);
+})
+socket.on("playerKicked", (playerID) => {
+    const playerDOM = document.getElementById(playerID);
+    playerList.removeChild(playerDOM);
+
+    if (readCookieValue("userID") == playerID){
+        const joinGameButton = document.getElementsByClassName("joinGame")[0];
+        joinGameButton.value = "Join Game";
+        startGameButton = document.getElementById("startGame");
+        startGameButton.remove();
+    }
 })
 
 
@@ -237,12 +250,10 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     const cropDiv = document.querySelector(`#player${playerNum} .Crops`);
     if (newType == "crop"){
         cropDiv.appendChild(tomatoes);
-        //fruitDiv.removeChild(tomatoes);
         tomatoes.src = "static/Images/Tomatoes.png";
     }
     else if (newType == "fruit"){
         fruitDiv.appendChild(tomatoes);
-        //cropDiv.removeChild(tomatoes);
         tomatoes.src = "static/Images/Tomatoes-fruit.png"
     }
 })
