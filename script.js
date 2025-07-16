@@ -68,6 +68,7 @@ io.on("connection", (socket) => {
 
     socket.on("startGame", () => {
         for (let i = 0; i < players.length; i++){
+            players[i].playerNum = i;
             players[i].isInGame = true;
             players[i].setNeighborNums;
         }
@@ -334,7 +335,7 @@ function endOfRound(){
 }
 
 function makePlayer(userID, name, color){
-    let playerNum = players.length;
+    let playerNum = undefined;
     let neighborNums = [];
     let tableau = [];
     let draftingHand = [];
