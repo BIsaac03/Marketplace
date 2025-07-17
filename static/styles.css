@@ -299,6 +299,7 @@ ul#playerList{
     background-color: rgba(160, 160, 160, 0.7);
     justify-items: center;
     height: fit-content;
+    z-index: 5;
     grid-template-rows: auto auto;
 }
 #currentOffer{

@@ -39,11 +39,7 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
         playerList.append(player);
 
     }
-    else if (removePlayer == true){
-
-    }
     else{
-        console.log(existingPlayer)
         existingPlayer.children[0].style.backgroundColor = playerColor;
         existingPlayer.children[1].textContent = playerName;
     }
@@ -220,16 +216,20 @@ socket.on("chooseLostGood", (player) => {
     }
 })
 
-socket.on("removeGoodDOM", (nameOfGoodToRemove, players) => {
-    for (let i = 0; i < players.length; i++){
-        const goodElement = document.querySelector(`#player${i} .tableau .${nameOfGoodToRemove}`);
-        goodElement.remove();
-    }
+socket.on("removeGoodDOM", (nameOfGoodToRemove, playerNum) => {
+    const goodElement = document.querySelector(`#player${playerNum} .tableau .${nameOfGoodToRemove}`);
+    goodElement.remove();
 })
 
 socket.on("pineappleTarget", (playerNum, players) => {
     if (myPlayerNum == playerNum){
-        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]] ,...players[players[playerNum].neighborNums[1]]])];
+        console.log(players[playerNum].neighborNums[0]);
+        console.log(players[players[playerNum].neighborNums[0]])
+        console.log(players[1].tableau);
+        // NEIGHBORNUMS ISSUE
+        
+        console.log(players[players[playerNum].neighborNums[0]].tableau)
+        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]].tableau ,...players[players[playerNum].neighborNums[1]].tableau])];
         selectGood(potentialCopies, "copy");
     }
 })
@@ -373,10 +373,12 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
             }
             else if (typeOfSelection == "lose"){
                 socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
+                socket.emit("readytoEndTurn", myPlayerNum);
             }
             else if (typeOfSelection == "copy"){
                 const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
                 socket.emit("copyGood", goodToCopy, myPlayerNum);
+                socket.emit("readyToEndTurn", myPlayerNum)
             }
             goodSelectionDiv.remove();
         }

@@ -188,7 +188,7 @@ io.on("connection", (socket) => {
         const player = players.find(player => player.playerNum == playerNum);
         const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
-        io.emit("removeGoodDOM", nameOfGoodToRemove, players);
+        io.emit("removeGoodDOM", nameOfGoodToRemove, playerNum);
     })
 
     socket.on("activeAbility", (abilityType, playerNum) => {
