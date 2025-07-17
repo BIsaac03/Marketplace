@@ -127,6 +127,10 @@ ul#playerList{
     grid-column: 1 / 3;
     font-size: 48px;
 }
+#opponentDisplay div[id^="player"]{
+    display: grid;
+    grid-template: 200px minmax(auto, 0px) / auto auto;
+}
 #opponentDisplay .stats .playerName{
     grid-column: 1 / 3;
     font-size: 24px;
@@ -140,7 +144,7 @@ ul#playerList{
 }
 #opponentDisplay{
     display: flex;
-    gap: 30px;
+    gap: 50px;
     justify-self: center;
 }
 .tableau{
