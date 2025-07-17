@@ -72,6 +72,8 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 players[i].playerNum = i;
                 players[i].isInGame = true;
+            }
+            for (let i = 0; i < players.length; i++){
                 players[i].setNeighborNums;
             }
             io.emit("gameStartSetup", players);
@@ -174,8 +176,8 @@ io.on("connection", (socket) => {
         }
     })
     
-    socket.on("readyToEndTurn", (player) => {
-        player.isReady = true;
+    socket.on("readyToEndTurn", (playerNum) => {
+        players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
             endOfTurn();
