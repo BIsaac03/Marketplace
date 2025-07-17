@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
 
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
-            io.emit("roundUpdate", players);
+            io.emit("turnUpdate", players);
             io.emit("displayReserve", players);
             if (activePlayer.draftingHand.length == 0){
                 console.log("All cards drafted; ready for sales.");
@@ -162,37 +162,25 @@ io.on("connection", (socket) => {
                 }
 
                 if (goodForSale[0].onPlay == "loseGood" && players[i].choice[0] == "invest"){
+                    players[i].isReady = false;
                     io.emit("chooseLostGood", players[i]);
                 }
             }
 
-            for (let i = 0; i < goodForSale.length; i++){
-                const indexOfSoldGood = players[vendorNum].reserve.findIndex(good => good.name == goodForSale[i].name);
-                players[vendorNum].reserve.splice(indexOfSoldGood, 1);
-            }
-
-            // round-end updates
-            io.emit("roundUpdate", players);
-            resetPlayerStates();
-
-            // proceed to next sale
-            players[vendorNum].isVendor = false;
-            if (vendorNum == players.length-1){
-                players[0].isVendor = true;
-            }
-            else{
-                players[vendorNum+1].isVendor = true;
-            }
-            const vendor = players.find(player => player.isVendor == true);
-            if (players.some(player => player.reserve.length > 1)){
-                io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
-            }
-
-            else{
-                endOfRound();
+            keepWaiting = players.find(player => player.isReady == false)
+            if (keepWaiting == undefined){
+                endOfTurn();
             }
         }
-    })   
+    })
+    
+    socket.on("readyToEndTurn", (player) => {
+        player.isReady = true;
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
+            endOfTurn();
+        }
+    })
     
     socket.on("removeGood", (nameOfGoodToRemove, playerNum) => {
         const player = players.find(player => player.playerNum == playerNum);
@@ -203,7 +191,7 @@ io.on("connection", (socket) => {
 
     socket.on("activeAbility", (abilityType, playerNum) => {
         if (abilityType == "perfumeAction"){
-            socket.emit("chooseLostGood");
+            socket.emit("chooseLostGood", players[playerNum]);
             players[playerNum].numVP += 5;
         }
         else if (abilityType == "tomatoAction"){
@@ -257,6 +245,37 @@ function resetPlayerStates() {
         players[i].isReady = false;
         players[i].choice.length = 0;
     } 
+}
+
+function endOfTurn(){
+    const oldVendor = players.find(player => player.isVendor == true);
+    const goodForSale = oldVendor.choice[0];
+
+    // remove good from vendor reserve
+    for (let i = 0; i < goodForSale.length; i++){
+        const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
+        oldVendor.reserve.splice(indexOfSoldGood, 1);
+    }
+
+    io.emit("turnUpdate", players);
+    resetPlayerStates();
+
+    // proceed to next vendor
+    oldVendor.isVendor = false;
+    if (oldVendor.playerNum == players.length-1){
+        players[0].isVendor = true;
+    }
+    else{
+        players[oldVendor.playerNum+1].isVendor = true;
+    }
+
+    const newVendor = players.find(player => player.isVendor == true);
+    if (players.some(player => player.reserve.length > 1)){
+        io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum);
+    }
+    else{
+        endOfRound();
+    }
 }
 
 function newRound()
@@ -332,8 +351,7 @@ function endOfRound(){
             scoreTableau(players[i], 0.5);
         }
         newRound();
-        io.emit("roundUpdate", players);
-
+        io.emit("turnUpdate", players);
     }
 }
 

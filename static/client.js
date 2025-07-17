@@ -199,7 +199,7 @@ socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
     }
 })
 
-socket.on("roundUpdate", (players) => {
+socket.on("turnUpdate", (players) => {
     displayReserve(players[myPlayerNum].reserve);
     updateStats(players);
 })
