@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     socket.on("currentID", (currentID) => {
         const existingID = players.find(player => player.userID == currentID);
         if (existingID != undefined) {
-            socket.emit("returningPlayer", existingID, players);
+            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound);
         }
         socket.emit("displayExistingPlayers", players);
     })
@@ -74,15 +74,20 @@ io.on("connection", (socket) => {
                 players[i].isInGame = true;
             }
             for (let i = 0; i < players.length; i++){
-                players[i].setNeighborNums;
+                players[i].neighborNums.push((i+1)%players.length);
+                if (i != 0){
+                    players[i].neighborNums.push(i-1);
+                }
+                else {players[i].neighborNums.push(players.length-1)};
+                console.log(players[i].neighborNums)
             }
-            io.emit("gameStartSetup", players);
             if (players.length < 5){
                 totalRounds = 3;
             }
             else if (players.length >= 5){
                 totalRounds = 2;
             }
+            io.emit("gameStartSetup", players, totalRounds, gameRound);
             newRound();
         }
     })
@@ -147,9 +152,9 @@ io.on("connection", (socket) => {
                 if (players[i].choice[0] == "buy"){
                     if (players[i].numCoins >= modifiedCost){ 
                         if (goodForSale.length == 2){
-                                resolvePurchase(i, goodForSale[1]);
+                                resolvePurchase(players[i], goodForSale[1]);
                             }
-                            resolvePurchase(i, goodForSale[0]);
+                            resolvePurchase(players[i], goodForSale[0]);
                             players[i].numCoins -= modifiedCost;
 
                         } 
@@ -164,7 +169,7 @@ io.on("connection", (socket) => {
                 }
 
                 if (goodForSale[0].onPlay == "loseGood" && players[i].choice[0] == "invest"){
-                    players[i].isReady = false;
+                    //players[i].isReady = false;
                     io.emit("chooseLostGood", players[i]);
                 }
             }
@@ -220,7 +225,7 @@ io.on("connection", (socket) => {
     socket.on("copyGood", (copiedGood, playerNum) => {
         const pineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
         pineapples.VP = copiedGood.VP;
-        socket.emit("PineappleToken", copiedGood.image, playerNum);
+        socket.emit("pineappleToken", copiedGood.image, playerNum);
     })
 
     socket.on("disconnect", (reason) => {
@@ -288,6 +293,7 @@ function newRound()
     }
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
+    console.log("continuing draft");
     io.emit("nextDraftRound", players);
 }
 
@@ -321,9 +327,9 @@ function checkDiscount(tableau, goodType){
     return discount;
 }
 
-function resolvePurchase(i, goodForSale){
-    io.emit("goodPurchased", goodForSale, i)
-    players[i].tableau.push(goodForSale);
+function resolvePurchase(player, goodForSale){
+    io.emit("goodPurchased", goodForSale, player.playerNum)
+    player.tableau.push(goodForSale);
     if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
         eval(goodForSale.onPlay);
     }
@@ -332,10 +338,18 @@ function resolvePurchase(i, goodForSale){
 function scoreTableau(player, modifier){
     let addedScore = 0;
     for (let i = 0; i < player.tableau.length; i++){
+    //    console.log(player.tableau[i].VP);
+    //    console.log(eval(player.tableau[i].VP));
+    //    console.log(Number(eval(player.tableau[i].VP)));
         addedScore += eval(player.tableau[i].VP);
+    //    console.log(addedScore);
     }
     let adjustedScore = addedScore * modifier;
+    //console.log("before vp");
+    //console.log(+player.numVP);
     player.numVP += adjustedScore;
+   // console.log("After: ");
+   // console.log(player.numVP);
 }
 
 function endOfRound(){
@@ -351,8 +365,10 @@ function endOfRound(){
         console.log("newRound")
         for (let i = 0; i < players.length; i++){
             scoreTableau(players[i], 0.5);
+            console.log("scored")
         }
         newRound();
+        console.log("updating")
         io.emit("turnUpdate", players);
     }
 }
@@ -369,15 +385,7 @@ function makePlayer(userID, name, color){
     let numVP = 0;
     let isReady = false;
     let isInGame = false;
-    let isVendor= false;
-
-    const setNeighborNums = () => {
-        neighborNums.push((playerNum+1)%players.length);
-        if (playerNum != 0){
-            neighborNums.push(playerNum-1);
-        }
-        else {neighborNums.push(players.length-1)};
-    }
+    let isVendor= false;     
     
     const scoreTableau = (modifier) => {
         let totalScore = 0;
@@ -389,9 +397,9 @@ function makePlayer(userID, name, color){
     }
 
     const getNumFruits = () => {
-        let numFruits = 0
+        let numFruits = 0;
         for (let i = 0; i < tableau.length; i++){
-            if (tableau[i].type = "Fruit"){
+            if (tableau[i].type == "Fruit"){
                 numFruits += 1;
             }
         }
@@ -399,9 +407,9 @@ function makePlayer(userID, name, color){
     }
 
     const getNumCrops = () => {
-        let numCrops = 0
+        let numCrops = 0;
         for (let i = 0; i < tableau.length; i++){
-            if (tableau[i].type = "Crop"){
+            if (tableau[i].type == "Crop"){
                 numCrops += 1;
             }
         }
@@ -409,14 +417,14 @@ function makePlayer(userID, name, color){
     }
 
     const getNumTrinkets = () => {
-        let numTrinkets = 0
+        let numTrinkets = 0;
         for (let i = 0; i < tableau.length; i++){
-            if (tableau[i].type = "Trinket"){
+            if (tableau[i].type == "Trinket"){
                 numTrinkets += 1;
             }
         }
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, setNeighborNums, scoreTableau, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, scoreTableau, getNumFruits, getNumCrops, getNumTrinkets}
 }

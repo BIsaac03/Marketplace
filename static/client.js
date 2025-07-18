@@ -98,7 +98,7 @@ socket.on("joinedLobby", (player) => {
     joinGameButton.value = "Update"
 })
 
-socket.on("returningPlayer", (returningPlayer, players) => {
+socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound) => {
     console.log(returningPlayer.name + " has returned!")
     if (!returningPlayer.isInGame){
         const startGameButton = document.createElement("button");
@@ -119,6 +119,7 @@ socket.on("returningPlayer", (returningPlayer, players) => {
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         // !!!!!!!!!!! should ensure duplicate tableaus are not created
+        addMetaTools(numRounds, currentRound);
         createTableaus(players);
         updateStats(players);
         displayTableaus(players);
@@ -163,12 +164,13 @@ socket.on("playerKicked", (playerID) => {
 })
 
 
-socket.on("gameStartSetup", (players) => {
+socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     const userID = readCookieValue("userID");
     const thisPlayer = players.find(player => player.userID == userID);
     myPlayerNum = thisPlayer.playerNum;
 
     bodyElement.innerHTML = "";
+    addMetaTools(numRounds, currentRound)
     createTableaus(players);
     updateStats(players);
 })
@@ -176,7 +178,11 @@ socket.on("gameStartSetup", (players) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    selectGood(players[myPlayerNum].draftingHand, "draft");
+    if(players[0].reserve.length == 3){
+        currentRound = document.getElementById("currentRound");
+        currentRound.textContent = Number(currentRound.textContent)+1;
+    }
+    selectGood(players[myPlayerNum].draftingHand, "draft");  
 })
 
 socket.on("displayReserve", (players) => {
@@ -226,7 +232,6 @@ socket.on("pineappleTarget", (playerNum, players) => {
         console.log(players[playerNum].neighborNums[0]);
         console.log(players[players[playerNum].neighborNums[0]])
         console.log(players[1].tableau);
-        // NEIGHBORNUMS ISSUE
         
         console.log(players[players[playerNum].neighborNums[0]].tableau)
         const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]].tableau ,...players[players[playerNum].neighborNums[1]].tableau])];
@@ -347,7 +352,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
 
     if (typeOfSelection == "sell"){
         const setPrice = document.createElement("input")
-        setPrice.type = "text";
+        setPrice.type = "number";
         setPrice.id = "setPrice"
         selectionPopUp.appendChild(setPrice);
 
@@ -630,6 +635,38 @@ function displayTableaus(players){
             }
         }
     }
+}
+function addMetaTools(numRounds, currentRound){
+    roundOverview = document.createElement("div");
+    roundOverview.id = "roundOverview";
+    roundCount = document.createElement("span");
+    roundCount.textContent = currentRound;
+    roundCount.id = "currentRound";
+    totalRounds = document.createElement("span");
+    totalRounds.textContent = " / "+numRounds;
+    totalRounds.id = "totalRounds";
+    roundOverview.appendChild(roundCount);
+    roundOverview.appendChild(totalRounds);
+    bodyElement.appendChild(roundOverview);
+
+    ruleDocument = document.createElement("img");
+    ruleDocument.style.position = "none";
+    //ruleDocument.src = "/static/rulesOverview.png";
+    ruleDocument.src = "/static/Icons/edit.svg";
+
+    ruleDocument.id = "rulesDoc";
+    bodyElement.appendChild(ruleDocument)
+    infoIcon = document.createElement("img");
+    infoIcon.src = "/static/Icons/rules.svg";
+    infoIcon.id = "infoIcon";
+    infoIcon.addEventListener("click", () => {
+        //ruleDocument = document.getElementById("rulesDoc");
+        if (ruleDocument.style.position == "fixed"){
+            ruleDocument.style.position = "none";
+        }
+        else {ruleDocument.style.position = "fixed"}
+    })
+    bodyElement.appendChild(infoIcon)
 }
 function fullUpdate(players, thisPlayer){
     updateDraft(cardsToDraft);

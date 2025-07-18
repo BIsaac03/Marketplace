@@ -8,20 +8,20 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "7"
     },
- /*   {
+    {
         "name": "Bananas",
         "type": "Fruit",
         "image": "static/Images/Bananas.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*players[i].getNumFruits)"
+        "VP": "Math.ceil(3/2*player.getNumFruits())"
     },
     {
         "name": "Blackberries",
         "type": "Fruit",
         "image": "static/Images/Blackberries.png",
-        "onPlay": "scoreTableau(players[i], 0.25)",
+        "onPlay": `scoreTableau(player, 0.25)`,
         "active": "none",
         "ongoing": "none",
         "VP": "0"
@@ -33,7 +33,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].numCoins/4, players[i].getNumFruits)"
+        "VP": "3*Math.min(player.numCoins/4, player.getNumFruits())"
     },
     {
         "name": "Coconuts",
@@ -42,7 +42,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "11-players[i].getNumFruits"
+        "VP": "11-player.getNumFruits()"
     },
     {
         "name": "Grapes",
@@ -51,9 +51,9 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[players[i].neighborNums[0]].getNumFruits+players[players[i].neighborNums[1].getNumFruits]"
+        "VP": `players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[1]].getNumFruits()`
     },
-    {
+  /*  {
         "name": "Guavas",
         "type": "Fruit",
         "image": "static/Images/Guavas.png",
@@ -84,16 +84,16 @@ export const allFruits = [
         "name": "Oranges",
         "type": "Fruit",
         "image": "static/Images/Oranges.png",
-        "onPlay": "players[i].numCoins += 4",
+        "onPlay": "player.numCoins += 4",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[i].getNumTrinkets"
+        "VP": "player.getNumTrinkets()"
     },
     {
         "name": "Papayas",
         "type": "Fruit",
         "image": "static/Images/Papayas.png",
-        "onPlay": "players[i].numCoins += 10; players[i].numWorkers += 2",
+        "onPlay": "player.numCoins += 10; player.numWorkers += 2",
         "active": "none",
         "ongoing": "none",
         "VP": "0"
@@ -114,13 +114,13 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(players[players[i].neighborNums[0]].tableau.filter(good => !players[players[i].neighborNums[1]].tableau.includes(good)).length)"
+        "VP": "2*(players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)).length)"
     },
     {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": "players[i].isReady = false; io.emit('pineappleTarget', i, players)",
+        "onPlay": "player.isReady = false; io.emit('pineappleTarget', i, players);",
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten"
@@ -132,6 +132,6 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[i].numCoins/3"
+        "VP": "player.numCoins/3"
     }
 ]

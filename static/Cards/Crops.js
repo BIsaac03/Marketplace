@@ -8,14 +8,14 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "2*players.length"
     },
-/*    {
+    {
         "name": "Cacao",
         "type": "Crop",
         "image": "static/Images/Cacao.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "players[i].getNumGoods"
+        "VP": "player.getNumGoods()"
     },
     {
         "name": "Coffee",
@@ -24,7 +24,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(players[i].getNumCrops - players[i].tableau.some(good -> good.name == "Coffee"))
+        "VP": `2*(player.getNumCrops() - player.tableau.some(good => good.name == "Coffee"))`
     },
     {
         "name": "Corn",
@@ -33,7 +33,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*players[i].getNumFruits"
+        "VP": "2*player.getNumFruits()"
     },
     {
         "name": "Cotton",
@@ -42,9 +42,9 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
-        "VP": "2*players[i].getNumTrinkets"
+        "VP": "2*player.getNumTrinkets()"
     },
-    {
+  /*  {
         "name": "Mint",
         "type": "Crop",
         "image": "static/Images/Mint.png",
@@ -60,7 +60,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(Math.abs(players[i].getNumCrops - (players[i].getNumFruits+players[i].getNumTrinkets)))"
+        "VP": "2*(Math.abs(player.getNumCrops() - (player.getNumFruits()+player.getNumTrinkets())))"
     },
     {
         "name": "Peanuts",
@@ -69,7 +69,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "5*Math.min(players[i].getNumFruits, players[i].getNumCrops, players[i].getNumTrinkets)"
+        "VP": "5*Math.min(player.getNumFruits(), player.getNumCrops(), player.getNumTrinkets())"
     },
  */   {
         "name": "Peppers",
@@ -78,7 +78,7 @@ export const allCrops = [
         "onPlay": "loseGood",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.ceil((players[i].getNumFruits + players[i].getNumTrinkets)/2)"
+        "VP": "Math.ceil((player.getNumFruits() + player.getNumTrinkets())/2)"
     },
 /*   {
         "name": "Potatoes",
@@ -89,14 +89,14 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "!!! 3*GOOD HERE NOT NEIGHBORING"
     },
-    {
+  */  {
         "name": "Rice",
         "type": "Crop",
         "image": "static/Images/Rice.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].getNumFruits, players[i].getNumCrops)"
+        "VP": "3*Math.min(player.getNumFruits(), player.getNumCrops())"
     },
     {
         "name": "Sugarcane",
@@ -105,7 +105,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor((players[players[i].neighborNums[0]].getNumFruits+players[players[i].neighborNums[0]].getNumTrinkets+players[players[i].neighborNums[1]].getNumFruits+players[players[i].neighborNums[1]].getNumTrinkets) / 2)"
+        "VP": "Math.floor((players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[0]].getNumTrinkets()+players[player.neighborNums[1]].getNumFruits()+players[player.neighborNums[1]].getNumTrinkets()) / 2)"
     },
     {
         "name": "Tobacco",
@@ -114,22 +114,22 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*players[i].getNumTrinkets-players[i].getNumCrops"
+        "VP": "(3*player.getNumTrinkets()) - (player.getNumCrops())"
     },
-*/    {
+    {
         "name": "Tomatoes",
         "type": "Crop",
         "image": "static/Images/Tomatoes.png",
         "onPlay": "none",
         "active": "socket.emit('activeAbility', 'tomatoAction', myPlayerNum);",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*players[i].getNumCrops)"
+        "VP": "Math.ceil(3/2*player.getNumCrops())"
     },
     {
         "name": "Wheat",
         "type": "Crop",
         "image": "static/Images/Wheat.png",
-        "onPlay": "players[i].numWorkers+=3",
+        "onPlay": "player.numWorkers+=3",
         "active": "none",
         "ongoing": "none",
         "VP": "4"

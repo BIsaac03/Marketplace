@@ -1,14 +1,14 @@
 export const allTrinkets = [
-/*    {
+    {
         "name": "Artwork",
         "type": "Trinket",
         "image": "static/Images/Artwork.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(players[i].getNumTrinkets >= 2)*1 + (players[i].getNumTrinkets >= 4)*4 + (players[i].getNumTrinkets >= 6)*5 + (players[i].getNumTrinkets >= 8)*10"
+        "VP": "(player.getNumTrinkets() >= 2)*1 + (player.getNumTrinkets() >= 4)*4 + (player.getNumTrinkets() >= 6)*5 + (player.getNumTrinkets() >= 8)*10"
     },
-    {
+ /*   {
         "name": "Bracelets",
         "type": "Trinket",
         "image": "static/Images/Bracelets.png",
@@ -42,7 +42,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: 1",
-        "VP": "players[players[i].neighborNums[0]].tableau.filter(good => players[players[i].neighborNums[1]].tableau.includes(good) && !players[i].tableau.includes(good)).length"
+        "VP": "players[player.neighborNums[0]].tableau.filter(good => players[player.neighborNums[1]].tableau.includes(good) && !player.tableau.includes(good)).length"
     },
        {
         "name": "Fabrics",
@@ -51,13 +51,13 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(players[i].getNumFruits, players[i].getNumTrinkets)"
+        "VP": "3*Math.min(player.getNumFruits(), player.getNumTrinkets())"
     },
     {
         "name": "Figurines",
         "type": "Trinket",
         "image": "static/Images/Figurines.png",
-        "onPlay": "players[i].numWorkers+=5",
+        "onPlay": "player.numWorkers+=5",
         "active": "none",
         "ongoing": "!!! TWO WORKERS PER TURN",
         "VP": "0"
@@ -80,7 +80,7 @@ export const allTrinkets = [
         "ongoing": "!!! ADAPT TYPE BASED ON DISCARDED COINS",
         "VP": "0"
     },
-    {
+ */   {
         "name": "Necklaces",
         "type": "Trinket",
         "image": "static/Images/Necklaces.png",
@@ -89,7 +89,7 @@ export const allTrinkets = [
         "ongoing": "none",
         "VP": "9"
     },
-  */  {
+    {
         "name": "Perfume",
         "type": "Trinket",
         "image": "static/Images/Perfume.png",
@@ -105,13 +105,13 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*players[i].getNumFruits-players[i].getNumTrinkets"
+        "VP": "2*player.getNumFruits()-player.getNumTrinkets()"
     },
     {
         "name": "Postcards",
         "type": "Trinket",
         "image": "static/Images/Postcards.png",
-        "onPlay": "scoreTableau(players[i], 0.5);players[i].numVP -= 4",
+        "onPlay": "scoreTableau(player, 0.5);player.numVP -= 4",
         "active": "none",
         "ongoing": "none",
         "VP": "0"
@@ -132,6 +132,6 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "!!! RECEIVE COINS IF CANNOT BUY",
-        "VP": "players[i].numCoins/5"
+        "VP": "player.numCoins/5"
     }*/
 ]
