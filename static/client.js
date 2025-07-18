@@ -178,7 +178,7 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    if(players[0].reserve.length == 3){
+    if(players[0].draftingHand.length == 3){
         currentRound = document.getElementById("currentRound");
         currentRound.textContent = Number(currentRound.textContent)+1;
     }
@@ -395,6 +395,11 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
 function createTableaus(players){
     let opponentDisplay = document.createElement("div");
     opponentDisplay.id = "opponentDisplay";
+    let laterOpponents = document.createElement("div");
+    laterOpponents.classList.add("later");
+    let priorOpponents = document.createElement("div");
+    priorOpponents.classList.add("prior")
+
     for (let i = 0; i < players.length; i++){
         let player = document.createElement("div");
         player.id = "player"+players[i].playerNum;
@@ -448,9 +453,14 @@ function createTableaus(players){
         }
         else{
             player.classList.add("opponent");
-            opponentDisplay.appendChild(player);
+            if (i - myPlayerNum > 0){
+                laterOpponents.appendChild(player);
+            }
+            else{priorOpponents.appendChild(player);            }
         }
     }
+    opponentDisplay.appendChild(laterOpponents);
+    opponentDisplay.appendChild(priorOpponents);
     bodyElement.appendChild(opponentDisplay);
 }
 
@@ -575,11 +585,15 @@ function addToTableau(purchasedGood, playerNum){
     //opponent's good
     if (playerNum != myPlayerNum){
         newGood.addEventListener("mouseover", () => {
-            newGood.classList.add("blownUpGood");
+            const blownUpGood = document.createElement("img");
+            blownUpGood.src = purchasedGood.image;
+            blownUpGood.id = "blownUpGood";
+            bodyElement.appendChild(blownUpGood);
         })
     
         newGood.addEventListener("mouseout", () => {
-            newGood.classList.remove("blownUpGood");
+            const blownUpGood = document.getElementById("blownUpGood");
+            blownUpGood.remove();
         })
     }
 
@@ -637,34 +651,37 @@ function displayTableaus(players){
     }
 }
 function addMetaTools(numRounds, currentRound){
-    roundOverview = document.createElement("div");
+    const roundOverview = document.createElement("div");
     roundOverview.id = "roundOverview";
-    roundCount = document.createElement("span");
+    
+    const description = document.createElement("span");
+    description.textContent = "Round: "
+    const roundCount = document.createElement("span");
     roundCount.textContent = currentRound;
     roundCount.id = "currentRound";
-    totalRounds = document.createElement("span");
+    const totalRounds = document.createElement("span");
     totalRounds.textContent = " / "+numRounds;
     totalRounds.id = "totalRounds";
+    roundOverview.appendChild(description);
     roundOverview.appendChild(roundCount);
     roundOverview.appendChild(totalRounds);
     bodyElement.appendChild(roundOverview);
 
-    ruleDocument = document.createElement("img");
-    ruleDocument.style.position = "none";
+    const ruleDocument = document.createElement("img");
+    ruleDocument.style.display = "none";
     //ruleDocument.src = "/static/rulesOverview.png";
     ruleDocument.src = "/static/Icons/edit.svg";
 
     ruleDocument.id = "rulesDoc";
     bodyElement.appendChild(ruleDocument)
-    infoIcon = document.createElement("img");
+    const infoIcon = document.createElement("img");
     infoIcon.src = "/static/Icons/rules.svg";
     infoIcon.id = "infoIcon";
     infoIcon.addEventListener("click", () => {
-        //ruleDocument = document.getElementById("rulesDoc");
-        if (ruleDocument.style.position == "fixed"){
-            ruleDocument.style.position = "none";
+        if (ruleDocument.style.display == "grid"){
+            ruleDocument.style.display = "none";
         }
-        else {ruleDocument.style.position = "fixed"}
+        else {ruleDocument.style.display = "grid"}
     })
     bodyElement.appendChild(infoIcon)
 }
