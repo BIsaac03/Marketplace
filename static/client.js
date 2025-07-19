@@ -178,8 +178,8 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    currentSaleCount = document.getElementById("currentSaleCount");
-    currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
+    //currentSaleCount = document.getElementById("currentSaleCount");
+    //currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
     if(players[0].draftingHand.length == 3){
         currentRound = document.getElementById("currentRound");
         currentRound.textContent = Number(currentRound.textContent)+1;
@@ -367,7 +367,10 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
         const setPrice = document.getElementById("setPrice");
         if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || setPrice.value != "")){
             if(typeOfSelection == "draft"){
-                socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1]);
+                if (goodsToSelectFrom.length == 1){
+                    socket.emit("finalDraft", myPlayerNum);
+                }
+                else{socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1])};
             }
             else if (typeOfSelection == "sell"){
                 const indexofGoodForSale = selectedGoodDOM.classList[1]

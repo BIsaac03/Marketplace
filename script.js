@@ -102,25 +102,15 @@ io.on("connection", (socket) => {
         if (keepWaiting == undefined){
             io.emit("turnUpdate", players);
             io.emit("displayReserve", players);
-            if (activePlayer.draftingHand.length == 0){
-                console.log("All cards drafted; ready for sales.");
-                players[Math.floor(Math.random()*players.length)].isVendor = true;
-                const vendor = players.find(player => player.isVendor == true);
-                saleCount += 1;
-                io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
-            }
-
             // passes remaining cards
-            else{
-                let previousHand = players[players.length-1].draftingHand;
-                let thisHand = [];
-                for (let i = 0; i < players.length; i++){
-                    thisHand = players[i].draftingHand;
-                    players[i].draftingHand = previousHand;
-                    previousHand = thisHand; 
-                }
-                io.emit("nextDraftRound", players);
+            let previousHand = players[players.length-1].draftingHand;
+            let thisHand = [];
+            for (let i = 0; i < players.length; i++){
+                thisHand = players[i].draftingHand;
+                players[i].draftingHand = previousHand;
+                previousHand = thisHand; 
             }
+            io.emit("nextDraftRound", players);    
             resetPlayerStates();
         }
     })
@@ -229,6 +219,28 @@ io.on("connection", (socket) => {
         socket.emit("pineappleToken", copiedGood.image, playerNum);
     })
 
+    socket.on("finalDraft", (playerNum) =>{
+        const passionFruit = players[playerNum].tableau.find(fruit => fruit.name = "Passion_Fruit")
+        if (passionFruit == undefined){
+            players[playerNum].reserve.push(players[playerNum].draftingHand[0])
+        }
+        else{
+            players[playerNum].tableau.push(players[playerNum].draftingHand[0]);
+        }
+        activePlayer.draftingHand.length = 0;
+        activePlayer.isReady = true;
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
+            players[Math.floor(Math.random()*players.length)].isVendor = true;
+            const vendor = players.find(player => player.isVendor == true);
+            saleCount += 1;
+            io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
+            io.emit("turnUpdate", players);
+            io.emit("displayReserve", players);
+        }
+        
+        resetPlayerStates();
+    })
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });

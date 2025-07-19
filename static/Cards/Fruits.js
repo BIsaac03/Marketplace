@@ -98,16 +98,16 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "0"
     },
-    {
+ */   {
         "name": "Passion_Fruit",
         "type": "Fruit",
         "image": "static/Images/Passion_Fruit.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! KEEP FINAL DRAFT",
+        "ongoing": "IMMEDIATELY PLACE FINAL DRAFTED CARD INTO YOUR TABLEAU",
         "VP": "0"
     },
- */   {
+    {
         "name": "Pears",
         "type": "Fruit",
         "image": "static/Images/Pears.png",

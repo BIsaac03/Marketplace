@@ -181,11 +181,11 @@ ul#playerList{
 }
 #opponentDisplay .later{
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: repeat(5, auto);
 }
 #opponentDisplay .prior{
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: repeat(5, auto);
 }
 #opponentDisplay .tableau div{
     display: grid;
