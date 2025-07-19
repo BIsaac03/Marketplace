@@ -98,7 +98,7 @@ socket.on("joinedLobby", (player) => {
     joinGameButton.value = "Update"
 })
 
-socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound) => {
+socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound, currentSale) => {
     console.log(returningPlayer.name + " has returned!")
     if (!returningPlayer.isInGame){
         const startGameButton = document.createElement("button");
@@ -119,7 +119,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound)
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
         // !!!!!!!!!!! should ensure duplicate tableaus are not created
-        addMetaTools(numRounds, currentRound);
+        addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
         displayTableaus(players);
@@ -170,7 +170,7 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     myPlayerNum = thisPlayer.playerNum;
 
     bodyElement.innerHTML = "";
-    addMetaTools(numRounds, currentRound)
+    addMetaTools(numRounds, currentRound, players.length*2, 0)
     createTableaus(players);
     updateStats(players);
 })
@@ -178,6 +178,8 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
+    currentSaleCount = document.getElementById("currentSaleCount");
+    currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
     if(players[0].draftingHand.length == 3){
         currentRound = document.getElementById("currentRound");
         currentRound.textContent = Number(currentRound.textContent)+1;
@@ -190,6 +192,7 @@ socket.on("displayReserve", (players) => {
 })
 
 socket.on("setSaleTerms", (reserve, vendorNum) => {
+    newVendor(vendorNum);
     if (myPlayerNum == vendorNum){
         selectGood(reserve, "sell")
     }
@@ -517,17 +520,21 @@ function displayGoodSale(goodForSale, price, vendorNum){
     const currentOffer = document.createElement("div");
     currentOffer.id = "currentOffer";
 
+    const goodsForSale = document.createElement("div");
+    goodsForSale.id = "goodsForSale"
+
     if (goodForSale.length == 2) {
         const good = document.createElement("img");
         good.src = goodForSale[1].image;
         good.classList.add("goodForSale");
-        currentOffer.appendChild(good);
+        goodsForSale.appendChild(good);
     }
 
     const good = document.createElement("img");
     good.src = goodForSale[0].image;
     good.classList.add("goodForSale");
-    currentOffer.appendChild(good);
+    goodsForSale.appendChild(good);
+    currentOffer.appendChild(goodsForSale);
 
     const salePrice = document.createElement("p");
     salePrice.textContent = price;
@@ -650,7 +657,19 @@ function displayTableaus(players){
         }
     }
 }
-function addMetaTools(numRounds, currentRound){
+
+function newVendor(vendorNum){
+    currentSaleCount = document.getElementById("currentSaleCount");
+    currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
+    const oldVendor = document.getElementById("vendor");
+    if (oldVendor != undefined){
+        oldVendor.id = "";
+    }    
+    const newVendor = document.querySelector(`#player${vendorNum}`);
+    newVendor.id = "vendor";
+}
+
+function addMetaTools(numRounds, currentRound, numSales, currentSale){
     const roundOverview = document.createElement("div");
     roundOverview.id = "roundOverview";
     
@@ -665,7 +684,27 @@ function addMetaTools(numRounds, currentRound){
     roundOverview.appendChild(description);
     roundOverview.appendChild(roundCount);
     roundOverview.appendChild(totalRounds);
-    bodyElement.appendChild(roundOverview);
+
+    const saleCountOverview = document.createElement("div");
+    saleCountOverview.id = "saleCountOverview";
+
+    const saleDescription = document.createElement("span");
+    saleDescription.textContent = "Sale: ";
+    const saleCount = document.createElement("span");
+    saleCount.textContent = currentSale
+    saleCount.id = "currentSaleCount";
+    const totalSales = document.createElement("span");
+    totalSales.textContent = " / "+numSales;
+    totalSales.id = "totalSales";
+    saleCountOverview.appendChild(saleDescription);
+    saleCountOverview.appendChild(saleCount);
+    saleCountOverview.appendChild(totalSales);
+
+    const gameOverview = document.createElement("div");
+    gameOverview.id = "gameOverview";
+    gameOverview.appendChild(roundOverview);
+    gameOverview.appendChild(saleCountOverview);
+    bodyElement.appendChild(gameOverview);
 
     const ruleDocument = document.createElement("img");
     ruleDocument.style.display = "none";

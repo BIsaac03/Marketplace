@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     socket.on("currentID", (currentID) => {
         const existingID = players.find(player => player.userID == currentID);
         if (existingID != undefined) {
-            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound);
+            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount);
         }
         socket.emit("displayExistingPlayers", players);
     })
@@ -106,6 +106,7 @@ io.on("connection", (socket) => {
                 console.log("All cards drafted; ready for sales.");
                 players[Math.floor(Math.random()*players.length)].isVendor = true;
                 const vendor = players.find(player => player.isVendor == true);
+                saleCount += 1;
                 io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             }
 
@@ -242,6 +243,7 @@ httpServer.listen(port, function () {
 let players = [];
 let gameRound = 0;
 let totalRounds = 0;
+let saleCount = 0;
 let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
@@ -278,9 +280,11 @@ function endOfTurn(){
 
     const newVendor = players.find(player => player.isVendor == true);
     if (players.some(player => player.reserve.length > 1)){
+        saleCount += 1;
         io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum);
     }
     else{
+        saleCount = 0
         endOfRound();
     }
 }
@@ -293,7 +297,6 @@ function newRound()
     }
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
-    console.log("continuing draft");
     io.emit("nextDraftRound", players);
 }
 
@@ -365,10 +368,8 @@ function endOfRound(){
         console.log("newRound")
         for (let i = 0; i < players.length; i++){
             scoreTableau(players[i], 0.5);
-            console.log("scored")
         }
         newRound();
-        console.log("updating")
         io.emit("turnUpdate", players);
     }
 }
