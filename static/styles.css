@@ -165,7 +165,8 @@ ul#playerList{
 }
 #opponentDisplay div[id^="player"]{
     display: grid;
-    grid-template: 200px / auto auto;
+    height: 200px;
+    grid-template-columns: auto auto;
     padding: 20px;
 }
 #opponentDisplay .stats img{
@@ -189,12 +190,14 @@ ul#playerList{
 }
 #opponentDisplay .tableau div{
     display: grid;
-    grid-template: repeat("autofill", auto) / repeat(2, auto);
-    width:100px;
+    grid-template-columns: auto auto;
+    grid-template-rows: min-content;
+    justify-content: center;
+    width: 90px;
 }
 #opponentDisplay .good{
     width: 40px;
-    padding: 5px;
+    padding: 2px;
 }
 #blownUpGood{
     position: fixed;
@@ -210,12 +213,12 @@ ul#playerList{
     overflow: auto;
 }
 
-#vendor{
+#vendor .playerName{
     text-decoration: underline;
 }
 .myself .tableau div{
     display: grid;
-    grid-template-columns: repeat(auto-fit,270px);
+    grid-template-columns: repeat(auto-fit, 270px);
     grid-template-rows: min-content;
     justify-content: center;
     width: 100%;
@@ -276,11 +279,13 @@ ul#playerList{
     align-items: center;
     display: grid;
     grid-template-columns: repeat(3, auto);
-    gap: 75px;
     padding: 25px;
     margin-top: 150px;
     background-color: rgba(182, 126, 126, 0.4);
     z-index: 6;
+}
+#detailedReserve>div{
+    padding: 20px;
 }
 
 #visibilityToggle{
