@@ -134,10 +134,16 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             }
         } 
         else{
-            if (vendor.isReady == true && returningPlayer.choice.length == 0){
+            if(returningPlayer.choice[0] == "pineappleTarget"){
+                const potentialCopies = [...new Set([...players[players[returningPlayer.playerNum].neighborNums[0]].tableau, ...players[players[returningPlayer.playerNum].neighborNums[1]].tableau])];
+                selectGood(potentialCopies, "copy");
+            }
+
+            else if (vendor.isReady == true && returningPlayer.choice.length == 0){
                 displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
             }   
         }
+
     }
 })
 
@@ -183,6 +189,8 @@ socket.on("nextDraftRound", (players) => {
     if(players[0].draftingHand.length == 3){
         currentRound = document.getElementById("currentRound");
         currentRound.textContent = Number(currentRound.textContent)+1;
+        currentSaleCount = document.getElementById("currentSaleCount");
+        currentSaleCount.textContent = 0;
     }
     selectGood(players[myPlayerNum].draftingHand, "draft");  
 })
@@ -232,24 +240,14 @@ socket.on("removeGoodDOM", (nameOfGoodToRemove, playerNum) => {
 
 socket.on("pineappleTarget", (playerNum, players) => {
     if (myPlayerNum == playerNum){
-        console.log(players[playerNum].neighborNums[0]);
-        console.log(players[players[playerNum].neighborNums[0]])
-        console.log(players[1].tableau);
+        //console.log(players[playerNum].neighborNums[0]);
+        //console.log(players[players[playerNum].neighborNums[0]])
+        //console.log(players[1].tableau);
         
-        console.log(players[players[playerNum].neighborNums[0]].tableau)
-        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]].tableau ,...players[players[playerNum].neighborNums[1]].tableau])];
+        //console.log(players[players[playerNum].neighborNums[0]].tableau)
+        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]].tableau, ...players[players[playerNum].neighborNums[1]].tableau])];
         selectGood(potentialCopies, "copy");
     }
-})
-
-socket.on("pineappleToken", (image, playerNum) => {
-    const pineapples = document.querySelector(`#player${playerNum} .Pineapples`)
-    pineapples.addEventListener("mouseover", () => {
-        pineapples.src = image;
-    })
-    pineapples.addEventListener("mouseout", () => {
-        pineapples.src = "static/Images/Pineapples.png";
-    })
 })
 
 socket.on("changeTomatoType", (newType, playerNum) => {
@@ -295,10 +293,13 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
 
     const fruitsDiv = document.createElement("div");
     fruitsDiv.classList.add("Fruits");
+    fruitsDiv.classList.add("typeContainer");
     const cropsDiv = document.createElement("div");
     cropsDiv.classList.add("Crops");
+    cropsDiv.classList.add("typeContainer");
     const trinketsDiv = document.createElement("div");
     trinketsDiv.classList.add("Trinkets");
+    trinketsDiv.classList.add("typeContainer");
 
     if(typeOfSelection == "lose" || typeOfSelection == "copy"){
         selectionPopUp.appendChild(fruitsDiv);
@@ -356,6 +357,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
     if (typeOfSelection == "sell"){
         const setPrice = document.createElement("input")
         setPrice.type = "number";
+        setPrice.min = 1;
         setPrice.id = "setPrice"
         selectionPopUp.appendChild(setPrice);
 
@@ -365,7 +367,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
     confirmSelection.addEventListener("click", () => {
         const selectedGoodDOM = document.getElementById("selectedGood");
         const setPrice = document.getElementById("setPrice");
-        if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || setPrice.value != "")){
+        if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || Number(setPrice.value) > 0)){
             if(typeOfSelection == "draft"){
                 if (goodsToSelectFrom.length == 1){
                     socket.emit("finalDraft", myPlayerNum);
@@ -380,7 +382,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
                     pinsIndex = pins.classList[1];
                     goodsForSale.push(goodsToSelectFrom[pinsIndex]);
                 } 
-                socket.emit("sellGood", goodsForSale, setPrice.value, myPlayerNum);
+                socket.emit("sellGood", goodsForSale, Number(setPrice.value), myPlayerNum);
             }
             else if (typeOfSelection == "lose"){
                 socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
@@ -389,7 +391,6 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
             else if (typeOfSelection == "copy"){
                 const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
                 socket.emit("copyGood", goodToCopy, myPlayerNum);
-                socket.emit("readyToEndTurn", myPlayerNum)
             }
             goodSelectionDiv.remove();
         }
@@ -458,7 +459,6 @@ function createTableaus(players){
             bodyElement.appendChild(player);
         }
         else{
-            player.classList.add("opponent");
             if (i - myPlayerNum > 0){
                 laterOpponents.appendChild(player);
             }
@@ -591,12 +591,21 @@ function addToTableau(purchasedGood, playerNum){
     const newGood = document.createElement("img");
     newGood.src = purchasedGood.image;
     newGood.classList.add("good", purchasedGood.name);
+
+    if (purchasedGood.name == "Pineapples"){
+        newGood.addEventListener("mouseover", () => {
+            newGood.src = purchasedGood.ongoing;
+        })
+        newGood.addEventListener("mouseout", () => {
+            newGood.src = purchasedGood.image;
+        })
+    }
     
     //opponent's good
     if (playerNum != myPlayerNum){
         newGood.addEventListener("mouseover", () => {
             const blownUpGood = document.createElement("img");
-            blownUpGood.src = purchasedGood.image;
+            blownUpGood.src = newGood.src;
             blownUpGood.id = "blownUpGood";
             bodyElement.appendChild(blownUpGood);
         })
@@ -646,17 +655,14 @@ function updateStats(players){
         const displayedWorkers = document.querySelector(`#player${i} .workers`);
         displayedWorkers.textContent = players[i].numWorkers;
         const displayedScore = document.querySelector(`#player${i} .VP`);
-        displayedScore.textContent = players[i].numVP;
+        displayedScore.textContent = Math.ceil(players[i].numVP);
     }
 }
 
 function displayTableaus(players){
     for (let i = 0; i < players.length; i++){
         for (let j = 0; j < players[i].tableau.length; j++){
-            const goodAlreadyDisplayed = document.getElementsByClassName(players[i].tableau[j].name)[0];
-            if (goodAlreadyDisplayed == undefined){
-                addToTableau(players[i].tableau[j], i);
-            }
+            addToTableau(players[i].tableau[j], i);
         }
     }
 }
@@ -666,10 +672,10 @@ function newVendor(vendorNum){
     currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
     const oldVendor = document.getElementById("vendor");
     if (oldVendor != undefined){
-        oldVendor.id = "";
+        oldVendor.classList.length = 0;
     }    
     const newVendor = document.querySelector(`#player${vendorNum}`);
-    newVendor.id = "vendor";
+    newVendor.classList.add("vendor");
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){

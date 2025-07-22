@@ -79,7 +79,6 @@ io.on("connection", (socket) => {
                     players[i].neighborNums.push(i-1);
                 }
                 else {players[i].neighborNums.push(players.length-1)};
-                console.log(players[i].neighborNums)
             }
             if (players.length < 5){
                 totalRounds = 3;
@@ -138,6 +137,17 @@ io.on("connection", (socket) => {
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
             // apply users' choices
+
+            for (let i = 0; i < players.length; i++){
+                const lanterns = players[i].tableau.find(trinket => trinket.name == "Laterns")
+                if (lanterns != undefined){
+                    const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != players[i].playerNum));
+                    if (sameChoice == undefined){
+                        players[i].VP += 3;
+                    }
+                }
+            }
+
             for (let i = 0; i < players.length; i++){
                 const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale[0].type)
                 if (players[i].choice[0] == "buy"){
@@ -157,39 +167,43 @@ io.on("connection", (socket) => {
             
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
+                    const bracelets = players[i].tableau.find(trinket => trinket.name == "Bracelets")
+                    if (bracelets != undefined){
+                        players[i].numCoins += 2;
+                    }
                 }
 
                 if (goodForSale[0].onPlay == "loseGood" && players[i].choice[0] == "invest"){
                     //players[i].isReady = false;
-                    io.emit("chooseLostGood", players[i]);
+                    io.emit("chooseLostGood", players[i], true);
                 }
             }
 
-            keepWaiting = players.find(player => player.isReady == false)
+            let keepWaiting = players.find(player => player.isReady == false)
             if (keepWaiting == undefined){
                 endOfTurn();
             }
         }
     })
     
-    socket.on("readyToEndTurn", (playerNum) => {
-        players[playerNum].isReady = true;
-        let keepWaiting = players.find(player => player.isReady == false)
-        if (keepWaiting == undefined){
-            endOfTurn();
-        }
-    })
-    
-    socket.on("removeGood", (nameOfGoodToRemove, playerNum) => {
+    socket.on("removeGood", (nameOfGoodToRemove, playerNum, waiting) => {
         const player = players.find(player => player.playerNum == playerNum);
         const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
         io.emit("removeGoodDOM", nameOfGoodToRemove, playerNum);
+
+        if (waiting){
+            players[playerNum].isReady = true;
+            let keepWaiting = players.find(player => player.isReady == false)
+            if (keepWaiting == undefined){
+                endOfTurn();
+            }
+        }
     })
 
     socket.on("activeAbility", (abilityType, playerNum) => {
         if (abilityType == "perfumeAction"){
-            socket.emit("chooseLostGood", players[playerNum]);
+            socket.emit("chooseLostGood", players[playerNum], false);
             players[playerNum].numVP += 5;
         }
         else if (abilityType == "tomatoAction"){
@@ -214,21 +228,47 @@ io.on("connection", (socket) => {
      })
 
     socket.on("copyGood", (copiedGood, playerNum) => {
-        const pineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
-        pineapples.VP = copiedGood.VP;
-        socket.emit("pineappleToken", copiedGood.image, playerNum);
+        const genericPineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
+        const pineappleIndex = players[playerNum].tableau.indexOf[genericPineapples];
+        const personalPineapples = genericPineapples;
+        personalPineapples.VP = copiedGood.VP;
+        personalPineapples.ongoing = copiedGood.image;
+        players[playerNum].tableau.splice(pineappleIndex, 1);
+        players[playerNum].tableau.push(personalPineapples);
+        players[playerNum].choice.length = 0;
+        io.emit("goodPurchased", personalPineapples, playerNum);
+
+
+        players[playerNum].isReady = true;
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
+            endOfTurn();
+        }
     })
 
     socket.on("finalDraft", (playerNum) =>{
-        const passionFruit = players[playerNum].tableau.find(fruit => fruit.name = "Passion_Fruit")
+        const passionFruit = players[playerNum].tableau.find(fruit => fruit.name == "Passion_Fruit")
         if (passionFruit == undefined){
             players[playerNum].reserve.push(players[playerNum].draftingHand[0])
         }
         else{
             players[playerNum].tableau.push(players[playerNum].draftingHand[0]);
+            io.emit("goodPurchased", players[playerNum].draftingHand[0], playerNum);
+
+            if (players[playerNum].reserve.some(good => good.name == "Pins")){
+                players[playerNum].reserve.push({
+                                                    "name": "Cornucopia",
+                                                    "type": "Crop",
+                                                    "image": "static/Images/Cornucopia.png",
+                                                    "onPlay": "none",
+                                                    "active": "none",
+                                                    "ongoing": "none",
+                                                    "VP": "Math.ceil(Math.random()*12"
+                                                })
+            }
         }
-        activePlayer.draftingHand.length = 0;
-        activePlayer.isReady = true;
+        players[playerNum].draftingHand.length = 0;
+        players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
             players[Math.floor(Math.random()*players.length)].isVendor = true;
@@ -237,9 +277,8 @@ io.on("connection", (socket) => {
             io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
             io.emit("turnUpdate", players);
             io.emit("displayReserve", players);
+            resetPlayerStates();
         }
-        
-        resetPlayerStates();
     })
     socket.on("disconnect", (reason) => {
         //console.log(reason);
@@ -306,6 +345,7 @@ function newRound()
     gameRound += 1;
     for (let i = 0; i < players.length; i++){
         players[i].reserve.length = 0;
+        players[i].isVendor = false;
     }
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
@@ -334,17 +374,21 @@ function createDraftingHands(draftingDeck){
 
 function checkDiscount(tableau, goodType){
     let discount = 0;
-    let discountEffects = tableau.filter(good => good.onPlay.startsWith("DISCOUNT: "));
-    discountEffects = discountEffects.map(item => item.replace("DISCOUNT: ", ""));
+    let discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT: "));
+    discountEffects = discountEffects.map(item => item.ongoing.replace("DISCOUNT: ", ""));
+    console.log(discountEffects)
     for (let i = 0; i < discountEffects.length; i++){
         eval(discountEffects[i]);
+        console.log(discountEffects[i])
     }
     return discount;
 }
 
 function resolvePurchase(player, goodForSale){
-    io.emit("goodPurchased", goodForSale, player.playerNum)
     player.tableau.push(goodForSale);
+    if (goodForSale.name != "Pineapples"){
+        io.emit("goodPurchased", goodForSale, player.playerNum);
+    }
     if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
         eval(goodForSale.onPlay);
     }
@@ -409,6 +453,14 @@ function makePlayer(userID, name, color){
         VP += adjustedScore;
     }
 
+    const getNumGoods = () => {
+        let numGoods = 0;
+        for (let i = 0; i < tableau.length; i++){
+            numGoods +=1;
+        }
+        return numGoods;
+    }
+
     const getNumFruits = () => {
         let numFruits = 0;
         for (let i = 0; i < tableau.length; i++){
@@ -439,5 +491,5 @@ function makePlayer(userID, name, color){
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, scoreTableau, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, scoreTableau, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
 }
