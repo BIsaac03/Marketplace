@@ -228,13 +228,13 @@ ul#playerList{
     width: 250px;
     padding: 10px;
 }
-.tableau .Fruits{
+ .Fruits{
     background-color: rgba(234,192,160,0.4);
 }
-.tableau .Crops{
+ .Crops{
     background-color: rgba(207,139,77, 0.4);
 }
-.tableau .Trinkets{
+.Trinkets{
     background-color: rgba(143,168,181,0.4);
 }
 
@@ -350,6 +350,25 @@ ul#playerList{
     margin-top: 30px;
 }
 
+#selectionPopUp>div.typeContainer{
+    align-self: baseline;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: min-content;
+    justify-content: center;
+    width: auto;
+    height: 100%;
+    padding: 0px;
+}
+
+#selectionPopUp>div.typeContainer img{
+    width: 150px;
+}
+
+#selectionPopUp>div.typeContainer>div{
+    padding: 5px;
+    margin-bottom: auto;
+}
 
 #offerContainer{
     display: grid;
