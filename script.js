@@ -228,16 +228,20 @@ io.on("connection", (socket) => {
      })
 
     socket.on("copyGood", (copiedGood, playerNum) => {
-        const genericPineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
-        const pineappleIndex = players[playerNum].tableau.indexOf[genericPineapples];
-        const personalPineapples = genericPineapples;
+        let personalPineapples = {
+            "name": "Pineapples",
+            "type": "Fruit",
+            "image": "static/Images/Pineapples.png",
+            "onPlay": `player.isReady = false; player.choice[0] = \"pineappleTarget\"; io.emit('pineappleTarget', player.playerNum, players);`,
+            "active": "none",
+            "ongoing": "none",
+            "VP": "overwritten"
+        }
         personalPineapples.VP = copiedGood.VP;
         personalPineapples.ongoing = copiedGood.image;
-        players[playerNum].tableau.splice(pineappleIndex, 1);
         players[playerNum].tableau.push(personalPineapples);
         players[playerNum].choice.length = 0;
         io.emit("goodPurchased", personalPineapples, playerNum);
-
 
         players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
@@ -376,17 +380,15 @@ function checkDiscount(tableau, goodType){
     let discount = 0;
     let discountEffects = tableau.filter(good => good.ongoing.startsWith("DISCOUNT: "));
     discountEffects = discountEffects.map(item => item.ongoing.replace("DISCOUNT: ", ""));
-    console.log(discountEffects)
     for (let i = 0; i < discountEffects.length; i++){
         eval(discountEffects[i]);
-        console.log(discountEffects[i])
     }
     return discount;
 }
 
 function resolvePurchase(player, goodForSale){
-    player.tableau.push(goodForSale);
     if (goodForSale.name != "Pineapples"){
+        player.tableau.push(goodForSale);
         io.emit("goodPurchased", goodForSale, player.playerNum);
     }
     if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
