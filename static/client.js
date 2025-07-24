@@ -45,6 +45,19 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
     }
 }
 
+function checkNumWorkers(){
+    let numWorkers = 0;
+    const workers = document.getElementById("workerCheck");
+    if (workers != null && workers.checked){
+        numWorkers += 1;
+        const doubled = document.getElementById("doubleWorkerCheck");
+        if (doubled != null && doubled.checked){
+            numWorkers += 1;
+        }
+    }
+    return numWorkers;
+}
+
 let myPlayerNum = undefined;
 
 ////// DOM MANIPULATION
@@ -133,8 +146,13 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
 
         }
         else if (returningPlayer.name == vendor.name){
-            if (returningPlayer.isReady == false){
-                selectGood(returningPlayer.reserve, "sell");
+            if (returningPlayer.isReady == false ){
+                if (players[(myPlayerNum + 1)%players.length].choice.length == 0){
+                    selectGood(returningPlayer.reserve, "sell");
+                }
+                else{
+                    displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, 0, false)
+                }
             }
         } 
         else{
@@ -148,7 +166,13 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             }
 
             else if (vendor.isReady == true && returningPlayer.choice.length == 0){
-                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
+                const numWorkers = returningPlayer.numWorkers;
+                let hasPouches = false;
+                const pouches = returningPlayer.tableau.find(trinket => trinket.name == "Pouches");
+                if (pouches != undefined){
+                    hasPouches = true;
+                }
+                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, numWorkers, hasPouches)
             }   
         }
     }
@@ -213,9 +237,19 @@ socket.on("setSaleTerms", (reserve, vendorNum) => {
     }
 })
 
-socket.on("resolveSale", (goodToBuy, price, vendorNum) => {
-    if (myPlayerNum != vendorNum){
-        displayGoodSale(goodToBuy, price, vendorNum);
+socket.on("resolveSale", (goodToBuy, price, vendorNum, players, isVendorTurn) => {
+    if (myPlayerNum != vendorNum && isVendorTurn == false){
+        const numWorkers = players[myPlayerNum].numWorkers;
+        let hasPouches = false;
+        const pouches = players[myPlayerNum].tableau.find(trinket => trinket.name == "Pouches");
+        if (pouches != undefined){
+            hasPouches = true;
+        }
+        displayGoodSale(goodToBuy, price, vendorNum, numWorkers, hasPouches);
+    }
+    else if (myPlayerNum == vendorNum && isVendorTurn == true){
+        console.log("vendor");
+        displayGoodSale(goodToBuy, price, vendorNum, 0, false);
     }
 })
 
@@ -531,7 +565,7 @@ function viewDetailedReservedCards(reserve, shouldEnlarge){
     }
 }
 
-function displayGoodSale(goodForSale, price, vendorNum){
+function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasPouches){
 
     const offerContainer = document.createElement("div");
     offerContainer.id = "offerContainer";
@@ -565,7 +599,8 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseBuy.id = "chooseBuy";
     chooseBuy.classList.add(goodForSale[0].type)
     chooseBuy.addEventListener("click", () => {
-        socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum);
+        const numWorkers = checkNumWorkers();
+        socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })
     currentOffer.appendChild(chooseBuy);
@@ -574,11 +609,36 @@ function displayGoodSale(goodForSale, price, vendorNum){
     chooseInvest.textContent = "Invest"
     chooseInvest.id = "chooseInvest";
     chooseInvest.addEventListener("click", () => {
-        socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum);
+        const numWorkers = checkNumWorkers();
+        socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })
     currentOffer.appendChild(chooseInvest);
 
+    if(numWorkers > 0){
+        const workerDiv = document.createElement("div");
+        workerDiv.id = "workerDiv";
+
+        const workerIcon = document.createElement("img");
+        workerIcon.src = "static/Icons/workers.png";
+        workerDiv.appendChild(workerIcon);
+        const workerCheck = document.createElement("input");
+        workerCheck.type = "checkbox";
+        workerCheck.id = "workerCheck";
+        workerDiv.appendChild(workerCheck);
+
+        if (hasPouches && numWorkers > 1){
+            const pouchDiv = document.createElement("div");
+            const doubleWorkerText = document.createElement("p");
+            doubleWorkerText.textContent = "x2";
+            const doubleWorkerCheck = document.createElement("input");
+            doubleWorkerCheck.type = "checkbox";
+            doubleWorkerCheck.id = "doubleWorkerCheck";
+            pouchDiv.appendChild(doubleWorkerText);
+            pouchDiv.appendChild(doubleWorkerCheck);
+        }
+        currentOffer.appendChild(workerDiv);
+    }
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";

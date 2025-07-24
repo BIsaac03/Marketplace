@@ -72,6 +72,9 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 players[i].playerNum = i;
                 players[i].isInGame = true;
+                if (players.length == 3 || players.length == 5){
+                    players[i].numWorkers = 2;
+                }
             }
             for (let i = 0; i < players.length; i++){
                 players[i].neighborNums.push((i+1)%players.length);
@@ -121,41 +124,89 @@ io.on("connection", (socket) => {
         players[vendorNum].choice = [goodToBuy, salePrice];
 
         players[vendorNum].isReady = true;
-        socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum)
+        socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum, players, false)
     })
 
-    socket.on("saleResult", (choice, myPlayerNum, goodForSale, price, vendorNum) => {
-        // preserve users' choices
+    socket.on("saleResult", (choice, myPlayerNum, goodForSale, price, vendorNum, numWorkers) => {
+        let discount = "none";
         players[myPlayerNum].isReady = true;
-        if (choice == "buy"){
-            players[myPlayerNum].choice.push("buy");
-        }
-        else if (choice == "invest"){
-            players[myPlayerNum].choice.push("invest");
-        }
+        players[myPlayerNum].numWorkers -= numWorkers;
+        let wait = players.find(player => player.isReady == false);
 
-        let keepWaiting = players.find(player => player.isReady == false)
-        if (keepWaiting == undefined){
-            // apply users' choices
-
-            for (let i = 0; i < players.length; i++){
-                const lanterns = players[i].tableau.find(trinket => trinket.name == "Laterns")
-                if (lanterns != undefined){
-                    const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != players[i].playerNum));
-                    if (sameChoice == undefined){
-                        players[i].VP += 3;
-                    }
-                }
+        if (myPlayerNum != vendorNum){
+            // preserve users' choices
+            if (choice == "buy"){
+                players[myPlayerNum].choice.push("buy");
+                numBuys += 1;
+                numInvests += numWorkers;
+            }
+            else if (choice == "invest"){
+                players[myPlayerNum].choice.push("invest");
+                numInvests += 1;
+                numBuys += numWorkers;
             }
 
+            if (wait == undefined){
+                // score for "Lantern"
+                for (let i = 0; i < players.length; i++){
+                    const lanterns = players[i].tableau.find(trinket => trinket.name == "Laterns")
+                    if (lanterns != undefined){
+                        const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != players[i].playerNum));
+                        if (sameChoice == undefined){
+                            players[i].VP += 3;
+                        }
+                    }
+                }
+
+                // determine discount
+                if (numBuys > numInvests){
+                    players[vendorNum].choice.length = 0;
+                    players[vendorNum].choice.push("invest");
+                    discount = "breakout";
+                }
+                else if (numInvests > numBuys){
+                    players[vendorNum].choice.length = 0;
+                    players[vendorNum].choice.push("buy");
+                    discount = "clearance";
+                }
+                else{
+                    console.log("tied choices");
+                    console.log(numBuys);
+                    console.log(numInvests);
+                    players[vendorNum].isReady = false;
+                    io.emit("resolveSale", goodForSale, price, vendorNum, players, true);
+                    players[vendorNum].choice.length = 0;
+                }
+            }
+        }
+ 
+        // if necessary, determine vendor's choice
+        else{
+            if (choice == "buy"){
+                players[myPlayerNum].choice.push("buy");
+                players[myPlayerNum].isReady = true;
+            }
+            else if (choice == "invest"){
+                players[myPlayerNum].choice.push("invest");
+                players[myPlayerNum].isReady = true;
+            }
+        }
+
+        wait = players.find(player => player.isReady == false);
+        if (wait == undefined){
+            // apply users' choices
             for (let i = 0; i < players.length; i++){
-                const modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale[0].type)
+                let modifiedCost = eval(price) - checkDiscount(players[i].tableau, goodForSale[0].type)
+            
                 if (players[i].choice[0] == "buy"){
                     if (players[i].numCoins >= modifiedCost){ 
                         if (goodForSale.length == 2){
                                 resolvePurchase(players[i], goodForSale[1]);
                             }
                             resolvePurchase(players[i], goodForSale[0]);
+                            if (discount == "clearance"){
+                                modifiedCost = Math.ceil(modifiedCost / 2);
+                            }
                             players[i].numCoins -= modifiedCost;
 
                         } 
@@ -164,9 +215,12 @@ io.on("connection", (socket) => {
                         players[i].numCoins += Math.ceil(eval(price) / 2);
                     }
                 }
-            
+
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
+                    if (discount == "breakout"){
+                        players[i].numCoins += Math.floor(eval(price)/2);
+                    }
                     const bracelets = players[i].tableau.find(trinket => trinket.name == "Bracelets")
                     if (bracelets != undefined){
                         players[i].numCoins += 2;
@@ -183,7 +237,7 @@ io.on("connection", (socket) => {
             if (keepWaiting == undefined){
                 endOfTurn();
             }
-        }
+        }      
     })
     
     socket.on("removeGood", (nameOfGoodToRemove, playerNum, waiting) => {
@@ -329,7 +383,9 @@ httpServer.listen(port, function () {
 });
 
 let players = [];
-let finalCrops = []
+let numBuys = 0;
+let numInvests = 0;
+let finalCrops = [];
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
@@ -342,7 +398,9 @@ function resetPlayerStates() {
     for (let i = 0; i < players.length; i++){
         players[i].isReady = false;
         players[i].choice.length = 0;
-    } 
+    }
+    numBuys = 0;
+    numInvests = 0;
 }
 
 function endOfTurn(){
