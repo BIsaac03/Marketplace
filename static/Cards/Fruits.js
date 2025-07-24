@@ -1,5 +1,5 @@
 export const allFruits = [
-    {
+/*    {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -53,13 +53,13 @@ export const allFruits = [
         "ongoing": "none",
         "VP": `players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[1]].getNumFruits()`
     },
-  /*  {
+ */   {
         "name": "Guavas",
         "type": "Fruit",
         "image": "static/Images/Guavas.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
+        "ongoing": "!!! TEMP SET WORTH BASED ON DISCARDED COINS",
         "VP": "0"
     },
     {
@@ -69,7 +69,7 @@ export const allFruits = [
         "onPlay": "vendor.numCoins++",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*KIWIS IN PLAY"
+        "VP": "!!! 3*KIWIS IN PLAY"
     },
     {
         "name": "Mangoes",
@@ -80,7 +80,7 @@ export const allFruits = [
         "ongoing": "!!! TRIPLE LOWEST SCORING CROP",
         "VP": "0"
     },
-    {
+ /*   {
         "name": "Oranges",
         "type": "Fruit",
         "image": "static/Images/Oranges.png",
@@ -98,7 +98,7 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "0"
     },
- */   {
+*/    {
         "name": "Passion_Fruit",
         "type": "Fruit",
         "image": "static/Images/Passion_Fruit.png",
@@ -114,18 +114,18 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)).length)"
+        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)"
     },
     {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": "player.isReady = false; io.emit('pineappleTarget', i, players);",
+        "onPlay": `player.isReady = false; player.choice[0] = \"pineappleTarget\"; io.emit('pineappleTarget', player.playerNum, players);`,
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten"
     },
-    {
+ /*   {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "static/Images/Strawberries.png",
@@ -133,5 +133,5 @@ export const allFruits = [
         "active": "none",
         "ongoing": "none",
         "VP": "player.numCoins/3"
-    }
+    }*/
 ]

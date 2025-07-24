@@ -1,5 +1,5 @@
 export const allTrinkets = [
-    {
+  /*  {
         "name": "Artwork",
         "type": "Trinket",
         "image": "static/Images/Artwork.png",
@@ -8,13 +8,13 @@ export const allTrinkets = [
         "ongoing": "none",
         "VP": "(player.getNumTrinkets() >= 2)*1 + (player.getNumTrinkets() >= 4)*4 + (player.getNumTrinkets() >= 6)*5 + (player.getNumTrinkets() >= 8)*10"
     },
- /*   {
+ */   {
         "name": "Bracelets",
         "type": "Trinket",
         "image": "static/Images/Bracelets.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! GET COINS WHEN SKIP SALE",
+        "ongoing": "GET 2 EXTRA COINS ON INVEST",
         "VP": "0"
     },
     {
@@ -32,7 +32,7 @@ export const allTrinkets = [
         "image": "static/Images/Charms.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! MINORITY BONUS",
+        "ongoing": "MINORITY BONUS",
         "VP": "0"
     },
     {
@@ -44,7 +44,7 @@ export const allTrinkets = [
         "ongoing": "DISCOUNT: 1",
         "VP": "players[player.neighborNums[0]].tableau.filter(good => players[player.neighborNums[1]].tableau.includes(good) && !player.tableau.includes(good)).length"
     },
-       {
+ /*   {
         "name": "Fabrics",
         "type": "Trinket",
         "image": "static/Images/Fabrics.png",
@@ -53,13 +53,13 @@ export const allTrinkets = [
         "ongoing": "none",
         "VP": "3*Math.min(player.getNumFruits(), player.getNumTrinkets())"
     },
-    {
+  */  {
         "name": "Figurines",
         "type": "Trinket",
         "image": "static/Images/Figurines.png",
         "onPlay": "player.numWorkers+=5",
         "active": "none",
-        "ongoing": "!!! TWO WORKERS PER TURN",
+        "ongoing": "TWO WORKERS PER TURN",
         "VP": "0"
     },
     {
@@ -68,10 +68,10 @@ export const allTrinkets = [
         "image": "static/Images/Lanterns.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! POINTS FOR UNIQUENESS",
+        "ongoing": "3 POINTS FOR UNIQUE CHOICES",
         "VP": "0"
     },
-    {
+ /*   {
         "name": "Masks",
         "type": "Trinket",
         "image": "static/Images/Masks.png",
@@ -80,7 +80,7 @@ export const allTrinkets = [
         "ongoing": "!!! ADAPT TYPE BASED ON DISCARDED COINS",
         "VP": "0"
     },
- */   {
+    {
         "name": "Necklaces",
         "type": "Trinket",
         "image": "static/Images/Necklaces.png",
@@ -125,7 +125,7 @@ export const allTrinkets = [
         "ongoing": "none",
         "VP": "2"
     },
-/*    {
+    {
         "name": "Shells",
         "type": "Trinket",
         "image": "static/Images/Shells.png",

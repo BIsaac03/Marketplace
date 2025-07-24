@@ -1,5 +1,5 @@
 export const allCrops = [
-    {
+ /*   {
         "name": "Beans",
         "type": "Crop",
         "image": "static/Images/Beans.png",
@@ -17,7 +17,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "player.getNumGoods()"
     },
-    {
+ */   {
         "name": "Coffee",
         "type": "Crop",
         "image": "static/Images/Coffee.png",
@@ -26,7 +26,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": `2*(player.getNumCrops() - player.tableau.some(good => good.name == "Coffee"))`
     },
-    {
+ /*   {
         "name": "Corn",
         "type": "Crop",
         "image": "static/Images/Corn.png",
@@ -41,10 +41,10 @@ export const allCrops = [
         "image": "static/Images/Cotton.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "DISCOUNT: if(goodtype == \"Trinket\"){discount+=1}",
+        "ongoing": "DISCOUNT: if(goodType == \"Trinket\"){discount+=1}",
         "VP": "2*player.getNumTrinkets()"
     },
-  /*  {
+ */   {
         "name": "Mint",
         "type": "Crop",
         "image": "static/Images/Mint.png",
@@ -71,7 +71,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "5*Math.min(player.getNumFruits(), player.getNumCrops(), player.getNumTrinkets())"
     },
- */   {
+    {
         "name": "Peppers",
         "type": "Crop",
         "image": "static/Images/Peppers.png",
@@ -80,7 +80,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "Math.ceil((player.getNumFruits() + player.getNumTrinkets())/2)"
     },
-/*   {
+   {
         "name": "Potatoes",
         "type": "Crop",
         "image": "static/Images/Potatoes.png",
@@ -89,7 +89,7 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "!!! 3*GOOD HERE NOT NEIGHBORING"
     },
-  */  {
+ /*   {
         "name": "Rice",
         "type": "Crop",
         "image": "static/Images/Rice.png",
@@ -133,5 +133,5 @@ export const allCrops = [
         "active": "none",
         "ongoing": "none",
         "VP": "4"
-    }
+    }*/
 ] 
