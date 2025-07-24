@@ -135,8 +135,12 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         } 
         else{
             if(returningPlayer.choice[0] == "pineappleTarget"){
-                const potentialCopies = [...new Set([...players[players[returningPlayer.playerNum].neighborNums[0]].tableau, ...players[players[returningPlayer.playerNum].neighborNums[1]].tableau])];
-                selectGood(potentialCopies, "copy");
+                let potentialCopies = [...new Set([...players[players[returningPlayer.playerNum].neighborNums[0]].tableau, ...players[players[returningPlayer.playerNum].neighborNums[1]].tableau])];
+                potentialCopies = players[players[returningPlayer.playerNum].neighborNums[0]].tableau.concat(players[players[returningPlayer.playerNum].neighborNums[1]].tableau)
+                console.log(potentialCopies)
+                let unique = [...new Set(potentialCopies)]
+                console.log(unique);
+                selectGood(unique, "copy");
             }
 
             else if (vendor.isReady == true && returningPlayer.choice.length == 0){
@@ -264,6 +268,12 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     }
 })
 
+socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
+
+
+
+})
+
 function selectGood(goodsToSelectFrom, typeOfSelection){
     const goodSelectionDiv = document.createElement("div");
     goodSelectionDiv.id = "goodSelectionDiv";
@@ -389,6 +399,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
                 socket.emit("readytoEndTurn", myPlayerNum);
             }
             else if (typeOfSelection == "copy"){
+                console.log(selectedGoodDOM.classList[0]);
                 const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
                 socket.emit("copyGood", goodToCopy, myPlayerNum);
             }
@@ -582,9 +593,6 @@ function displayGoodSale(goodForSale, price, vendorNum){
     offerContainer.appendChild(currentOffer);
 
     bodyElement.appendChild(offerContainer);
-
-
-    //bodyElement.appendChild(currentOffer);
 }
 
 function addToTableau(purchasedGood, playerNum){

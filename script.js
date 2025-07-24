@@ -284,6 +284,16 @@ io.on("connection", (socket) => {
             resetPlayerStates();
         }
     })
+
+    socket.on("endGame", (finalSaleCoins, playerNum) => {
+        players[playerNum].isReady = true;
+
+        for (let i = 0; i < players.length; i++){
+            scoreTableau(players[i], 1);
+        }
+        console.log("End of Game");    
+    })
+
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });
@@ -415,11 +425,9 @@ function scoreTableau(player, modifier){
 
 function endOfRound(){
     if (gameRound == totalRounds){
-        // !!!!!!!!!! final crop sale
-        for (let i = 0; i < players.length; i++){
-            scoreTableau(players[i], 1);
-        }
-        console.log("End of Game");
+        let firstCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+        let secondCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+        io.emit("finalCropSale", firstCrop, secondCrop, players);
     }
 
     else{
