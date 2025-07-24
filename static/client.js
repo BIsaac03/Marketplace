@@ -167,12 +167,12 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
 
             else if (vendor.isReady == true && returningPlayer.choice.length == 0){
                 const numWorkers = returningPlayer.numWorkers;
-                let hasPouches = false;
-                const pouches = returningPlayer.tableau.find(trinket => trinket.name == "Pouches");
-                if (pouches != undefined){
-                    hasPouches = true;
+                let hasFigurines = false;
+                const figurines = returningPlayer.tableau.find(trinket => trinket.name == "figurines");
+                if (figurines != undefined){
+                    hasFigurines = true;
                 }
-                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, numWorkers, hasPouches)
+                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, numWorkers, hasFigurines)
             }   
         }
     }
@@ -240,12 +240,12 @@ socket.on("setSaleTerms", (reserve, vendorNum) => {
 socket.on("resolveSale", (goodToBuy, price, vendorNum, players, isVendorTurn) => {
     if (myPlayerNum != vendorNum && isVendorTurn == false){
         const numWorkers = players[myPlayerNum].numWorkers;
-        let hasPouches = false;
-        const pouches = players[myPlayerNum].tableau.find(trinket => trinket.name == "Pouches");
-        if (pouches != undefined){
-            hasPouches = true;
+        let hasFigurines = false;
+        const figurines = players[myPlayerNum].tableau.find(trinket => trinket.name == "figurines");
+        if (figurines != undefined){
+            hasFigurines = true;
         }
-        displayGoodSale(goodToBuy, price, vendorNum, numWorkers, hasPouches);
+        displayGoodSale(goodToBuy, price, vendorNum, numWorkers, hasFigurines);
     }
     else if (myPlayerNum == vendorNum && isVendorTurn == true){
         console.log("vendor");
@@ -303,6 +303,22 @@ socket.on("changeTomatoType", (newType, playerNum) => {
         fruitDiv.appendChild(tomatoes);
         tomatoes.src = "static/Images/Tomatoes-fruit.png"
     }
+})
+
+socket.on("setGuavaValue", (modifier, numCoins) => {
+    const guavaDiv = document.createElement("div");
+    guavaDiv.id = "guavaDiv";
+    const coinEntry = document.createElement("input");
+    coinEntry.type = "number";
+    coinEntry.min = 0;
+    coinEntry.max = numCoins;
+    const confirm = document.createElement("button");
+    confirm.addEventListener("click", () =>{
+        socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier);
+    })
+    guavaDiv.appendChild(coinEntry);
+    guavaDiv.appendChild(confirm);
+    bodyElement.appendChild(guavaDiv);
 })
 
 socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
@@ -565,7 +581,7 @@ function viewDetailedReservedCards(reserve, shouldEnlarge){
     }
 }
 
-function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasPouches){
+function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines){
 
     const offerContainer = document.createElement("div");
     offerContainer.id = "offerContainer";
@@ -627,7 +643,7 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasPouches){
         workerCheck.id = "workerCheck";
         workerDiv.appendChild(workerCheck);
 
-        if (hasPouches && numWorkers > 1){
+        if (hasFigurines && numWorkers > 1){
             const pouchDiv = document.createElement("div");
             const doubleWorkerText = document.createElement("p");
             doubleWorkerText.textContent = "x2";

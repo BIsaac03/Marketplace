@@ -24,7 +24,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "!!! 4*NUM PLAYERS LESS COINS"
+        "VP": "let poorer = 0; for(let i = 0; i < players.length; i++){if(player.numCoins > players[i].numCoins){poorer += 1;}}; 4*poorer;"
     },
        {
         "name": "Charms",

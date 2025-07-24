@@ -204,7 +204,7 @@ io.on("connection", (socket) => {
                                 resolvePurchase(players[i], goodForSale[1]);
                             }
                             resolvePurchase(players[i], goodForSale[0]);
-                            if (discount == "clearance"){
+                            if (discount == "clearance" || (discount == "none" && players[i].tableau.some(good => good.name = "Charms"))){
                                 modifiedCost = Math.ceil(modifiedCost / 2);
                             }
                             players[i].numCoins -= modifiedCost;
@@ -218,7 +218,7 @@ io.on("connection", (socket) => {
 
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
-                    if (discount == "breakout"){
+                    if (discount == "breakout" || (discount == "none" && players[i].tableau.some(good => good.name = "Charms"))){
                         players[i].numCoins += Math.floor(eval(price)/2);
                     }
                     const bracelets = players[i].tableau.find(trinket => trinket.name == "Bracelets")
@@ -339,6 +339,13 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on("guavasSet", (playerNum, guavaValue, modifier) => {
+        players[playerNum].numCoins -= guavaValue;
+        const guavas = players[playerNum].tableau.find(fruit => fruit.name == "Guavas");
+        guavas.VP = guavaValue;
+        scoreTableau(players[playerNum], modifier, true);
+    })
+
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
         players[playerNum].numCoins -= (bid1 + bid2);
         players[playerNum].choice.push([bid1, bid2]);
@@ -363,7 +370,7 @@ io.on("connection", (socket) => {
             io.emit("turnUpdate", players);
             
             for (let i = 0; i < players.length; i++){
-                scoreTableau(players[i], 1);
+                scoreTableau(players[i], 1, false);
             }
             io.emit("turnUpdate", players);
             io.emit("endOfGame", players);
@@ -488,9 +495,46 @@ function resolvePurchase(player, goodForSale){
     }
 }
 
-function scoreTableau(player, modifier){
+function scoreTableau(player, modifier, evaluatedGuavas){
+    if (player.tableau.some(fruit => fruit.name == "Guavas" && evaluatedGuavas == false)){
+        socket.emit("setGuavaValue", modifier, player.numCoins)
+        return 0;
+    }
+
+    // set VP of variable goods
+    const mint = player.tableau.find(crop => crop.name == "Mint");
+    if (mint != undefined){
+        let highestFruit = 0;
+        for (let i = 0; i < player.tableau.length; i++){
+            if (player.tableau[i].type == "Fruit"){
+                const fruitVP = eval(player.tableau[i].VP);
+                if (fruitVP > highestFruit){
+                    highestFruit = fruitVP;
+                }
+            }
+        }
+        mint.VP = highestFruit;
+    }
+    if (player.tableau.some(fruit => fruit.name == "Mangoes")){
+        let lowestCrop = 999;
+        let cropIndex = undefined;
+        for (let i = 0; i < player.tableau.length; i++){
+            if (player.tableau[i].type == "Crop"){
+                const cropVP = eval(player.tableau[i].VP);
+                if (cropVP < lowestCrop){
+                    lowestCrop = cropVP;
+                    cropIndex = i;
+                }
+            }
+        }
+        if (lowestCrop < 999){
+            player.tableau[cropIndex].VP = lowestCrop*3;
+        }
+    }
+
     let addedScore = 0;
     for (let i = 0; i < player.tableau.length; i++){
+
     //    console.log(player.tableau[i].VP);
     //    console.log(eval(player.tableau[i].VP));
     //    console.log(Number(eval(player.tableau[i].VP)));
@@ -517,7 +561,7 @@ function endOfRound(){
     else{
         console.log("newRound")
         for (let i = 0; i < players.length; i++){
-            scoreTableau(players[i], 0.5);
+            scoreTableau(players[i], 0.5, false);
         }
         newRound();
         io.emit("turnUpdate", players);
@@ -537,15 +581,6 @@ function makePlayer(userID, name, color){
     let isReady = false;
     let isInGame = false;
     let isVendor= false;     
-    
-    const scoreTableau = (modifier) => {
-        let totalScore = 0;
-        for (let i = 0; i < tableau.length; i++){
-            totalScore += eval(tableau[i].VP);
-        }
-        let adjustedScore = totalScore * modifier;
-        VP += adjustedScore;
-    }
 
     const getNumGoods = () => {
         let numGoods = 0;
@@ -585,5 +620,5 @@ function makePlayer(userID, name, color){
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, scoreTableau, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
 }

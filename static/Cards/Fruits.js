@@ -59,7 +59,7 @@ export const allFruits = [
         "image": "static/Images/Guavas.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! TEMP SET WORTH BASED ON DISCARDED COINS",
+        "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
         "VP": "0"
     },
     {
@@ -69,7 +69,7 @@ export const allFruits = [
         "onPlay": "vendor.numCoins++",
         "active": "none",
         "ongoing": "none",
-        "VP": "!!! 3*KIWIS IN PLAY"
+        "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;"
     },
     {
         "name": "Mangoes",
@@ -77,7 +77,7 @@ export const allFruits = [
         "image": "static/Images/Mangoes.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! TRIPLE LOWEST SCORING CROP",
+        "ongoing": "TRIPLE LOWEST SCORING CROP",
         "VP": "0"
     },
  /*   {

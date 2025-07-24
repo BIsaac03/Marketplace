@@ -87,7 +87,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "!!! 3*GOOD HERE NOT NEIGHBORING"
+        "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name === good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name === good3.name)).length)"
     },
  /*   {
         "name": "Rice",
