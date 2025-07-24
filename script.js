@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     socket.on("currentID", (currentID) => {
         const existingID = players.find(player => player.userID == currentID);
         if (existingID != undefined) {
-            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount);
+            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
         }
         socket.emit("displayExistingPlayers", players);
     })
@@ -285,15 +285,38 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("endGame", (finalSaleCoins, playerNum) => {
+    socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
+        players[playerNum].numCoins -= (bid1 + bid2);
+        players[playerNum].choice.push([bid1, bid2]);
         players[playerNum].isReady = true;
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
+            let runningBid1 = 0;
+            let runningBid2 = 0;
+            for (let i = 0; i < players.length; i++){
+                runningBid1 += players[i].choice[0][0];
+                runningBid2 += players[i].choice[0][1]
+            }
+            for (let i = 0; i < players.length; i++){
+                if(players[i].choice[0][0] > (runningBid1 / players.length)){
+                    io.emit("goodPurchsed", finalCrops[0], i)
+                }
+                if(players[i].choice[0][1] > (runningBid1 / players.length)){
+                    io.emit("goodPurchsed", finalCrops[1], i)
+                }
+            }
 
-        for (let i = 0; i < players.length; i++){
-            scoreTableau(players[i], 1);
+            io.emit("turnUpdate", players);
+            
+            for (let i = 0; i < players.length; i++){
+                scoreTableau(players[i], 1);
+            }
+            io.emit("turnUpdate", players);
+            io.emit("endOfGame", players);
+            console.log("End of Game");   
         }
-        console.log("End of Game");    
     })
-
+  
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });
@@ -306,6 +329,7 @@ httpServer.listen(port, function () {
 });
 
 let players = [];
+let finalCrops = []
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
@@ -426,7 +450,9 @@ function scoreTableau(player, modifier){
 function endOfRound(){
     if (gameRound == totalRounds){
         let firstCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+        finalCrops.push(firstCrop);
         let secondCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
+        finalCrops.push(secondCrop);
         io.emit("finalCropSale", firstCrop, secondCrop, players);
     }
 

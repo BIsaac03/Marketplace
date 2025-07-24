@@ -98,7 +98,7 @@ socket.on("joinedLobby", (player) => {
     joinGameButton.value = "Update"
 })
 
-socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound, currentSale) => {
+socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound, currentSale, finalCrops) => {
     console.log(returningPlayer.name + " has returned!")
     if (!returningPlayer.isInGame){
         const startGameButton = document.createElement("button");
@@ -128,7 +128,11 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         }
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
-        if (returningPlayer.name == vendor.name){
+        if (finalCrops.length != 0){
+            displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
+
+        }
+        else if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false){
                 selectGood(returningPlayer.reserve, "sell");
             }
@@ -147,7 +151,6 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                 displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum)
             }   
         }
-
     }
 })
 
@@ -269,9 +272,11 @@ socket.on("changeTomatoType", (newType, playerNum) => {
 })
 
 socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
+    displayFinalSale(firstCrop, secondCrop, players[myPlayerNum].numCoins);
+})
 
-
-
+socket.on("endOfGame", (players) => {
+    // final scores
 })
 
 function selectGood(goodsToSelectFrom, typeOfSelection){
@@ -684,6 +689,33 @@ function newVendor(vendorNum){
     }    
     const newVendor = document.querySelector(`#player${vendorNum}`);
     newVendor.classList.add("vendor");
+}
+
+function displayFinalSale(firstCrop, secondCrop, numCoins){
+    const finalSaleDiv = document.createElement("div");
+    const good1 = document.createElement("img");
+    good1.src = firstCrop.image;
+    const good2 = document.createElement("img");
+    good2.src = secondCrop.image;
+    const bid1 = document.createElement("input")
+    bid1.type = "number";
+    bid1.min = 0;
+    const bid2 = document.createElement("input")
+    bid2.type = "number";
+    bid2.min = 0;
+    const confirmButton = document.createElement("buton");
+    confirmButton.addEventListener("click", () => {
+        if (bid1.value + bid2.value <= numCoins){
+            socket.emit("resolveFinalSale", bid1.value, bid1.value, myPlayerNum);
+            finalSaleDiv.remove()
+        }
+    })
+    finalSaleDiv.appendChild(good1);
+    finalSaleDiv.appendChild(good2);
+    finalSaleDiv.appendChild(bid1);
+    finalSaleDiv.appendChild(bid2);
+    finalSaleDiv.appendChild(confirmButton);
+    bodyElement.appendChild(finalSaleDiv);
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){
