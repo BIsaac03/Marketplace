@@ -6,7 +6,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(player.getNumTrinkets() >= 2)*1 + (player.getNumTrinkets() >= 4)*4 + (player.getNumTrinkets() >= 6)*5 + (player.getNumTrinkets() >= 8)*10"
+        "VP": "(player.getNumTrinkets() >= 1)*1 + (player.getNumTrinkets() >= 3)*4 + (player.getNumTrinkets() >= 5)*5 + (player.getNumTrinkets() >= 7)*10"
     },
  */   {
         "name": "Bracelets",
@@ -68,7 +68,7 @@ export const allTrinkets = [
         "image": "static/Images/Lanterns.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "3 POINTS FOR UNIQUE CHOICES",
+        "ongoing": "POINTS FOR SIMILAR GOODS ON SALE",
         "VP": "0"
     },
  /*   {

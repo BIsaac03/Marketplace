@@ -299,7 +299,7 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     }
 })
 
-socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
+socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRound) => {
     if (playerNum == myPlayerNum){
         const maskDiv = document.createElement("div");
         maskDiv.id = "maskDiv";
@@ -317,7 +317,7 @@ socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
         coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
-            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier);
+            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
         })
         maskDiv.appendChild(toFruitDescription);
         maskDiv.appendChild(coinToFruit);
@@ -328,7 +328,7 @@ socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
     }
 })
 
-socket.on("setGuavaValue", (modifier, playerNum,numCoins) => {
+socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound) => {
     if (playerNum == myPlayerNum){
         const guavaDiv = document.createElement("div");
         guavaDiv.id = "guavaDiv";
@@ -341,7 +341,7 @@ socket.on("setGuavaValue", (modifier, playerNum,numCoins) => {
         coinEntry.step = 2;
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
-            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier);
+            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
         })
         guavaDiv.appendChild(guavaDescription);
         guavaDiv.appendChild(coinEntry);

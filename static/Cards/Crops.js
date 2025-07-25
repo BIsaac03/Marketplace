@@ -78,7 +78,7 @@ export const allCrops = [
         "onPlay": "loseGood",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.ceil((player.getNumFruits() + player.getNumTrinkets())/2)"
+        "VP": "Math.floor((player.getNumFruits() + player.getNumTrinkets())/2)"
     },
    {
         "name": "Potatoes",
@@ -87,7 +87,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name == good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name == good3.name))).length);"
+        "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name === good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name === good3.name)).length)"
     },
  /*   {
         "name": "Rice",
@@ -123,7 +123,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "socket.emit('activeAbility', 'tomatoAction', myPlayerNum);",
         "ongoing": "none",
-        "VP": "Math.ceil(3/2*player.getNumCrops())"
+        "VP": "4*Math.floor(player.getNumCrops()/2)"
     },
     {
         "name": "Wheat",

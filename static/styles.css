@@ -481,10 +481,12 @@ ul#playerList{
 #guavaDiv{
     position: absolute;
     top: 25vh;
+    background-color: rgba(160, 160, 160, 0.7);
     justify-self: center;
     justify-items: center;
     display: grid;
     grid-template-rows: auto auto auto;
+    padding: 20px;
 }
 #guavaDiv input{
     font-size: 36px;

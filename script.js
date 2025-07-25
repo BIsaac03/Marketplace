@@ -124,6 +124,12 @@ io.on("connection", (socket) => {
         }
         players[vendorNum].saleOffer = [goodToBuy, salePrice];
 
+        const lanterns = players[vendorNum].tableau.find(trinket => trinket.name == "Laterns")
+        if (lanterns != undefined){
+            const goodsOfSimilarType = players[vendorNum].tableau.filter(good => good.type == goodToBuy.type);
+            players[vendorNum].VP += goodsOfSimilarType.length;
+        }
+
         players[vendorNum].isReady = true;
         socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum, players, false)
     })
@@ -148,18 +154,6 @@ io.on("connection", (socket) => {
             }
 
             if (wait == undefined){
-                // score for "Lantern"
-                for (let i = 0; i < players.length; i++){
-                    const lanterns = players[i].tableau.find(trinket => trinket.name == "Laterns")
-                    if (lanterns != undefined){
-                        const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != i));
-                        console.log(sameChoice)
-                        if (sameChoice == undefined){
-                            players[i].VP += 3;
-                        }
-                    }
-                }
-
                 // determine discount
                 if (numBuys > numInvests){
                     console.log("breakout")
@@ -346,16 +340,16 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier) => {
+    socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
-        scoreTableau(players[playerNum], modifier, true, false);
+        scoreTableau(players[playerNum], modifier, true, false, isLastRound);
     })
 
-    socket.on("guavasSet", (playerNum, guavaValue, modifier) => {
+    socket.on("guavasSet", (playerNum, guavaValue, modifier, isLastRound) => {
         players[playerNum].numCoins -= guavaValue;
         const guavas = players[playerNum].tableau.find(fruit => fruit.name == "Guavas");
         guavas.VP = guavaValue;
-        scoreTableau(players[playerNum], modifier, true, true);
+        scoreTableau(players[playerNum], modifier, true, true, isLastRound);
     })
 
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
@@ -382,7 +376,7 @@ io.on("connection", (socket) => {
             io.emit("turnUpdate", players);
             
             for (let i = 0; i < players.length; i++){
-                scoreTableau(players[i], 1, false, false);
+                scoreTableau(players[i], 1, false, false, true);
             }
 
             io.emit("endOfGame");
@@ -515,14 +509,14 @@ function resolvePurchase(player, goodForSale){
     }
 }
 
-function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas){
+function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastRound){
     if (player.tableau.some(trinket => trinket.name == "Masks" && evaluatedMasks == false)){
-        io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets())
+        io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets(), isLastRound)
         return 0;
     }
 
     if (player.tableau.some(fruit => fruit.name == "Guavas" && evaluatedGuavas == false)){
-        io.emit("setGuavaValue", modifier, player.playerNum, player.numCoins)
+        io.emit("setGuavaValue", modifier, player.playerNum, player.numCoin, isLastRound)
         return 0;
     }
 
@@ -572,6 +566,13 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas){
     player.numVP += adjustedScore;
    // console.log("After: ");
    // console.log(player.numVP);
+
+    player.isReady = true;
+    const keepWaiting = players.find(player => player.isReady == false);
+    if (keepWaiting == undefined && !isLastRound){
+        newRound();
+        io.emit("turnUpdate", players);
+    }
 }
 
 function endOfRound(){
@@ -585,11 +586,10 @@ function endOfRound(){
 
     else{
         console.log("newRound")
+        resetPlayerStates();
         for (let i = 0; i < players.length; i++){
-            scoreTableau(players[i], 0.5, false, false);
+            scoreTableau(players[i], 0.5, false, false, false);
         }
-        newRound();
-        io.emit("turnUpdate", players);
     }
 }
 
