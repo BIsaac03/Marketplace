@@ -122,7 +122,7 @@ io.on("connection", (socket) => {
         for(let i = 0; i < players.length; i++){
             players[i].choice.length = 0;
         }
-        players[vendorNum].choice = [goodToBuy, salePrice];
+        players[vendorNum].saleOffer = [goodToBuy, salePrice];
 
         players[vendorNum].isReady = true;
         socket.broadcast.emit("resolveSale", goodToBuy, salePrice, vendorNum, players, false)
@@ -163,13 +163,11 @@ io.on("connection", (socket) => {
                 // determine discount
                 if (numBuys > numInvests){
                     console.log("breakout")
-                    players[vendorNum].choice.length = 0;
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
                 }
                 else if (numInvests > numBuys){
                     console.log("clearance")
-                    players[vendorNum].choice.length = 0;
                     players[vendorNum].choice.push("buy");
                     discount = "clearance";
                 }
@@ -179,7 +177,6 @@ io.on("connection", (socket) => {
                     console.log(numInvests);
                     players[vendorNum].isReady = false;
                     io.emit("resolveSale", goodForSale, price, vendorNum, players, true);
-                    players[vendorNum].choice.length = 0;
                 }
             }
         }
@@ -241,30 +238,23 @@ io.on("connection", (socket) => {
                 }
 
                 if (goodForSale[0].onPlay == "loseGood" && players[i].choice[0] == "invest"){
-                    //players[i].isReady = false;
+                    players[i].isReady = false;
                     io.emit("chooseLostGood", players[i], true);
                 }
             }
-
-            let keepWaiting = players.find(player => player.isReady == false)
-            if (keepWaiting == undefined){
-                endOfTurn();
-            }
+            endOfTurn();
         }      
     })
     
-    socket.on("removeGood", (nameOfGoodToRemove, playerNum, waiting) => {
+    socket.on("removeGood", (nameOfGoodToRemove, playerNum, isWaiting) => {
         const player = players.find(player => player.playerNum == playerNum);
         const indexOfRemovedGood = player.tableau.findIndex(good => good.name == nameOfGoodToRemove);
         player.tableau.splice(indexOfRemovedGood, 1);
         io.emit("removeGoodDOM", nameOfGoodToRemove, playerNum);
 
-        if (waiting){
+        if (isWaiting){
             players[playerNum].isReady = true;
-            let keepWaiting = players.find(player => player.isReady == false)
-            if (keepWaiting == undefined){
-                endOfTurn();
-            }
+            endOfTurn();
         }
     })
 
@@ -311,10 +301,7 @@ io.on("connection", (socket) => {
         io.emit("goodPurchased", personalPineapples, playerNum);
 
         players[playerNum].isReady = true;
-        let keepWaiting = players.find(player => player.isReady == false)
-        if (keepWaiting == undefined){
-            endOfTurn();
-        }
+        endOfTurn();
     })
 
     socket.on("finalDraft", (playerNum) =>{
@@ -397,9 +384,12 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 scoreTableau(players[i], 1, false, false);
             }
-            io.emit("turnUpdate", players);
-            io.emit("endOfGame", players);
-            console.log("End of Game");   
+
+            io.emit("endOfGame");
+            players.sort((a, b) => a.VP - b.VP);
+            for (let i = 0; i < players.length; i++){
+                setTimeout(io.emit("displayFinalScore", players[i], i, players.length), 2000*(i+1));
+            }
         }
     })
   
@@ -436,35 +426,40 @@ function resetPlayerStates() {
 }
 
 function endOfTurn(){
-    const oldVendor = players.find(player => player.isVendor == true);
-    const goodForSale = oldVendor.choice[0];
+    let keepWaiting = players.find(player => player.isReady == false)
+    if (keepWaiting == undefined){
+        const oldVendor = players.find(player => player.isVendor == true);
+        const goodForSale = oldVendor.saleOffer[0];
 
-    // remove good from vendor reserve
-    for (let i = 0; i < goodForSale.length; i++){
-        const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
-        oldVendor.reserve.splice(indexOfSoldGood, 1);
-    }
+        // remove good from vendor reserve
+        for (let i = 0; i < goodForSale.length; i++){
+            const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
+            oldVendor.reserve.splice(indexOfSoldGood, 1);
+        }
 
-    // proceed to next vendor
-    oldVendor.isVendor = false;
-    if (oldVendor.playerNum == players.length-1){
-        players[0].isVendor = true;
-    }
-    else{
-        players[oldVendor.playerNum+1].isVendor = true;
-    }
+        oldVendor.saleOffer.length = 0;
 
-    io.emit("turnUpdate", players);
-    resetPlayerStates();
+        // proceed to next vendor
+        oldVendor.isVendor = false;
+        if (oldVendor.playerNum == players.length-1){
+            players[0].isVendor = true;
+        }
+        else{
+            players[oldVendor.playerNum+1].isVendor = true;
+        }
 
-    const newVendor = players.find(player => player.isVendor == true);
-    if (players.some(player => player.reserve.length > 1)){
-        saleCount += 1;
-        io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum);
-    }
-    else{
-        saleCount = 0
-        endOfRound();
+        io.emit("turnUpdate", players);
+        resetPlayerStates();
+
+        const newVendor = players.find(player => player.isVendor == true);
+        if (players.some(player => player.reserve.length > 1)){
+            saleCount += 1;
+            io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum);
+        }
+        else{
+            saleCount = 0
+            endOfRound();
+        }
     }
 }
 
@@ -604,6 +599,7 @@ function makePlayer(userID, name, color){
     let tableau = [];
     let draftingHand = [];
     let reserve = [];
+    let saleOffer = [];
     let choice = [];
     let numCoins = 20;
     let numWorkers = 1;
@@ -650,5 +646,5 @@ function makePlayer(userID, name, color){
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, saleOffer, choice, numCoins, numWorkers, numVP, isReady, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
 }
