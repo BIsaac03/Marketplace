@@ -319,12 +319,13 @@ io.on("connection", (socket) => {
 
     socket.on("finalDraft", (playerNum) =>{
         const passionFruit = players[playerNum].tableau.find(fruit => fruit.name == "Passion_Fruit")
+        console.log(passionFruit);
         if (passionFruit == undefined){
             players[playerNum].reserve.push(players[playerNum].draftingHand[0])
         }
         else{
             resolvePurchase(players[playerNum], players[playerNum].draftingHand[0])
-            if (draftingHand[0].name == "Peppers"){
+            if (players[playerNum].draftingHand[0].name == "Peppers"){
                 for (let i = 0; i < players.length; i++){
                     if (i !=playerNum){
                         io.emit("chooseLostGood", players[i], true);
