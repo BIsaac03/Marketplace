@@ -124,7 +124,7 @@ io.on("connection", (socket) => {
         }
         players[vendorNum].saleOffer = [goodToBuy, salePrice];
 
-        const lanterns = players[vendorNum].tableau.find(trinket => trinket.name == "Laterns")
+        const lanterns = players[vendorNum].tableau.find(trinket => trinket.name == "Lanterns")
         if (lanterns != undefined){
             const goodsOfSimilarType = players[vendorNum].tableau.filter(good => good.type == goodToBuy.type);
             players[vendorNum].VP += goodsOfSimilarType.length;
@@ -569,6 +569,7 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
     player.isReady = true;
     const keepWaiting = players.find(player => player.isReady == false);
     if (keepWaiting == undefined && !isLastRound){
+        resetPlayerStates();
         newRound();
         io.emit("turnUpdate", players);
     }
