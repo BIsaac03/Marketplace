@@ -76,6 +76,7 @@ io.on("connection", (socket) => {
                     players[i].numWorkers = 2;
                 }
             }
+            players[Math.floor(Math.random()*players.length)].isVendor = true;
             for (let i = 0; i < players.length; i++){
                 players[i].neighborNums.push((i+1)%players.length);
                 if (i != 0){
@@ -151,7 +152,8 @@ io.on("connection", (socket) => {
                 for (let i = 0; i < players.length; i++){
                     const lanterns = players[i].tableau.find(trinket => trinket.name == "Laterns")
                     if (lanterns != undefined){
-                        const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != players[i].playerNum));
+                        const sameChoice = players.find(player => (player.choice[0] == players[i].choice[0] && player.playerNum != i));
+                        console.log(sameChoice)
                         if (sameChoice == undefined){
                             players[i].VP += 3;
                         }
@@ -160,11 +162,13 @@ io.on("connection", (socket) => {
 
                 // determine discount
                 if (numBuys > numInvests){
+                    console.log("breakout")
                     players[vendorNum].choice.length = 0;
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
                 }
                 else if (numInvests > numBuys){
+                    console.log("clearance")
                     players[vendorNum].choice.length = 0;
                     players[vendorNum].choice.push("buy");
                     discount = "clearance";
@@ -204,7 +208,8 @@ io.on("connection", (socket) => {
                                 resolvePurchase(players[i], goodForSale[1]);
                             }
                             resolvePurchase(players[i], goodForSale[0]);
-                            if (discount == "clearance" || (discount == "none" && players[i].tableau.some(good => good.name = "Charms"))){
+                            if (discount == "clearance" || (discount == "none" && players[i].tableau.some(good => good.name == "Charms"))){
+                                console.log(discount)
                                 modifiedCost = Math.ceil(modifiedCost / 2);
                             }
                             players[i].numCoins -= modifiedCost;
@@ -212,13 +217,21 @@ io.on("connection", (socket) => {
                         } 
                     else{
                         players[i].choice[0] = "invest";
-                        players[i].numCoins += Math.ceil(eval(price) / 2);
+                        if (players[i].tableau.some(trinket => trinket.name == "Shells")){
+                            players[i].numCoins += Math.floor(3/2*eval(price));
+                            players[i].VP += 2;
+                        }
+                        else{
+                            players[i].numCoins += Math.ceil(eval(price) / 2);
+                        }
                     }
                 }
 
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
-                    if (discount == "breakout" || (discount == "none" && players[i].tableau.some(good => good.name = "Charms"))){
+                    if (discount == "breakout" || (discount == "none" && players[i].tableau.some(good => good.name == "Charms"))){
+                        console.log(discount)
+
                         players[i].numCoins += Math.floor(eval(price)/2);
                     }
                     const bracelets = players[i].tableau.find(trinket => trinket.name == "Bracelets")
@@ -310,8 +323,14 @@ io.on("connection", (socket) => {
             players[playerNum].reserve.push(players[playerNum].draftingHand[0])
         }
         else{
-            players[playerNum].tableau.push(players[playerNum].draftingHand[0]);
-            io.emit("goodPurchased", players[playerNum].draftingHand[0], playerNum);
+            resolvePurchase(players[playerNum], players[playerNum].draftingHand[0])
+            if (draftingHand[0].name == "Peppers"){
+                for (let i = 0; i < players.length; i++){
+                    if (i !=playerNum){
+                        io.emit("chooseLostGood", players[i], true);
+                    }
+                }
+            }
 
             if (players[playerNum].reserve.some(good => good.name == "Pins")){
                 players[playerNum].reserve.push({
@@ -329,7 +348,7 @@ io.on("connection", (socket) => {
         players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
-            players[Math.floor(Math.random()*players.length)].isVendor = true;
+            //players[Math.floor(Math.random()*players.length)].isVendor = true;
             const vendor = players.find(player => player.isVendor == true);
             saleCount += 1;
             io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
@@ -339,11 +358,16 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier) => {
+        players[playerNum].numCoins -= (newFruits + newCrops);
+        scoreTableau(players[playerNum], modifier, true, false);
+    })
+
     socket.on("guavasSet", (playerNum, guavaValue, modifier) => {
         players[playerNum].numCoins -= guavaValue;
         const guavas = players[playerNum].tableau.find(fruit => fruit.name == "Guavas");
         guavas.VP = guavaValue;
-        scoreTableau(players[playerNum], modifier, true);
+        scoreTableau(players[playerNum], modifier, true, true);
     })
 
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
@@ -370,7 +394,7 @@ io.on("connection", (socket) => {
             io.emit("turnUpdate", players);
             
             for (let i = 0; i < players.length; i++){
-                scoreTableau(players[i], 1, false);
+                scoreTableau(players[i], 1, false, false);
             }
             io.emit("turnUpdate", players);
             io.emit("endOfGame", players);
@@ -420,9 +444,6 @@ function endOfTurn(){
         oldVendor.reserve.splice(indexOfSoldGood, 1);
     }
 
-    io.emit("turnUpdate", players);
-    resetPlayerStates();
-
     // proceed to next vendor
     oldVendor.isVendor = false;
     if (oldVendor.playerNum == players.length-1){
@@ -431,6 +452,9 @@ function endOfTurn(){
     else{
         players[oldVendor.playerNum+1].isVendor = true;
     }
+
+    io.emit("turnUpdate", players);
+    resetPlayerStates();
 
     const newVendor = players.find(player => player.isVendor == true);
     if (players.some(player => player.reserve.length > 1)){
@@ -448,7 +472,7 @@ function newRound()
     gameRound += 1;
     for (let i = 0; i < players.length; i++){
         players[i].reserve.length = 0;
-        players[i].isVendor = false;
+        //players[i].isVendor = false;
     }
     let draftingDeck = createDraftingDeck(players.length);
     createDraftingHands(draftingDeck);
@@ -495,9 +519,14 @@ function resolvePurchase(player, goodForSale){
     }
 }
 
-function scoreTableau(player, modifier, evaluatedGuavas){
+function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas){
+    if (player.tableau.some(trinket => trinket.name == "Masks" && evaluatedMasks == false)){
+        io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets())
+        return 0;
+    }
+
     if (player.tableau.some(fruit => fruit.name == "Guavas" && evaluatedGuavas == false)){
-        socket.emit("setGuavaValue", modifier, player.numCoins)
+        io.emit("setGuavaValue", modifier, player.playerNum, player.numCoins)
         return 0;
     }
 
@@ -561,7 +590,7 @@ function endOfRound(){
     else{
         console.log("newRound")
         for (let i = 0; i < players.length; i++){
-            scoreTableau(players[i], 0.5, false);
+            scoreTableau(players[i], 0.5, false, false);
         }
         newRound();
         io.emit("turnUpdate", players);

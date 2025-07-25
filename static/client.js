@@ -141,6 +141,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         }
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
+        newVendor(vendor.playerNum);
         if (finalCrops.length != 0){
             displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
 
@@ -168,7 +169,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             else if (vendor.isReady == true && returningPlayer.choice.length == 0){
                 const numWorkers = returningPlayer.numWorkers;
                 let hasFigurines = false;
-                const figurines = returningPlayer.tableau.find(trinket => trinket.name == "figurines");
+                const figurines = returningPlayer.tableau.find(trinket => trinket.name == "Figurines");
                 if (figurines != undefined){
                     hasFigurines = true;
                 }
@@ -241,7 +242,7 @@ socket.on("resolveSale", (goodToBuy, price, vendorNum, players, isVendorTurn) =>
     if (myPlayerNum != vendorNum && isVendorTurn == false){
         const numWorkers = players[myPlayerNum].numWorkers;
         let hasFigurines = false;
-        const figurines = players[myPlayerNum].tableau.find(trinket => trinket.name == "figurines");
+        const figurines = players[myPlayerNum].tableau.find(trinket => trinket.name == "Figurines");
         if (figurines != undefined){
             hasFigurines = true;
         }
@@ -305,41 +306,45 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     }
 })
 
-socket.on("resolveMasks", (modifier, numCoins, numTrinkets) => {
-    const maskDiv = document.createElement("div");
-    maskDiv.id = "maskDiv";
-    const coinToFruit = document.createElement("input");
-    coinToFruit.type = "number";
-    coinToFruit.min = 0;
-    coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
-    const coinToCrop = document.createElement("input");
-    coinToCrop.type = "number";
-    coinToCrop.min = 0;
-    coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
-    const confirm = document.createElement("button");
-    confirm.addEventListener("click", () =>{
-        socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier);
-    })
-    maskDiv.appendChild(coinToFruit);
-    maskDiv.appendChild(coinToCrop);
-    maskDiv.appendChild(confirm);
-    bodyElement.appendChild(maskDiv);
+socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
+    if (playerNum == myPlayerNum){
+        const maskDiv = document.createElement("div");
+        maskDiv.id = "maskDiv";
+        const coinToFruit = document.createElement("input");
+        coinToFruit.type = "number";
+        coinToFruit.min = 0;
+        coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
+        const coinToCrop = document.createElement("input");
+        coinToCrop.type = "number";
+        coinToCrop.min = 0;
+        coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
+        const confirm = document.createElement("button");
+        confirm.addEventListener("click", () =>{
+            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier);
+        })
+        maskDiv.appendChild(coinToFruit);
+        maskDiv.appendChild(coinToCrop);
+        maskDiv.appendChild(confirm);
+        bodyElement.appendChild(maskDiv);
+    }
 })
 
-socket.on("setGuavaValue", (modifier, numCoins) => {
-    const guavaDiv = document.createElement("div");
-    guavaDiv.id = "guavaDiv";
-    const coinEntry = document.createElement("input");
-    coinEntry.type = "number";
-    coinEntry.min = 0;
-    coinEntry.max = numCoins;
-    const confirm = document.createElement("button");
-    confirm.addEventListener("click", () =>{
-        socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier);
-    })
-    guavaDiv.appendChild(coinEntry);
-    guavaDiv.appendChild(confirm);
-    bodyElement.appendChild(guavaDiv);
+socket.on("setGuavaValue", (modifier, playerNum,numCoins) => {
+    if (playerNum == myPlayerNum){
+        const guavaDiv = document.createElement("div");
+        guavaDiv.id = "guavaDiv";
+        const coinEntry = document.createElement("input");
+        coinEntry.type = "number";
+        coinEntry.min = 0;
+        coinEntry.max = numCoins;
+        const confirm = document.createElement("button");
+        confirm.addEventListener("click", () =>{
+            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier);
+        })
+        guavaDiv.appendChild(coinEntry);
+        guavaDiv.appendChild(confirm);
+        bodyElement.appendChild(guavaDiv);
+    }
 })
 
 socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
@@ -351,139 +356,141 @@ socket.on("endOfGame", (players) => {
 })
 
 function selectGood(goodsToSelectFrom, typeOfSelection){
-    const goodSelectionDiv = document.createElement("div");
-    goodSelectionDiv.id = "goodSelectionDiv";
-    const message = document.createElement("p");
-    message.textContent = "Select a good to "+typeOfSelection;
-    message.id = "message";
-    goodSelectionDiv.append(message);
-
-    const visibilityToggle = document.createElement("img");
-    const selectionPopUp = document.createElement("div");
-    selectionPopUp.id = "selectionPopUp";
-    goodSelectionDiv.appendChild(selectionPopUp);
-    visibilityToggle.src = "static/Icons/visibility-off.svg";
-    visibilityToggle.classList.add("icon");
-    visibilityToggle.id = "visibilityToggle";
-    visibilityToggle.addEventListener("click", () => {
-        if (visibilityToggle.src.endsWith("visibility-off.svg")){
-            selectionPopUp.style.display = "none";
-            visibilityToggle.src = "static/Icons/visibility-on.svg";
-        } 
-        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
-            selectionPopUp.style.display = "grid";
-            visibilityToggle.src = "static/Icons/visibility-off.svg";
-        }
-    })
-    goodSelectionDiv.appendChild(visibilityToggle);
-
-    const fruitsDiv = document.createElement("div");
-    fruitsDiv.classList.add("Fruits");
-    fruitsDiv.classList.add("typeContainer");
-    const cropsDiv = document.createElement("div");
-    cropsDiv.classList.add("Crops");
-    cropsDiv.classList.add("typeContainer");
-    const trinketsDiv = document.createElement("div");
-    trinketsDiv.classList.add("Trinkets");
-    trinketsDiv.classList.add("typeContainer");
-
-    if(typeOfSelection == "lose" || typeOfSelection == "copy"){
-        selectionPopUp.appendChild(fruitsDiv);
-        selectionPopUp.appendChild(cropsDiv);
-        selectionPopUp.appendChild(trinketsDiv);
-    }
-
-    for (let i = 0; i < goodsToSelectFrom.length; i++){
-        const selectedDiv = document.createElement("div");
-        const selectedGood = document.createElement("img");
-        selectedGood.src = goodsToSelectFrom[i].image;
-        selectedGood.classList.add(goodsToSelectFrom[i].name);
-        selectedGood.classList.add(i);
-        selectedGood.addEventListener("click", () => {
-            if (typeOfSelection == "sell" && goodsToSelectFrom[i].name == "Pins"){
-                if (selectedGood.id == "selectedPins"){
-                    selectedGood.removeAttribute("id");
-                    selectedDiv.removeAttribute("id");
-                }
-                else{
-                    selectedGood.id = "selectedPins";
-                    selectedDiv.id = "selectedPinsDiv";
-                }
-            }
-
-            else{
-                const previouslySelectedGood = document.getElementById("selectedGood");
-                if (previouslySelectedGood != undefined){
-                    previouslySelectedGood.removeAttribute("id");
-                    const previousDiv = document.getElementById("selectedDiv")
-                    previousDiv.removeAttribute("id");
-                }
+    if (goodsToSelectFrom.length > 0){
+        const goodSelectionDiv = document.createElement("div");
+        goodSelectionDiv.id = "goodSelectionDiv";
+        const message = document.createElement("p");
+        message.textContent = "Select a good to "+typeOfSelection;
+        message.id = "message";
+        goodSelectionDiv.append(message);
     
-                selectedGood.id = "selectedGood";
-                selectedDiv.id = "selectedDiv";
+        const visibilityToggle = document.createElement("img");
+        const selectionPopUp = document.createElement("div");
+        selectionPopUp.id = "selectionPopUp";
+        goodSelectionDiv.appendChild(selectionPopUp);
+        visibilityToggle.src = "static/Icons/visibility-off.svg";
+        visibilityToggle.classList.add("icon");
+        visibilityToggle.id = "visibilityToggle";
+        visibilityToggle.addEventListener("click", () => {
+            if (visibilityToggle.src.endsWith("visibility-off.svg")){
+                selectionPopUp.style.display = "none";
+                visibilityToggle.src = "static/Icons/visibility-on.svg";
+            } 
+            else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+                selectionPopUp.style.display = "grid";
+                visibilityToggle.src = "static/Icons/visibility-off.svg";
             }
         })
-        selectedDiv.appendChild(selectedGood);
-
-        if (typeOfSelection == "lose" || typeOfSelection == "copy"){
-            if (goodsToSelectFrom[i].type == "Fruit"){
-                fruitsDiv.appendChild(selectedDiv);
-            }
-            if (goodsToSelectFrom[i].type == "Crop"){
-                cropsDiv.appendChild(selectedDiv);
-            }
-            else if (goodsToSelectFrom[i].type == "Trinket"){
-                trinketsDiv.appendChild(selectedDiv);
-            }
+        goodSelectionDiv.appendChild(visibilityToggle);
+    
+        const fruitsDiv = document.createElement("div");
+        fruitsDiv.classList.add("Fruits");
+        fruitsDiv.classList.add("typeContainer");
+        const cropsDiv = document.createElement("div");
+        cropsDiv.classList.add("Crops");
+        cropsDiv.classList.add("typeContainer");
+        const trinketsDiv = document.createElement("div");
+        trinketsDiv.classList.add("Trinkets");
+        trinketsDiv.classList.add("typeContainer");
+    
+        if(typeOfSelection == "lose" || typeOfSelection == "copy"){
+            selectionPopUp.appendChild(fruitsDiv);
+            selectionPopUp.appendChild(cropsDiv);
+            selectionPopUp.appendChild(trinketsDiv);
         }
-        else{selectionPopUp.appendChild(selectedDiv);
-        }
-    }
-
-    if (typeOfSelection == "sell"){
-        const setPrice = document.createElement("input")
-        setPrice.type = "number";
-        setPrice.min = 1;
-        setPrice.id = "setPrice"
-        selectionPopUp.appendChild(setPrice);
-
-    }
-    const confirmSelection = document.createElement("button");
-    confirmSelection.textContent = "Confirm";
-    confirmSelection.addEventListener("click", () => {
-        const selectedGoodDOM = document.getElementById("selectedGood");
-        const setPrice = document.getElementById("setPrice");
-        if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || Number(setPrice.value) > 0)){
-            if(typeOfSelection == "draft"){
-                if (goodsToSelectFrom.length == 1){
-                    socket.emit("finalDraft", myPlayerNum);
+    
+        for (let i = 0; i < goodsToSelectFrom.length; i++){
+            const selectedDiv = document.createElement("div");
+            const selectedGood = document.createElement("img");
+            selectedGood.src = goodsToSelectFrom[i].image;
+            selectedGood.classList.add(goodsToSelectFrom[i].name);
+            selectedGood.classList.add(i);
+            selectedGood.addEventListener("click", () => {
+                if (typeOfSelection == "sell" && goodsToSelectFrom[i].name == "Pins"){
+                    if (selectedGood.id == "selectedPins"){
+                        selectedGood.removeAttribute("id");
+                        selectedDiv.removeAttribute("id");
+                    }
+                    else{
+                        selectedGood.id = "selectedPins";
+                        selectedDiv.id = "selectedPinsDiv";
+                    }
                 }
-                else{socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1])};
+    
+                else{
+                    const previouslySelectedGood = document.getElementById("selectedGood");
+                    if (previouslySelectedGood != undefined){
+                        previouslySelectedGood.removeAttribute("id");
+                        const previousDiv = document.getElementById("selectedDiv")
+                        previousDiv.removeAttribute("id");
+                    }
+        
+                    selectedGood.id = "selectedGood";
+                    selectedDiv.id = "selectedDiv";
+                }
+            })
+            selectedDiv.appendChild(selectedGood);
+    
+            if (typeOfSelection == "lose" || typeOfSelection == "copy"){
+                if (goodsToSelectFrom[i].type == "Fruit"){
+                    fruitsDiv.appendChild(selectedDiv);
+                }
+                if (goodsToSelectFrom[i].type == "Crop"){
+                    cropsDiv.appendChild(selectedDiv);
+                }
+                else if (goodsToSelectFrom[i].type == "Trinket"){
+                    trinketsDiv.appendChild(selectedDiv);
+                }
             }
-            else if (typeOfSelection == "sell"){
-                const indexofGoodForSale = selectedGoodDOM.classList[1]
-                let goodsForSale = [goodsToSelectFrom[indexofGoodForSale]];
-                const pins = document.getElementById("selectedPins");
-                if (pins != undefined){
-                    pinsIndex = pins.classList[1];
-                    goodsForSale.push(goodsToSelectFrom[pinsIndex]);
-                } 
-                socket.emit("sellGood", goodsForSale, Number(setPrice.value), myPlayerNum);
+            else{selectionPopUp.appendChild(selectedDiv);
             }
-            else if (typeOfSelection == "lose"){
-                socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
-                socket.emit("readytoEndTurn", myPlayerNum);
-            }
-            else if (typeOfSelection == "copy"){
-                console.log(selectedGoodDOM.classList[0]);
-                const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
-                socket.emit("copyGood", goodToCopy, myPlayerNum);
-            }
-            goodSelectionDiv.remove();
         }
-    })
-    selectionPopUp.appendChild(confirmSelection);
-    bodyElement.appendChild(goodSelectionDiv);
+    
+        if (typeOfSelection == "sell"){
+            const setPrice = document.createElement("input")
+            setPrice.type = "number";
+            setPrice.min = 1;
+            setPrice.id = "setPrice"
+            selectionPopUp.appendChild(setPrice);
+    
+        }
+        const confirmSelection = document.createElement("button");
+        confirmSelection.textContent = "Confirm";
+        confirmSelection.addEventListener("click", () => {
+            const selectedGoodDOM = document.getElementById("selectedGood");
+            const setPrice = document.getElementById("setPrice");
+            if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || Number(setPrice.value) > 0)){
+                if(typeOfSelection == "draft"){
+                    if (goodsToSelectFrom.length == 1){
+                        socket.emit("finalDraft", myPlayerNum);
+                    }
+                    else{socket.emit("draftedCard", myPlayerNum, selectedGoodDOM.classList[1])};
+                }
+                else if (typeOfSelection == "sell"){
+                    const indexofGoodForSale = selectedGoodDOM.classList[1]
+                    let goodsForSale = [goodsToSelectFrom[indexofGoodForSale]];
+                    const pins = document.getElementById("selectedPins");
+                    if (pins != undefined){
+                        pinsIndex = pins.classList[1];
+                        goodsForSale.push(goodsToSelectFrom[pinsIndex]);
+                    } 
+                    socket.emit("sellGood", goodsForSale, Number(setPrice.value), myPlayerNum);
+                }
+                else if (typeOfSelection == "lose"){
+                    socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
+                    socket.emit("readytoEndTurn", myPlayerNum);
+                }
+                else if (typeOfSelection == "copy"){
+                    console.log(selectedGoodDOM.classList[0]);
+                    const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
+                    socket.emit("copyGood", goodToCopy, myPlayerNum);
+                }
+                goodSelectionDiv.remove();
+            }
+        })
+        selectionPopUp.appendChild(confirmSelection);
+        bodyElement.appendChild(goodSelectionDiv);
+    } 
 }
 
 function createTableaus(players){
@@ -665,14 +672,20 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
         workerDiv.appendChild(workerCheck);
 
         if (hasFigurines && numWorkers > 1){
-            const pouchDiv = document.createElement("div");
+            const figurineDiv = document.createElement("div");
             const doubleWorkerText = document.createElement("p");
             doubleWorkerText.textContent = "x2";
             const doubleWorkerCheck = document.createElement("input");
             doubleWorkerCheck.type = "checkbox";
             doubleWorkerCheck.id = "doubleWorkerCheck";
-            pouchDiv.appendChild(doubleWorkerText);
-            pouchDiv.appendChild(doubleWorkerCheck);
+            doubleWorkerCheck.addEventListener("click", () => {
+                if (workerCheck.checked == false){
+                    workerCheck.checked = true;
+                }
+            })
+            figurineDiv.appendChild(doubleWorkerText);
+            figurineDiv.appendChild(doubleWorkerCheck);
+            workerDiv.appendChild(figurineDiv);
         }
         currentOffer.appendChild(workerDiv);
     }
@@ -780,7 +793,7 @@ function displayTableaus(players){
 function newVendor(vendorNum){
     currentSaleCount = document.getElementById("currentSaleCount");
     currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
-    const oldVendor = document.getElementById("vendor");
+    const oldVendor = document.getElementsByClassName("vendor")[0];
     if (oldVendor != undefined){
         oldVendor.classList.length = 0;
     }    
