@@ -131,7 +131,7 @@ export const allTrinkets = [
         "image": "static/Images/Shells.png",
         "onPlay": "none",
         "active": "none",
-        "ongoing": "!!! RECEIVE COINS IF CANNOT BUY",
-        "VP": "player.numCoins/5"
+        "ongoing": "BREAKOUT + 2VP WHEN YOU BUY A CARD YOU CANNOT AFFORD",
+        "VP": "0"
     }*/
 ]

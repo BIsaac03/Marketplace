@@ -66,7 +66,7 @@ export const allFruits = [
         "name": "Kiwis",
         "type": "Fruit",
         "image": "static/Images/Kiwis.png",
-        "onPlay": "vendor.numCoins++",
+        "onPlay": "if(player.numCoins > 0){const vendor = players.find(player => (player.isVendor == true)); vendor.numCoins += 1; player.numCoins -= 1;}",
         "active": "none",
         "ongoing": "none",
         "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;"
@@ -114,7 +114,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)"
+        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)" 
     },
     {
         "name": "Pineapples",
