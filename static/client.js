@@ -305,6 +305,27 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     }
 })
 
+socket.on("resolveMasks", (modifier, numCoins, numTrinkets) => {
+    const maskDiv = document.createElement("div");
+    maskDiv.id = "maskDiv";
+    const coinToFruit = document.createElement("input");
+    coinToFruit.type = "number";
+    coinToFruit.min = 0;
+    coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
+    const coinToCrop = document.createElement("input");
+    coinToCrop.type = "number";
+    coinToCrop.min = 0;
+    coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
+    const confirm = document.createElement("button");
+    confirm.addEventListener("click", () =>{
+        socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier);
+    })
+    maskDiv.appendChild(coinToFruit);
+    maskDiv.appendChild(coinToCrop);
+    maskDiv.appendChild(confirm);
+    bodyElement.appendChild(maskDiv);
+})
+
 socket.on("setGuavaValue", (modifier, numCoins) => {
     const guavaDiv = document.createElement("div");
     guavaDiv.id = "guavaDiv";
