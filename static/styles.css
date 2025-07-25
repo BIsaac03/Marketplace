@@ -209,11 +209,11 @@ ul#playerList{
 .tableau{
     grid-area: 1 / 2 / 3 / 3;
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, 1fr);
     overflow: auto;
 }
 
-#vendor .playerName{
+.vendor .playerName{
     text-decoration: underline;
 }
 .myself .tableau div{
@@ -382,7 +382,7 @@ ul#playerList{
 #currentOffer{
     z-index: 5;
     display: grid;
-    grid-template: auto auto auto / auto auto;
+    display: grid;
     column-gap: 20px;
     justify-items: center;
 }
@@ -402,6 +402,26 @@ ul#playerList{
     background-color: aliceblue;
     font-size: 30px;
     font-weight: bold;
+}
+#currentOffer #workerDiv{
+    grid-area: 1 / 3 / 2 / 4;
+    display: grid;
+    grid-template: auto auto / auto auto;
+    align-self: center;
+    justify-items: center;
+}
+#currentOffer #workerDiv input{
+    grid-row: 2 / 3;
+    width: 40px;
+    height: 40px;
+}
+#workerDiv div{
+    grid-row: 1 / 3;
+    display: grid;
+    grid-template-rows: auto auto;
+    align-items: center;
+    padding:20px;
+    font-size: 50px;
 }
 #currentOffer button{
     width: 100px;
@@ -456,4 +476,22 @@ ul#playerList{
 }
 #abilityConfirmation #cancelAbility{
     background-color: rgb(109, 23, 23);
+}
+
+#guavaDiv{
+    position: absolute;
+    top: 25vh;
+    justify-self: center;
+    justify-items: center;
+    display: grid;
+    grid-template-rows: auto auto auto;
+}
+#guavaDiv input{
+    font-size: 36px;
+    width: 75px;
+    height: 75px;
+}
+#guavaDiv button{
+    height: 30px;
+    width: 50px;
 }
