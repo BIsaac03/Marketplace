@@ -300,7 +300,6 @@ io.on("connection", (socket) => {
 
     socket.on("finalDraft", (playerNum) =>{
         const passionFruit = players[playerNum].tableau.find(fruit => fruit.name == "Passion_Fruit")
-        console.log(passionFruit);
         if (passionFruit == undefined){
             players[playerNum].reserve.push(players[playerNum].draftingHand[0])
         }
@@ -333,7 +332,7 @@ io.on("connection", (socket) => {
             //players[Math.floor(Math.random()*players.length)].isVendor = true;
             const vendor = players.find(player => player.isVendor == true);
             saleCount += 1;
-            io.emit("setSaleTerms", vendor.reserve, vendor.playerNum);
+            io.emit("setSaleTerms", vendor.reserve, vendor.playerNum, saleCount);
             io.emit("turnUpdate", players);
             io.emit("displayReserve", players);
             resetPlayerStates();
@@ -446,9 +445,9 @@ function endOfTurn(){
         resetPlayerStates();
 
         const newVendor = players.find(player => player.isVendor == true);
-        if (players.some(player => player.reserve.length > 1)){
+        if (saleCount < 2*players.length){
             saleCount += 1;
-            io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum);
+            io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum, saleCount);
         }
         else{
             saleCount = 0

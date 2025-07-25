@@ -59,6 +59,7 @@ function checkNumWorkers(){
 }
 
 let myPlayerNum = undefined;
+let popUp = undefined;
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
@@ -141,10 +142,13 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         }
         displayReserve(returningPlayer.reserve);
         const vendor = players.find(player => player.isVendor == true);
-        newVendor(vendor.playerNum);
+        newVendor(vendor.playerNum, currentSale);
         if (finalCrops.length != 0){
             displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
 
+        }
+        if (popUp != undefined){
+            eval(popUp);
         }
         else if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false ){
@@ -228,8 +232,8 @@ socket.on("displayReserve", (players) => {
     displayReserve(players[myPlayerNum].reserve);
 })
 
-socket.on("setSaleTerms", (reserve, vendorNum) => {
-    newVendor(vendorNum);
+socket.on("setSaleTerms", (reserve, vendorNum, saleCount) => {
+    newVendor(vendorNum, saleCount);
     if (myPlayerNum == vendorNum){
         selectGood(reserve, "sell")
     }
@@ -301,52 +305,15 @@ socket.on("changeTomatoType", (newType, playerNum) => {
 
 socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRound) => {
     if (playerNum == myPlayerNum){
-        const maskDiv = document.createElement("div");
-        maskDiv.id = "maskDiv";
-        const toFruitDescription = document.createElement("p");
-        toFruitDescription.textContent = "Spend coins to treat Trinkets as Fruits:";
-        const coinToFruit = document.createElement("input");
-        coinToFruit.type = "number";
-        coinToFruit.min = 0;
-        coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
-        const toCropDescription = document.createElement("p");
-        toCropDescription.textContent = "Spend coins to treat Trinkets as Crops:";
-        const coinToCrop = document.createElement("input");
-        coinToCrop.type = "number";
-        coinToCrop.min = 0;
-        coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
-        const confirm = document.createElement("button");
-        confirm.addEventListener("click", () =>{
-            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
-        })
-        maskDiv.appendChild(toFruitDescription);
-        maskDiv.appendChild(coinToFruit);
-        maskDiv.appendChild(toCropDescription);
-        maskDiv.appendChild(coinToCrop);
-        maskDiv.appendChild(confirm);
-        bodyElement.appendChild(maskDiv);
+        popUp = `maskResolve(`+modifier+`,`+numCoins+`,`+numTrinkets+`,`+isLastRound+`)`;
+        maskResolve(modifier, numCoins, numTrinkets, isLastRound);
     }
 })
 
 socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound) => {
     if (playerNum == myPlayerNum){
-        const guavaDiv = document.createElement("div");
-        guavaDiv.id = "guavaDiv";
-        const guavaDescription = document.createElement("p");
-        guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
-        const coinEntry = document.createElement("input");
-        coinEntry.type = "number";
-        coinEntry.min = 0;
-        coinEntry.max = numCoins;
-        coinEntry.step = 2;
-        const confirm = document.createElement("button");
-        confirm.addEventListener("click", () =>{
-            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
-        })
-        guavaDiv.appendChild(guavaDescription);
-        guavaDiv.appendChild(coinEntry);
-        guavaDiv.appendChild(confirm);
-        bodyElement.appendChild(guavaDiv);
+        popUp = `guavaResolve(`+modifier+`,`+numCoins+`,`+isLastRound+`)`;
+        guavaResolve(modifier, numCoins, isLastRound)
     }
 })
 
@@ -810,15 +777,66 @@ function displayTableaus(players){
     }
 }
 
-function newVendor(vendorNum){
+function newVendor(vendorNum, saleCount){
     currentSaleCount = document.getElementById("currentSaleCount");
-    currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
+    currentSaleCount.textContent = saleCount;
     const oldVendor = document.getElementsByClassName("vendor")[0];
     if (oldVendor != undefined){
             oldVendor.classList.remove("vendor");
     }    
     const newVendor = document.querySelector(`#player${vendorNum}`);
     newVendor.classList.add("vendor");
+}
+
+function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
+    const maskDiv = document.createElement("div");
+    maskDiv.id = "maskDiv";
+    const toFruitDescription = document.createElement("p");
+    toFruitDescription.textContent = "Spend coins to treat Trinkets as Fruits:";
+    const coinToFruit = document.createElement("input");
+    coinToFruit.type = "number";
+    coinToFruit.min = 0;
+    coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
+    const toCropDescription = document.createElement("p");
+    toCropDescription.textContent = "Spend coins to treat Trinkets as Crops:";
+    const coinToCrop = document.createElement("input");
+    coinToCrop.type = "number";
+    coinToCrop.min = 0;
+    coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
+    const confirm = document.createElement("button");
+    confirm.addEventListener("click", () =>{
+        socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
+        popUp = undefined;
+        maskDiv.remove();
+    })
+    maskDiv.appendChild(toFruitDescription);
+    maskDiv.appendChild(coinToFruit);
+    maskDiv.appendChild(toCropDescription);
+    maskDiv.appendChild(coinToCrop);
+    maskDiv.appendChild(confirm);
+    bodyElement.appendChild(maskDiv);
+}
+
+function guavaResolve(modifier, numCoins, isLastRound){
+    const guavaDiv = document.createElement("div");
+        guavaDiv.id = "guavaDiv";
+        const guavaDescription = document.createElement("p");
+        guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
+        const coinEntry = document.createElement("input");
+        coinEntry.type = "number";
+        coinEntry.min = 0;
+        coinEntry.max = numCoins;
+        coinEntry.step = 2;
+        const confirm = document.createElement("button");
+        confirm.addEventListener("click", () =>{
+            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
+            popUp = undefined
+            guavaDiv.remove();
+        })
+        guavaDiv.appendChild(guavaDescription);
+        guavaDiv.appendChild(coinEntry);
+        guavaDiv.appendChild(confirm);
+        bodyElement.appendChild(guavaDiv);
 }
 
 function displayFinalSale(firstCrop, secondCrop, numCoins){
