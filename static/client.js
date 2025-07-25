@@ -152,18 +152,15 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                     selectGood(returningPlayer.reserve, "sell");
                 }
                 else{
-                    displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, 0, false)
+                    displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, 0, false)
                 }
             }
         } 
         else{
             if(returningPlayer.choice[0] == "pineappleTarget"){
-                let potentialCopies = [...new Set([...players[players[returningPlayer.playerNum].neighborNums[0]].tableau, ...players[players[returningPlayer.playerNum].neighborNums[1]].tableau])];
-                potentialCopies = players[players[returningPlayer.playerNum].neighborNums[0]].tableau.concat(players[players[returningPlayer.playerNum].neighborNums[1]].tableau)
-                console.log(potentialCopies)
-                let unique = [...new Set(potentialCopies)]
-                console.log(unique);
-                selectGood(unique, "copy");
+                const firstNeighborExclusive = (players[players[returningPlayer.playerNum].neighborNums[0]].tableau).filter(good1 => !(players[players[returningPlayer.playerNum].neighborNums[1]].tableau.some(good2 => good2.name == good1.name)));
+                const potentialCopies = firstNeighborExclusive.concat(players[players[returningPlayer.playerNum].neighborNums[1]].tableau)
+                selectGood(potentialCopies, "copy");
             }
 
             else if (vendor.isReady == true && returningPlayer.choice.length == 0){
@@ -173,7 +170,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                 if (figurines != undefined){
                     hasFigurines = true;
                 }
-                displayGoodSale(vendor.choice[0], vendor.choice[1], vendor.playerNum, numWorkers, hasFigurines)
+                displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, numWorkers, hasFigurines)
             }   
         }
     }
@@ -267,10 +264,10 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
     addToTableau(purchasedGood, playerNum)
 })
 
-socket.on("chooseLostGood", (player) => {
+socket.on("chooseLostGood", (player, isWaiting) => {
     if (myPlayerNum == player.playerNum){
         if (player.tableau.length > 0){
-            selectGood(player.tableau, "lose");
+            selectGood(player.tableau, "lose", isWaiting);
         }
     }
 })
@@ -282,12 +279,8 @@ socket.on("removeGoodDOM", (nameOfGoodToRemove, playerNum) => {
 
 socket.on("pineappleTarget", (playerNum, players) => {
     if (myPlayerNum == playerNum){
-        //console.log(players[playerNum].neighborNums[0]);
-        //console.log(players[players[playerNum].neighborNums[0]])
-        //console.log(players[1].tableau);
-        
-        //console.log(players[players[playerNum].neighborNums[0]].tableau)
-        const potentialCopies = [...new Set([...players[players[playerNum].neighborNums[0]].tableau, ...players[players[playerNum].neighborNums[1]].tableau])];
+        const firstNeighborExclusive = (players[players[playerNum].neighborNums[0]].tableau).filter(good1 => !(players[players[playerNum].neighborNums[1]].tableau.some(good2 => good2.name == good1.name)));
+        const potentialCopies = firstNeighborExclusive.concat(players[players[playerNum].neighborNums[1]].tableau)
         selectGood(potentialCopies, "copy");
     }
 })
@@ -310,10 +303,14 @@ socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
     if (playerNum == myPlayerNum){
         const maskDiv = document.createElement("div");
         maskDiv.id = "maskDiv";
+        const toFruitDescription = document.createElement("p");
+        toFruitDescription.textContent = "Spend coins to treat Trinkets as Fruits:";
         const coinToFruit = document.createElement("input");
         coinToFruit.type = "number";
         coinToFruit.min = 0;
         coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
+        const toCropDescription = document.createElement("p");
+        toCropDescription.textContent = "Spend coins to treat Trinkets as Crops:";
         const coinToCrop = document.createElement("input");
         coinToCrop.type = "number";
         coinToCrop.min = 0;
@@ -322,7 +319,9 @@ socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets) => {
         confirm.addEventListener("click", () =>{
             socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier);
         })
+        maskDiv.appendChild(toFruitDescription);
         maskDiv.appendChild(coinToFruit);
+        maskDiv.appendChild(toCropDescription);
         maskDiv.appendChild(coinToCrop);
         maskDiv.appendChild(confirm);
         bodyElement.appendChild(maskDiv);
@@ -333,14 +332,18 @@ socket.on("setGuavaValue", (modifier, playerNum,numCoins) => {
     if (playerNum == myPlayerNum){
         const guavaDiv = document.createElement("div");
         guavaDiv.id = "guavaDiv";
+        const guavaDescription = document.createElement("p");
+        guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
         const coinEntry = document.createElement("input");
         coinEntry.type = "number";
         coinEntry.min = 0;
         coinEntry.max = numCoins;
+        coinEntry.step = 2;
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
             socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier);
         })
+        guavaDiv.appendChild(guavaDescription);
         guavaDiv.appendChild(coinEntry);
         guavaDiv.appendChild(confirm);
         bodyElement.appendChild(guavaDiv);
@@ -351,11 +354,29 @@ socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
     displayFinalSale(firstCrop, secondCrop, players[myPlayerNum].numCoins);
 })
 
-socket.on("endOfGame", (players) => {
-    // final scores
+socket.on("endOfGame", () => {
+    const finalScores = document.createElement("div");
+    finalScores.id = "finalScores";
 })
 
-function selectGood(goodsToSelectFrom, typeOfSelection){
+socket.on("displayFinalScore", (player, i, numPlayers) => {
+    const finalScores = document.getElementById("finalScores");
+    const playerDiv = document.createElement("div");
+
+    const position = document.createElement("span");
+    position.textContent = (numPlayers - i)+".";
+    position.classList.add(numPlayers - i);
+    const playerName = document.createElement("span");
+    playerName.textContent = player.name;
+    const playerScore = document.createElement("span");
+    playerScore.textContent = player.VP;
+    playerDiv.appendChild(position);
+    playerDiv.appendChild(playerName);
+    playerDiv.appendChild(playerScore);
+    finalScores.appendChild(playerDiv);
+})
+
+function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
     if (goodsToSelectFrom.length > 0){
         const goodSelectionDiv = document.createElement("div");
         goodSelectionDiv.id = "goodSelectionDiv";
@@ -477,8 +498,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection){
                     socket.emit("sellGood", goodsForSale, Number(setPrice.value), myPlayerNum);
                 }
                 else if (typeOfSelection == "lose"){
-                    socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum);
-                    socket.emit("readytoEndTurn", myPlayerNum);
+                    socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum, isWaiting);
                 }
                 else if (typeOfSelection == "copy"){
                     console.log(selectedGoodDOM.classList[0]);
@@ -795,7 +815,7 @@ function newVendor(vendorNum){
     currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
     const oldVendor = document.getElementsByClassName("vendor")[0];
     if (oldVendor != undefined){
-        oldVendor.classList.length = 0;
+            oldVendor.classList.remove("vendor");
     }    
     const newVendor = document.querySelector(`#player${vendorNum}`);
     newVendor.classList.add("vendor");
