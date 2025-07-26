@@ -59,7 +59,6 @@ function checkNumWorkers(){
 }
 
 let myPlayerNum = undefined;
-let popUp = undefined;
 
 ////// DOM MANIPULATION
 const bodyElement = document.body;
@@ -141,14 +140,16 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             selectGood(returningPlayer.draftingHand, "draft");
         }
         displayReserve(returningPlayer.reserve);
+        if (returningPlayer.choice[0] != undefined){
+            if (returningPlayer.choice[0].includes("Resolve")){
+                eval(returningPlayer.choice[0]);
+            }
+        }
         const vendor = players.find(player => player.isVendor == true);
         newVendor(vendor.playerNum, currentSale);
         if (finalCrops.length != 0){
             displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
 
-        }
-        if (popUp != undefined){
-            eval(popUp);
         }
         else if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false ){
@@ -273,6 +274,9 @@ socket.on("chooseLostGood", (player, isWaiting) => {
         if (player.tableau.length > 0){
             selectGood(player.tableau, "lose", isWaiting);
         }
+        else{
+            socket.emit("readyPlayer", player.playerNum);
+        }
     }
 })
 
@@ -305,14 +309,12 @@ socket.on("changeTomatoType", (newType, playerNum) => {
 
 socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRound) => {
     if (playerNum == myPlayerNum){
-        popUp = `maskResolve(`+modifier+`,`+numCoins+`,`+numTrinkets+`,`+isLastRound+`)`;
         maskResolve(modifier, numCoins, numTrinkets, isLastRound);
     }
 })
 
 socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound) => {
     if (playerNum == myPlayerNum){
-        popUp = `guavaResolve(`+modifier+`,`+numCoins+`,`+isLastRound+`)`;
         guavaResolve(modifier, numCoins, isLastRound)
     }
 })
@@ -765,7 +767,7 @@ function updateStats(players){
         const displayedWorkers = document.querySelector(`#player${i} .workers`);
         displayedWorkers.textContent = players[i].numWorkers;
         const displayedScore = document.querySelector(`#player${i} .VP`);
-        displayedScore.textContent = Math.ceil(players[i].numVP);
+        displayedScore.textContent = players[i].numVP.toFixed(1);
     }
 }
 
@@ -796,18 +798,17 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     const coinToFruit = document.createElement("input");
     coinToFruit.type = "number";
     coinToFruit.min = 0;
-    coinToFruit.max = (Math.min(numCoins, numTrinkets) - coinToCrop.value);
     const toCropDescription = document.createElement("p");
     toCropDescription.textContent = "Spend coins to treat Trinkets as Crops:";
     const coinToCrop = document.createElement("input");
     coinToCrop.type = "number";
     coinToCrop.min = 0;
-    coinToCrop.max = (Math.min(numCoins, numTrinkets) - coinToFruit.value);
     const confirm = document.createElement("button");
     confirm.addEventListener("click", () =>{
-        socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
-        popUp = undefined;
-        maskDiv.remove();
+        if (coinToFruit.value + coinToCrop.value <= Math.min(numCoins, numTrinkets)){
+            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
+            maskDiv.remove();
+        }
     })
     maskDiv.appendChild(toFruitDescription);
     maskDiv.appendChild(coinToFruit);
@@ -824,14 +825,14 @@ function guavaResolve(modifier, numCoins, isLastRound){
         guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
         const coinEntry = document.createElement("input");
         coinEntry.type = "number";
-        coinEntry.min = 0;
-        coinEntry.max = numCoins;
-        coinEntry.step = 2;
+        //coinEntry.min = 0;
+        //coinEntry.step = 2;
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
-            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
-            popUp = undefined
-            guavaDiv.remove();
+            if (Number(coinEntry.value) <= numCoins){
+                socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
+                guavaDiv.remove();               
+            }
         })
         guavaDiv.appendChild(guavaDescription);
         guavaDiv.appendChild(coinEntry);
@@ -840,7 +841,14 @@ function guavaResolve(modifier, numCoins, isLastRound){
 }
 
 function displayFinalSale(firstCrop, secondCrop, numCoins){
+    const cropSaleContainer = document.createElement("div");
+    cropSaleContainer.id = "cropSaleContainer";
     const finalSaleDiv = document.createElement("div");
+    finalSaleDiv.id = "cropSale";
+    const avg1 = document.createElement("p");
+    avg1.id = "avg1";
+    const avg2 = document.createElement("p");
+    avg2.id = "avg2";
     const good1 = document.createElement("img");
     good1.src = firstCrop.image;
     const good2 = document.createElement("img");
@@ -851,19 +859,40 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     const bid2 = document.createElement("input")
     bid2.type = "number";
     bid2.min = 0;
-    const confirmButton = document.createElement("buton");
+    const confirmButton = document.createElement("button");
+    confirmButton.textContent = "Confirm";
     confirmButton.addEventListener("click", () => {
-        if (bid1.value + bid2.value <= numCoins){
+        if (Number(bid1.value) + Number(bid2.value) <= numCoins && Number(bid1.value) >=0 && Number(bid2.value) >= 0){
             socket.emit("resolveFinalSale", bid1.value, bid1.value, myPlayerNum);
             finalSaleDiv.remove()
         }
     })
+    finalSaleDiv.appendChild(avg1);
+    finalSaleDiv.appendChild(avg2);
     finalSaleDiv.appendChild(good1);
     finalSaleDiv.appendChild(good2);
     finalSaleDiv.appendChild(bid1);
     finalSaleDiv.appendChild(bid2);
     finalSaleDiv.appendChild(confirmButton);
-    bodyElement.appendChild(finalSaleDiv);
+
+    const visibilityToggle = document.createElement("img");
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.id = "visibilityToggle";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            finalSaleDiv.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            finalSaleDiv.style.display = "grid";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+
+    cropSaleContainer.appendChild(visibilityToggle);
+    cropSaleContainer.appendChild(finalSaleDiv);
+    bodyElement.appendChild(cropSaleContainer);
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){
@@ -920,11 +949,4 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
         else {ruleDocument.style.display = "grid"}
     })
     bodyElement.appendChild(infoIcon)
-}
-function fullUpdate(players, thisPlayer){
-    updateDraft(cardsToDraft);
-    updateReserve(thisPlayer);
-    updateCurrentOffer();
-    updateTableaus(players);
-    updateStats(players);
 }

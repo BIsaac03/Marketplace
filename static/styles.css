@@ -497,3 +497,39 @@ ul#playerList{
     height: 30px;
     width: 50px;
 }
+
+#cropSaleContainer{
+    position: absolute;
+    top: 25vh;
+    justify-self: center;
+    display: grid;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    padding-top: 10px;
+    background-color: rgba(160, 160, 160, 0.7);
+}
+#cropSale{
+    display: grid;
+    grid-template: auto auto auto auto/ auto auto;
+    justify-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+#cropSale img{
+    width: 300px;
+}
+#cropSale input{
+    width: 75px;
+    height: 75px;
+    margin: 20px;
+    text-align: center;
+    font-size: 40px;
+}
+#cropSale button{
+    grid-column: 1 / 3;
+    margin-top: -75px;
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+}
