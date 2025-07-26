@@ -226,13 +226,12 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
 
 /////// GAME LOGIC
 socket.on("nextDraftRound", (players) => {
-    //currentSaleCount = document.getElementById("currentSaleCount");
-    //currentSaleCount.textContent = Number(currentSaleCount.textContent)+1;
     if(players[0].draftingHand.length == 3){
         currentRound = document.getElementById("currentRound");
         currentRound.textContent = Number(currentRound.textContent)+1;
         currentSaleCount = document.getElementById("currentSaleCount");
         currentSaleCount.textContent = 0;
+        displayNextRound(currentRound, players.length);
     }
     selectGood(players[myPlayerNum].draftingHand, "draft");  
 })
@@ -987,4 +986,33 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
         else {ruleDocument.style.display = "grid"}
     })
     bodyElement.appendChild(infoIcon)
+}
+
+function displayNextRound(roundNum, numPlayers){
+    let totalRounds = 2;
+    if (numPlayers < 5){
+        totalRounds = 3;
+    }
+    const newRoundDiv = document.createElement("div");
+    newRoundDiv.id = "newRound";
+    const intro = document.createElement("p");
+    intro.id = "intro";
+    const description1 = document.createElement("p");
+    const description2 = document.createElement("p");
+    if (roundNum == totalRounds){
+        intro.textContent = "FINAL ROUND";
+        description1.textContent = "crop sale and 1.0x scoring at round end"
+    }
+    else{
+        intro.textContent = "ROUND "+roundNum;
+        description1.textContent = (1+totalRounds-roundNum)+" rounds remaining"
+        description2.textContent = "0.5x scoring at round end"
+    }
+
+    newRoundDiv.appendChild(intro);
+    newRoundDiv.appendChild(description1);
+    newRoundDiv.appendChild(description2);
+    bodyElement.appendChild(newRoundDiv);
+
+    setTimeout(newRoundDiv.remove(), 4000);
 }
