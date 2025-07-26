@@ -186,6 +186,11 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                 displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, numWorkers, hasFigurines)
             }   
         }
+
+        const background = document.createElement("img");
+        background.src = "static/Images/Background.jpg";
+        background.id = "backgroundImage";
+        bodyElement.appendChild(background);
     }
 })
 
@@ -216,6 +221,11 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     const userID = readCookieValue("userID");
     const thisPlayer = players.find(player => player.userID == userID);
     myPlayerNum = thisPlayer.playerNum;
+
+    const background = document.createElement("img");
+    background.src = "static/Images/Background.jpg";
+    background.id = "backgroundImage";
+    bodyElement.appendChild(background);
 
     bodyElement.innerHTML = "";
     addMetaTools(numRounds, currentRound, players.length*2, 0)
