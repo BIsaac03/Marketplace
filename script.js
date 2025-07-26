@@ -366,8 +366,8 @@ io.on("connection", (socket) => {
     })
 
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
-        players[playerNum].choice.push(Number(bid1));
-        players[playerNum].choice.push(Number(bid2));
+        players[playerNum].choice.push(bid1);
+        players[playerNum].choice.push(bid2);
         players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
@@ -382,13 +382,35 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 players[i].isReady = false;
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
-                if(players[i].choice[0][0] > (avg1)){
+                if(players[i].choice[0] > (avg1)){
+                    if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
+                        eval(goodForSale.onPlay);
+                    }
                     io.emit("goodPurchsed", finalCrops[0], i)
                 }
-                if(players[i].choice[0][1] > (avg2)){
+                if(players[i].choice[1] > (avg2)){
+                    if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
+                        eval(goodForSale.onPlay);
+                    }
                     io.emit("goodPurchsed", finalCrops[1], i)
                 }
             }
+            // pepper checks
+            if (finalCrops[0].onPlay == "loseGood"){
+                for (let i = 0; i < players.length; i++){
+                    if(players[i].choice[0] <= (avg1)){
+                        eval(goodForSale.onPlay);
+                    }
+                }
+            }
+            else if (finalCrops[1].onPlay == "loseGood"){
+                for (let i = 0; i < players.length; i++){
+                    if(players[i].choice[0] <= (avg1)){
+                        eval(goodForSale.onPlay);
+                    }
+                }
+            }
+
             console.log(runningBid1);
             console.log(runningBid2);
             io.emit("displayFinalSaleAvg", avg1, avg2);

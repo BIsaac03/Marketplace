@@ -866,11 +866,11 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     const confirmButton = document.createElement("button");
     confirmButton.textContent = "Confirm";
     confirmButton.addEventListener("click", () => {
-        if (Number(bid1.value) + Number(bid2.value) <= numCoins && bid1.value >=0 && bid2.value >= 0){
+        if (bid1.value + bid2.value <= numCoins && bid1.value >=0 && bid2.value >= 0){
             confirmButton.remove();
             console.log(bid1.value);
             console.log(bid2.value);
-            socket.emit("resolveFinalSale", bid1.value, bid1.value, myPlayerNum);
+            socket.emit("resolveFinalSale", Number(bid1.value), Number(bid2.value), myPlayerNum);
         }
     })
     finalSaleDiv.appendChild(avg1);
