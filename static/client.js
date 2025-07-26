@@ -148,8 +148,16 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         const vendor = players.find(player => player.isVendor == true);
         newVendor(vendor.playerNum, currentSale);
         if (finalCrops.length != 0){
-            displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
-
+            if (!returningPlayer.choice.length > 0){
+                displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
+            }
+            else{
+                createFinalScoreboard();
+                players.sort((a, b) => a.numVP - b.numVP);
+                for (let i = 0; i < players.length; i++){
+                    setTimeout(displayFinalScore(players[i], i, players.length), 2000*(i+1));
+                }
+            }
         }
         else if (returningPlayer.name == vendor.name){
             if (returningPlayer.isReady == false ){
@@ -328,25 +336,11 @@ socket.on("displayFinalSaleAvg", (avg1, avg2) => {
 })
 
 socket.on("endOfGame", () => {
-    const finalScores = document.createElement("div");
-    finalScores.id = "finalScores";
+    createFinalScoreboard();
 })
 
 socket.on("displayFinalScore", (player, i, numPlayers) => {
-    const finalScores = document.getElementById("finalScores");
-    const playerDiv = document.createElement("div");
-
-    const position = document.createElement("span");
-    position.textContent = (numPlayers - i)+".";
-    position.classList.add(numPlayers - i);
-    const playerName = document.createElement("span");
-    playerName.textContent = player.name;
-    const playerScore = document.createElement("span");
-    playerScore.textContent = player.VP;
-    playerDiv.appendChild(position);
-    playerDiv.appendChild(playerName);
-    playerDiv.appendChild(playerScore);
-    finalScores.appendChild(playerDiv);
+    displayFinalScore(player, i, numPlayers);
 })
 
 function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
@@ -915,6 +909,28 @@ function addFinalAvg(avg1, avg2){
         container.remove();
     })
     document.getElementById("cropSale").appendChild(button);
+}
+
+function createFinalScoreboard(){
+    const finalScores = document.createElement("div");
+    finalScores.id = "finalScores";
+}
+
+function displayFinalScore(player, i, numPlayers){
+    const finalScores = document.getElementById("finalScores");
+    const playerDiv = document.createElement("div");
+    
+    const position = document.createElement("span");
+    position.textContent = (numPlayers - i)+".";
+    position.classList.add(numPlayers - i);
+    const playerName = document.createElement("span");
+    playerName.textContent = player.name;
+    const playerScore = document.createElement("span");
+    playerScore.textContent = player.VP;
+    playerDiv.appendChild(position);
+    playerDiv.appendChild(playerName);
+    playerDiv.appendChild(playerScore);
+    finalScores.appendChild(playerDiv);
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){
