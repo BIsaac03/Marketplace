@@ -323,6 +323,10 @@ socket.on("finalCropSale", (firstCrop, secondCrop, players) => {
     displayFinalSale(firstCrop, secondCrop, players[myPlayerNum].numCoins);
 })
 
+socket.on("displayFinalSaleAvg", (avg1, avg2) => {
+    addFinalAvg(avg1, avg2);
+})
+
 socket.on("endOfGame", () => {
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
@@ -862,9 +866,11 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     const confirmButton = document.createElement("button");
     confirmButton.textContent = "Confirm";
     confirmButton.addEventListener("click", () => {
-        if (Number(bid1.value) + Number(bid2.value) <= numCoins && Number(bid1.value) >=0 && Number(bid2.value) >= 0){
+        if (Number(bid1.value) + Number(bid2.value) <= numCoins && bid1.value >=0 && bid2.value >= 0){
+            confirmButton.remove();
+            console.log(bid1.value);
+            console.log(bid2.value);
             socket.emit("resolveFinalSale", bid1.value, bid1.value, myPlayerNum);
-            finalSaleDiv.remove()
         }
     })
     finalSaleDiv.appendChild(avg1);
@@ -893,6 +899,22 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     cropSaleContainer.appendChild(visibilityToggle);
     cropSaleContainer.appendChild(finalSaleDiv);
     bodyElement.appendChild(cropSaleContainer);
+}
+
+function addFinalAvg(avg1, avg2){
+    const firstAvg = document.getElementById("avg1");
+    firstAvg.textContent = avg1;
+    const secondAvg = document.getElementById("avg2");
+    secondAvg.textContent = avg2;
+    const button = document.createElement("button");
+    button.id = "confirm;"
+    button.textContent = "Continue";
+    button.addEventListener("click", () => {
+        socket.emit("seenFinalSale", myPlayerNum);
+        const container = document.getElementById("cropSaleContainer");
+        container.remove();
+    })
+    document.getElementById("cropSale").appendChild(button);
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){

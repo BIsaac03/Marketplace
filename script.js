@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
                 else {players[i].neighborNums.push(players.length-1)};
             }
             if (players.length < 5){
-                totalRounds = 3;
+                totalRounds = 1;
             }
             else if (players.length >= 5){
                 totalRounds = 2;
@@ -125,9 +125,11 @@ io.on("connection", (socket) => {
         players[vendorNum].saleOffer = [goodToBuy, salePrice];
 
         const lanterns = players[vendorNum].tableau.find(trinket => trinket.name == "Lanterns")
+        console.log(lanterns)
         if (lanterns != undefined){
-            const goodsOfSimilarType = players[vendorNum].tableau.filter(good => good.type == goodToBuy.type);
-            players[vendorNum].VP += goodsOfSimilarType.length;
+            const goodsOfSimilarType = players[vendorNum].tableau.filter(good => good.type == goodToBuy[0].type);
+            console.log(goodsOfSimilarType.length)
+            players[vendorNum].numVP += goodsOfSimilarType.length;
         }
 
         players[vendorNum].isReady = true;
@@ -156,19 +158,14 @@ io.on("connection", (socket) => {
             if (wait == undefined){
                 // determine discount
                 if (numBuys > numInvests){
-                    console.log("breakout")
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
                 }
                 else if (numInvests > numBuys){
-                    console.log("clearance")
                     players[vendorNum].choice.push("buy");
                     discount = "clearance";
                 }
                 else{
-                    console.log("tied choices");
-                    console.log(numBuys);
-                    console.log(numInvests);
                     players[vendorNum].isReady = false;
                     io.emit("resolveSale", goodForSale, price, vendorNum, players, true);
                 }
@@ -210,7 +207,7 @@ io.on("connection", (socket) => {
                         players[i].choice[0] = "invest";
                         if (players[i].tableau.some(trinket => trinket.name == "Shells")){
                             players[i].numCoins += Math.floor(3/2*eval(price));
-                            players[i].VP += 2;
+                            players[i].numVP += 2;
                         }
                         else{
                             players[i].numCoins += Math.ceil(eval(price) / 2);
@@ -298,6 +295,10 @@ io.on("connection", (socket) => {
         endOfTurn();
     })
 
+    socket.on("readyPlayer", (playerNum) => {
+        players[playerNum].isReady = true;
+        endOfTurn();
+    })
     socket.on("finalDraft", (playerNum) =>{
         const passionFruit = players[playerNum].tableau.find(fruit => fruit.name == "Passion_Fruit")
         if (passionFruit == undefined){
@@ -341,6 +342,19 @@ io.on("connection", (socket) => {
 
     socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
+        for (let i = 0; i < newFruits; i++){
+            players[playerNum].tableau.push(
+                {
+                    "name": "Masked",
+                    "type": "Fruit",
+                    "image": "",
+                    "onPlay": "none",
+                    "active": "none",
+                    "ongoing": "none",
+                    "VP": "0"
+                }
+            )
+        }
         scoreTableau(players[playerNum], modifier, true, false, isLastRound);
     })
 
@@ -352,40 +366,55 @@ io.on("connection", (socket) => {
     })
 
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
-        players[playerNum].numCoins -= (bid1 + bid2);
-        players[playerNum].choice.push([bid1, bid2]);
+        players[playerNum].choice.push(Number(bid1));
+        players[playerNum].choice.push(Number(bid2));
         players[playerNum].isReady = true;
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
             let runningBid1 = 0;
             let runningBid2 = 0;
             for (let i = 0; i < players.length; i++){
-                runningBid1 += players[i].choice[0][0];
-                runningBid2 += players[i].choice[0][1]
+                runningBid1 += players[i].choice[0];
+                runningBid2 += players[i].choice[1]
             }
+            let avg1 = Math.floor(runningBid1 / players.length);
+            let avg2 = Math.floor(runningBid2 / players.length);
             for (let i = 0; i < players.length; i++){
-                if(players[i].choice[0][0] > (runningBid1 / players.length)){
+                players[i].isReady = false;
+                players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
+                if(players[i].choice[0][0] > (avg1)){
                     io.emit("goodPurchsed", finalCrops[0], i)
                 }
-                if(players[i].choice[0][1] > (runningBid1 / players.length)){
+                if(players[i].choice[0][1] > (avg2)){
                     io.emit("goodPurchsed", finalCrops[1], i)
                 }
             }
-
+            console.log(runningBid1);
+            console.log(runningBid2);
+            io.emit("displayFinalSaleAvg", avg1, avg2);
+        }
+    })
+  
+    socket.on("seenFinalSale", (playerNum) => {
+        players[playerNum].isReady = true;
+        let keepWaiting = players.find(player => player.isReady == false)
+        if (keepWaiting == undefined){
             io.emit("turnUpdate", players);
+            resetPlayerStates();
             
             for (let i = 0; i < players.length; i++){
                 scoreTableau(players[i], 1, false, false, true);
             }
-
+    
             io.emit("endOfGame");
-            players.sort((a, b) => a.VP - b.VP);
+            players.sort((a, b) => a.numVP - b.numVP);
             for (let i = 0; i < players.length; i++){
-                setTimeout(io.emit("displayFinalScore", players[i], i, players.length), 2000*(i+1));
+                setTimeout(() => {io.emit("displayFinalScore", players[i], i, players.length)}, 2000*(i+1));
             }
         }
     })
-  
+
+
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });
@@ -510,13 +539,21 @@ function resolvePurchase(player, goodForSale){
 
 function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastRound){
     if (player.tableau.some(trinket => trinket.name == "Masks" && evaluatedMasks == false)){
+        player.choice.push("maskResolve("+modifier+","+player.numCoins+","+player.getNumTrinkets()+","+isLastRound+")");
         io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets(), isLastRound)
         return 0;
     }
+    else if (player.tableau.some(trinket => trinket.name == "Masks")){
+        player.choice.length = 0;
+    }
 
     if (player.tableau.some(fruit => fruit.name == "Guavas" && evaluatedGuavas == false)){
+        player.choice.push("guavaResolve("+modifier+","+player.numCoins+","+isLastRound+")");
         io.emit("setGuavaValue", modifier, player.playerNum, player.numCoin, isLastRound)
         return 0;
+    }
+    else if (player.tableau.some(fruit => fruit.name == "Guavas")){
+        player.choice.length = 0;
     }
 
     // set VP of variable goods
@@ -577,6 +614,7 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
 
 function endOfRound(){
     if (gameRound == totalRounds){
+        resetPlayerStates();
         let firstCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
         finalCrops.push(firstCrop);
         let secondCrop = cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0];
