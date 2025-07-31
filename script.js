@@ -125,10 +125,8 @@ io.on("connection", (socket) => {
         players[vendorNum].saleOffer = [goodToBuy, salePrice];
 
         const lanterns = players[vendorNum].tableau.find(trinket => trinket.name == "Lanterns")
-        console.log(lanterns)
         if (lanterns != undefined){
             const goodsOfSimilarType = players[vendorNum].tableau.filter(good => good.type == goodToBuy[0].type);
-            console.log(goodsOfSimilarType.length)
             players[vendorNum].numVP += goodsOfSimilarType.length;
         }
 
@@ -197,7 +195,6 @@ io.on("connection", (socket) => {
                             }
                             resolvePurchase(players[i], goodForSale[0]);
                             if (discount == "clearance" || (discount == "none" && players[i].tableau.some(good => good.name == "Charms"))){
-                                console.log(discount)
                                 modifiedCost = Math.ceil(modifiedCost / 2);
                             }
                             players[i].numCoins -= modifiedCost;
@@ -218,8 +215,6 @@ io.on("connection", (socket) => {
                 else if (players[i].choice[0] == "invest"){
                     players[i].numCoins += eval(price);
                     if (discount == "breakout" || (discount == "none" && players[i].tableau.some(good => good.name == "Charms"))){
-                        console.log(discount)
-
                         players[i].numCoins += Math.floor(eval(price)/2);
                     }
                     const bracelets = players[i].tableau.find(trinket => trinket.name == "Bracelets")
@@ -380,17 +375,16 @@ io.on("connection", (socket) => {
             let avg1 = Math.floor(runningBid1 / players.length);
             let avg2 = Math.floor(runningBid2 / players.length);
             for (let i = 0; i < players.length; i++){
-                players[i].isReady = false;
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > (avg1)){
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
-                        eval(goodForSale.onPlay);
+                        eval(finalCrops[0].onPlay);
                     }
                     io.emit("goodPurchsed", finalCrops[0], i)
                 }
                 if(players[i].choice[1] > (avg2)){
                     if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
-                        eval(goodForSale.onPlay);
+                        eval(finalCrops[1].onPlay);
                     }
                     io.emit("goodPurchsed", finalCrops[1], i)
                 }
@@ -399,22 +393,25 @@ io.on("connection", (socket) => {
             if (finalCrops[0].onPlay == "loseGood"){
                 for (let i = 0; i < players.length; i++){
                     if(players[i].choice[0] <= (avg1)){
-                        eval(goodForSale.onPlay);
+                        players[i].isReady = false;
+                        io.emit("chooseLostGood", players[i], true);
                     }
                 }
             }
             else if (finalCrops[1].onPlay == "loseGood"){
                 for (let i = 0; i < players.length; i++){
                     if(players[i].choice[0] <= (avg1)){
-                        eval(goodForSale.onPlay);
+                        players[i].isReady = false;
+                        io.emit("chooseLostGood", players[i], true);
                     }
                 }
             }
-
-            console.log(runningBid1);
-            console.log(runningBid2);
-            io.emit("displayFinalSaleAvg", avg1, avg2);
-        }
+            keepWaiting = players.find(player => player.isReady == false)
+            if (keepWaiting == undefined){
+                resetPlayerStates();
+                io.emit("displayFinalSaleAvg", avg1, avg2);
+            }   
+        }  
     })
   
     socket.on("seenFinalSale", (playerNum) => {
@@ -422,13 +419,14 @@ io.on("connection", (socket) => {
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
             io.emit("turnUpdate", players);
-            resetPlayerStates();
+            console.log("avgs seen");
+            //resetPlayerStates();
             
             for (let i = 0; i < players.length; i++){
                 scoreTableau(players[i], 1, false, false, true);
             }
     
-            io.emit("endOfGame");
+            io.emit("endOfGame", players.length);
             players.sort((a, b) => a.numVP - b.numVP);
             for (let i = 0; i < players.length; i++){
                 setTimeout(() => {io.emit("displayFinalScore", players[i], i, players.length)}, 2000*(i+1));
@@ -472,37 +470,53 @@ function resetPlayerStates() {
 function endOfTurn(){
     let keepWaiting = players.find(player => player.isReady == false)
     if (keepWaiting == undefined){
-        const oldVendor = players.find(player => player.isVendor == true);
-        const goodForSale = oldVendor.saleOffer[0];
-
-        // remove good from vendor reserve
-        for (let i = 0; i < goodForSale.length; i++){
-            const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
-            oldVendor.reserve.splice(indexOfSoldGood, 1);
+        if (finalCrops.length == 0){
+            const oldVendor = players.find(player => player.isVendor == true);
+            const goodForSale = oldVendor.saleOffer[0];
+    
+            // remove good from vendor reserve
+            for (let i = 0; i < goodForSale.length; i++){
+                const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
+                oldVendor.reserve.splice(indexOfSoldGood, 1);
+            }
+    
+            oldVendor.saleOffer.length = 0;
+    
+            // proceed to next vendor
+            oldVendor.isVendor = false;
+            if (oldVendor.playerNum == players.length-1){
+                players[0].isVendor = true;
+            }
+            else{
+                players[oldVendor.playerNum+1].isVendor = true;
+            }
+    
+            io.emit("turnUpdate", players);
+            resetPlayerStates();
+    
+            const newVendor = players.find(player => player.isVendor == true);
+            if (saleCount < 2*players.length){
+                saleCount += 1;
+                io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum, saleCount);
+            }
+            else{
+                saleCount = 0
+                endOfRound();
+            }
         }
 
-        oldVendor.saleOffer.length = 0;
-
-        // proceed to next vendor
-        oldVendor.isVendor = false;
-        if (oldVendor.playerNum == players.length-1){
-            players[0].isVendor = true;
-        }
         else{
-            players[oldVendor.playerNum+1].isVendor = true;
-        }
+            let runningBid1 = 0;
+            let runningBid2 = 0;
+            for (let i = 0; i < players.length; i++){
+                runningBid1 += players[i].choice[0];
+                runningBid2 += players[i].choice[1]
+            }
+            let avg1 = Math.floor(runningBid1 / players.length);
+            let avg2 = Math.floor(runningBid2 / players.length);
 
-        io.emit("turnUpdate", players);
-        resetPlayerStates();
-
-        const newVendor = players.find(player => player.isVendor == true);
-        if (saleCount < 2*players.length){
-            saleCount += 1;
-            io.emit("setSaleTerms", newVendor.reserve, newVendor.playerNum, saleCount);
-        }
-        else{
-            saleCount = 0
-            endOfRound();
+            resetPlayerStates();
+            io.emit("displayFinalSaleAvg", avg1, avg2);
         }
     }
 }
@@ -611,19 +625,10 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
 
     let addedScore = 0;
     for (let i = 0; i < player.tableau.length; i++){
-
-    //    console.log(player.tableau[i].VP);
-    //    console.log(eval(player.tableau[i].VP));
-    //    console.log(Number(eval(player.tableau[i].VP)));
         addedScore += eval(player.tableau[i].VP);
-    //    console.log(addedScore);
     }
     let adjustedScore = addedScore * modifier;
-    //console.log("before vp");
-    //console.log(+player.numVP);
     player.numVP += adjustedScore;
-   // console.log("After: ");
-   // console.log(player.numVP);
 
     player.isReady = true;
     const keepWaiting = players.find(player => player.isReady == false);
