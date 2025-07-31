@@ -20,7 +20,7 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
 
         const playerColorDOM = document.createElement("div");
         playerColorDOM.classList.add("playerColor");
-        playerColorDOM.style.backgroundColor = playerColor;
+        playerColorDOM.style.backgroundColor = playerColor[0];
         player.appendChild(playerColorDOM);
 
         const playerNameDOM = document.createElement("li");
@@ -40,7 +40,7 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
 
     }
     else{
-        existingPlayer.children[0].style.backgroundColor = playerColor;
+        existingPlayer.children[0].style.backgroundColor = playerColor[0];
         existingPlayer.children[1].textContent = playerName;
     }
 }
@@ -140,7 +140,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             selectGood(returningPlayer.draftingHand, "draft");
         }
         displayReserve(returningPlayer.reserve);
-        if (returningPlayer.choice[0] != undefined){
+        if (returningPlayer.choice[0] != undefined && typeof returningPlayer.choice[0] == 'string'){
             if (returningPlayer.choice[0].includes("Resolve")){
                 eval(returningPlayer.choice[0]);
             }
@@ -151,15 +151,17 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             if (!returningPlayer.choice.length > 0){
                 displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
             }
-            else{
-                createFinalScoreboard();
+            else if (!players.some(player => player.isReady == false)){
+                createFinalScoreboard(players.length);
+                console.log(players)
                 players.sort((a, b) => a.numVP - b.numVP);
+                console.log(players);
                 for (let i = 0; i < players.length; i++){
-                    setTimeout(displayFinalScore(players[i], i, players.length), 2000*(i+1));
+                    setTimeout(() => {displayFinalScore(players[i], i, players.length)}, 2000*(i+1));
                 }
             }
         }
-        else if (returningPlayer.name == vendor.name){
+        if (returningPlayer.name == vendor.name && finalCrops.length == 0){
             if (returningPlayer.isReady == false ){
                 if (players[(myPlayerNum + 1)%players.length].choice.length == 0){
                     selectGood(returningPlayer.reserve, "sell");
@@ -221,13 +223,13 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     const userID = readCookieValue("userID");
     const thisPlayer = players.find(player => player.userID == userID);
     myPlayerNum = thisPlayer.playerNum;
+    bodyElement.innerHTML = "";
 
     const background = document.createElement("img");
     background.src = "static/Images/Background.jpg";
     background.id = "backgroundImage";
     bodyElement.appendChild(background);
 
-    bodyElement.innerHTML = "";
     addMetaTools(numRounds, currentRound, players.length*2, 0)
     createTableaus(players);
     updateStats(players);
@@ -344,8 +346,8 @@ socket.on("displayFinalSaleAvg", (avg1, avg2) => {
     addFinalAvg(avg1, avg2);
 })
 
-socket.on("endOfGame", () => {
-    createFinalScoreboard();
+socket.on("endOfGame", (numPlayers) => {
+    createFinalScoreboard(numPlayers);
 })
 
 socket.on("displayFinalScore", (player, i, numPlayers) => {
@@ -477,7 +479,6 @@ function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
                     socket.emit("removeGood", selectedGoodDOM.classList[0], myPlayerNum, isWaiting);
                 }
                 else if (typeOfSelection == "copy"){
-                    console.log(selectedGoodDOM.classList[0]);
                     const goodToCopy = goodsToSelectFrom.find(good => good.name == selectedGoodDOM.classList[0]);
                     socket.emit("copyGood", goodToCopy, myPlayerNum);
                 }
@@ -527,7 +528,11 @@ function createTableaus(players){
         let VP = document.createElement("p");
         VP.classList.add("VP");
         stats.appendChild(VP);
-        stats.style.backgroundColor = players[i].color;        
+        stats.style.backgroundColor = players[i].color[0];
+        console.log(players[i].color)
+        if (players[i].color[1] == true){
+            stats.style.color = "white";
+        }       
 
         let tableau = document.createElement("div");
         tableau.classList.add("tableau")
@@ -869,10 +874,8 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     const confirmButton = document.createElement("button");
     confirmButton.textContent = "Confirm";
     confirmButton.addEventListener("click", () => {
-        if (bid1.value + bid2.value <= numCoins && bid1.value >=0 && bid2.value >= 0){
+        if (Number(bid1.value) + Number(bid2.value) <= numCoins && bid1.value >=0 && bid2.value >= 0){
             confirmButton.remove();
-            console.log(bid1.value);
-            console.log(bid2.value);
             socket.emit("resolveFinalSale", Number(bid1.value), Number(bid2.value), myPlayerNum);
         }
     })
@@ -920,9 +923,11 @@ function addFinalAvg(avg1, avg2){
     document.getElementById("cropSale").appendChild(button);
 }
 
-function createFinalScoreboard(){
+function createFinalScoreboard(numPlayers){
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
+    finalScores.style.height = 200*numPlayers+"px";
+    bodyElement.appendChild(finalScores);
 }
 
 function displayFinalScore(player, i, numPlayers){
@@ -935,7 +940,7 @@ function displayFinalScore(player, i, numPlayers){
     const playerName = document.createElement("span");
     playerName.textContent = player.name;
     const playerScore = document.createElement("span");
-    playerScore.textContent = player.VP;
+    playerScore.textContent = player.numVP;
     playerDiv.appendChild(position);
     playerDiv.appendChild(playerName);
     playerDiv.appendChild(playerScore);
@@ -1024,5 +1029,5 @@ function displayNextRound(roundNum, numPlayers){
     newRoundDiv.appendChild(description2);
     bodyElement.appendChild(newRoundDiv);
 
-    setTimeout(newRoundDiv.remove(), 4000);
+    setTimeout(() => {newRoundDiv.remove()}, 4000);
 }

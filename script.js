@@ -8,6 +8,8 @@ import { Server } from "socket.io";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+import tinycolor from "tinycolor2";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -41,21 +43,26 @@ io.on("connection", (socket) => {
     })
 
     socket.on("joinGame", (userID, playerName, playerColor) => {
+        let colorSpecs = undefined;
+        if (tinycolor(playerColor).isDark()){
+            colorSpecs = [playerColor, true];
+        }
+        else{colorSpecs =  [playerColor, false];}
         const existingName = players.find(player => player.name == playerName);
         const existingID = players.find(player => player.userID == userID);
         if (existingName != undefined && existingName.userID != userID){
             socket.emit("nameTaken", playerName);
         }
         else if (existingID == undefined){
-            let thisPlayer = makePlayer(userID, playerName, playerColor);
+            let thisPlayer = makePlayer(userID, playerName, colorSpecs);
             players.push(thisPlayer);
             socket.emit("joinedLobby", thisPlayer);
-            io.emit("playerJoined", userID, playerName, playerColor);
+            io.emit("playerJoined", userID, playerName, colorSpecs);
         }
         else{
             existingID.name = playerName;
-            existingID.color = playerColor
-            io.emit("playerJoined", userID, playerName, playerColor);
+            existingID.color = colorSpecs;
+            io.emit("playerJoined", userID, playerName, colorSpecs);
         }
     })
 
@@ -408,7 +415,9 @@ io.on("connection", (socket) => {
             }
             keepWaiting = players.find(player => player.isReady == false)
             if (keepWaiting == undefined){
-                resetPlayerStates();
+                for (let i = 0; i < players.length; i++){
+                    players[i].isReady = false;
+                }
                 io.emit("displayFinalSaleAvg", avg1, avg2);
             }   
         }  
