@@ -131,12 +131,11 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
     else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
+        addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
         displayTableaus(players);
         displayReserve(returningPlayer.reserve);
-        addMetaTools(numRounds, currentRound, players.length*2, currentSale);
-
 
         const vendor = players.find(player => player.isVendor == true);
         newVendor(vendor.playerNum, currentSale);
@@ -233,22 +232,21 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     background.id = "backgroundImage";
     bodyElement.appendChild(background);
 
+    addMetaTools(numRounds, currentRound, players.length*2, 0)
     createTableaus(players);
     updateStats(players);
-    addMetaTools(numRounds, currentRound, players.length*2, 0)
-
 })
 
 
 /////// GAME LOGIC
+socket.on("newRound", (currentRoundNum, totalRoundsNum) => {
+    const currentRound = document.getElementById("currentRound");
+    currentRound.textContent = currentRoundNum
+    const currentSaleCount = document.getElementById("currentSaleCount");
+    currentSaleCount.textContent = 0;
+    displayNextRound(currentRoundNum, totalRoundsNum);
+})
 socket.on("nextDraftRound", (players) => {
-    if(players[0].draftingHand.length == 3){
-        currentRound = document.getElementById("currentRound");
-        currentRound.textContent = Number(currentRound.textContent)+1;
-        currentSaleCount = document.getElementById("currentSaleCount");
-        currentSaleCount.textContent = 0;
-        displayNextRound(currentRound, players.length);
-    }
     selectGood(players[myPlayerNum].draftingHand, "draft");  
 })
 
@@ -957,6 +955,9 @@ function createFinalScoreboard(numPlayers){
 function displayFinalScore(player, i, numPlayers){
     const finalScores = document.getElementById("finalScores");
     const playerDiv = document.createElement("div");
+    if (i == numPlayers - 1){
+        playerDiv.style.fontWeight = "bold";
+    }
     
     const position = document.createElement("span");
     position.textContent = (numPlayers - i)+".";
@@ -1027,24 +1028,21 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
     bodyElement.appendChild(infoIcon)
 }
 
-function displayNextRound(roundNum, numPlayers){
-    let totalRounds = 2;
-    if (numPlayers < 5){
-        totalRounds = 3;
-    }
+function displayNextRound(currentRound, totalRounds){
     const newRoundDiv = document.createElement("div");
     newRoundDiv.id = "newRound";
     const intro = document.createElement("p");
     intro.id = "intro";
     const description1 = document.createElement("p");
     const description2 = document.createElement("p");
-    if (roundNum == totalRounds){
+    if (currentRound == totalRounds){
         intro.textContent = "FINAL ROUND";
-        description1.textContent = "crop sale and 1.0x scoring at round end"
+        description1.textContent = "crop sale remaining"
+        description2.textContent = "1.0x scoring at round end"
     }
     else{
-        intro.textContent = "ROUND "+roundNum;
-        description1.textContent = (1+totalRounds-roundNum)+" rounds remaining"
+        intro.textContent = "ROUND "+currentRound;
+        description1.textContent = (1+totalRounds-currentRound)+" rounds remaining"
         description2.textContent = "0.5x scoring at round end"
     }
 
@@ -1053,5 +1051,5 @@ function displayNextRound(roundNum, numPlayers){
     newRoundDiv.appendChild(description2);
     bodyElement.appendChild(newRoundDiv);
 
-    setTimeout(() => {newRoundDiv.remove()}, 4000);
+    //setTimeout(() => {newRoundDiv.remove()}, 4000);
 }

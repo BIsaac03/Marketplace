@@ -133,12 +133,17 @@ ul#playerList{
 
 #newRound{
 position: fixed;
+justify-self: center;
 width: 100vw;
-height: 300px;
+height: 40vh;
+top: 30vh;
 display: grid;
 grid-template-rows: repeat(3, auto);
 justify-content: center;
-background-color: rgb(211, 186, 43);
+text-align: center;
+color: white;
+background-color: rgba(70, 70, 70, 0.90);
+z-index: 100;
 }
 #newRound #intro{
     font-size: 80px;
