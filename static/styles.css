@@ -189,14 +189,23 @@ z-index: 100;
 .myself .stats .playerName{
     font-size: 48px;
 }
+.vendor .playerName{
+    text-decoration: underline;
+}
 #opponentDisplay .stats .playerName{
     font-size: 24px;
 }
 #opponentDisplay div[id^="player"]{
     display: grid;
+    grid-template: auto 1fr / auto auto;
+    row-gap: 10px;
     height: 200px;
-    grid-template-columns: auto auto;
     padding: 20px;
+}
+div[id^="player"] .status{
+    grid-area: 1 / 1 / 2 / 3;
+    width: 30px;
+    justify-self: center;
 }
 #opponentDisplay .stats img{
     width: 40px;
@@ -217,6 +226,9 @@ z-index: 100;
     display: grid;
     grid-template-columns: repeat(5, auto);
 }
+#opponentDisplay .tableau{
+    grid-area: 2 / 2 / 3 / 3;
+} 
 #opponentDisplay .tableau div{
     display: grid;
     grid-template-columns: auto auto;
@@ -240,10 +252,6 @@ z-index: 100;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     overflow: auto;
-}
-
-.vendor .playerName{
-    text-decoration: underline;
 }
 .myself .tableau div{
     display: grid;

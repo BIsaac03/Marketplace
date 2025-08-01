@@ -141,7 +141,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         newVendor(vendor.playerNum, currentSale);
 
         const background = document.createElement("img");
-        background.src = "static/Images/Background.jpg";
+        background.src = "static/Images/Background-min.jpg";
         background.id = "backgroundImage";
         bodyElement.appendChild(background);
 
@@ -173,11 +173,14 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             else if (returningPlayer.waitingOn == "finalScores"){
                 console.log("return at end")
                 createFinalScoreboard(players.length);
-                players.sort((a, b) => a.numVP - b.numVP);
+                let sortedPlayers = players.toSorted((a, b) => a.numVP - b.numVP);
                 for (let i = 0; i < players.length; i++){
-                    displayFinalScore(players[i], i, players.length);
+                    displayFinalScore(sortedPlayers[i], i, players.length);
                 }
             }
+
+
+
             else if (returningPlayer.waitingOn == "loseGood"){
                 if (returningPlayer.tableau.length > 0){
                     selectGood(returningPlayer.tableau, "lose", true);
@@ -237,6 +240,17 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     updateStats(players);
 })
 
+socket.on("updatePlayerStatus", (isReady, playerNum) => {
+    if (playerNum != myPlayerNum){
+        const readyStatus = document.querySelector(`#player${playerNum} .status`);
+        if (isReady){
+            readyStatus.src = "static/Icons/ready.svg";
+        }
+        else{
+            readyStatus.src = "static/Icons/waiting.svg";
+        }
+    }
+})
 
 /////// GAME LOGIC
 socket.on("newRound", (currentRoundNum, totalRoundsNum) => {
@@ -504,6 +518,9 @@ function createTableaus(players){
     for (let i = 0; i < players.length; i++){
         let player = document.createElement("div");
         player.id = "player"+players[i].playerNum;
+        let readyStatus = document.createElement("img");
+        readyStatus.src = "static/Icons/waiting.svg"
+        readyStatus.classList.add("status")
         let stats = document.createElement("div");
         stats.classList.add("stats");
         let playerName = document.createElement("p");
@@ -556,6 +573,7 @@ function createTableaus(players){
             bodyElement.appendChild(player);
         }
         else{
+            player.appendChild(readyStatus);
             if (i - myPlayerNum > 0){
                 laterOpponents.appendChild(player);
             }
@@ -782,6 +800,14 @@ function updateStats(players){
         displayedWorkers.textContent = players[i].numWorkers;
         const displayedScore = document.querySelector(`#player${i} .VP`);
         displayedScore.textContent = players[i].numVP.toFixed(1);
+
+        if (i != myPlayerNum){
+            const readyStatus = document.querySelector(`#player${i} .status`);
+            if (players[i].isReady){
+                readyStatus.src = "static/Icons/ready.svg"
+            }
+            else {readyStatus.src = "static/Icons/waiting.svg"}        
+        }
     }
 }
 
@@ -819,7 +845,7 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     coinToCrop.min = 0;
     const confirm = document.createElement("button");
     confirm.addEventListener("click", () =>{
-        if (coinToFruit.value + coinToCrop.value <= Math.min(numCoins, numTrinkets)){
+        if (coinToFruit.value + coinToCrop.value <= Math.min(numCoins, numTrinkets) && coinToFruit.value >= 0 && coinToCrop.value >= 0){
             socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
             maskDiv.remove();
         }
@@ -842,7 +868,7 @@ function guavaResolve(modifier, numCoins, isLastRound){
         coinEntry.min = 0;
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
-            if (Number(coinEntry.value) <= numCoins){
+            if (Number(coinEntry.value) <= numCoins && Number(coinEntry.value) >= 0){
                 socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
                 guavaDiv.remove();               
             }
@@ -1051,5 +1077,5 @@ function displayNextRound(currentRound, totalRounds){
     newRoundDiv.appendChild(description2);
     bodyElement.appendChild(newRoundDiv);
 
-    //setTimeout(() => {newRoundDiv.remove()}, 4000);
+    setTimeout(() => {newRoundDiv.remove()}, 4000);
 }
