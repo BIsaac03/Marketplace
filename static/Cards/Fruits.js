@@ -6,7 +6,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "7"
+        "VP": "7",
+        "deckRestriction": "false"
     },
     {
         "name": "Bananas",
@@ -15,7 +16,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "4*Math.floor(player.getNumFruits()/2)"
+        "VP": "4*Math.floor(player.getNumFruits()/2)",
+        "deckRestriction": "false"
     },
     {
         "name": "Blackberries",
@@ -24,7 +26,8 @@ export const allFruits = [
         "onPlay": `scoreTableau(player, 0.25, false, false, true)`,
         "active": "none",
         "ongoing": "none",
-        "VP": "0"
+        "VP": "0",
+        "deckRestriction": "gameRound == 1"
     },
     {
         "name": "Cherries",
@@ -33,7 +36,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(player.numCoins/4, player.getNumFruits())"
+        "VP": "3*Math.min(player.numCoins/4, player.getNumFruits())",
+        "deckRestriction": "false"
     },
     {
         "name": "Coconuts",
@@ -42,7 +46,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "11-player.getNumFruits()"
+        "VP": "11-player.getNumFruits()",
+        "deckRestriction": "false"
     },
     {
         "name": "Grapes",
@@ -51,7 +56,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": `players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[1]].getNumFruits()`
+        "VP": `players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[1]].getNumFruits()`,
+        "deckRestriction": "false"
     },
  */   {
         "name": "Guavas",
@@ -60,7 +66,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "TEMP SET WORTH BASED ON DISCARDED COINS",
-        "VP": "0"
+        "VP": "0",
+        "deckRestriction": "false"
     },
     {
         "name": "Kiwis",
@@ -69,7 +76,8 @@ export const allFruits = [
         "onPlay": "if(player.numCoins > 0){const vendor = players.find(player => (player.isVendor == true)); vendor.numCoins += 1; player.numCoins -= 1;}",
         "active": "none",
         "ongoing": "none",
-        "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;"
+        "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;",
+        "deckRestriction": "players.length == 6"
     },
     {
         "name": "Mangoes",
@@ -78,7 +86,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "TRIPLE LOWEST SCORING CROP",
-        "VP": "0"
+        "VP": "0",
+        "deckRestriction": "false"
     },
  /*   {
         "name": "Oranges",
@@ -87,7 +96,8 @@ export const allFruits = [
         "onPlay": "player.numCoins += 4",
         "active": "none",
         "ongoing": "none",
-        "VP": "player.getNumTrinkets()"
+        "VP": "player.getNumTrinkets()",
+        "deckRestriction": "false"
     },
     {
         "name": "Papayas",
@@ -96,7 +106,8 @@ export const allFruits = [
         "onPlay": "player.numCoins += 10; player.numWorkers += 2",
         "active": "none",
         "ongoing": "none",
-        "VP": "0"
+        "VP": "0",
+        "deckRestriction": "false"
     },
 */    {
         "name": "Passion_Fruit",
@@ -105,7 +116,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "IMMEDIATELY PLACE FINAL DRAFTED CARD INTO YOUR TABLEAU",
-        "VP": "0"
+        "VP": "0",
+        "deckRestriction": "gameRound == totalRounds"
     },
     {
         "name": "Pears",
@@ -114,16 +126,18 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)"
+        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)",
+        "deckRestriction": "false"
     },
     {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('pineappleTarget', player.playerNum, players);`,
+        "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
         "active": "none",
         "ongoing": "none",
-        "VP": "overwritten"
+        "VP": "overwritten",
+        "deckRestriction": "gameRound == 1"
     },
  /*   {
         "name": "Strawberries",
@@ -132,6 +146,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor(player.numCoins/3)"
+        "VP": "Math.floor(player.numCoins/3)",
+        "deckRestriction": "false"
     }*/
 ]

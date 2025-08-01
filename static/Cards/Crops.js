@@ -6,7 +6,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*players.length"
+        "VP": "2*players.length",
+        "deckRestriction": "players.length == 6"
     },
     {
         "name": "Cacao",
@@ -15,7 +16,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "player.getNumGoods()"
+        "VP": "player.getNumGoods()",
+        "deckRestriction": "false"
     },
  */   {
         "name": "Coffee",
@@ -24,7 +26,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": `2*(player.getNumCrops() - player.tableau.some(good => good.name == "Coffee"))`
+        "VP": `2*(player.getNumCrops() - player.tableau.some(good => good.name == "Coffee"))`,
+        "deckRestriction": "false"
     },
  /*   {
         "name": "Corn",
@@ -33,7 +36,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*player.getNumFruits()"
+        "VP": "2*player.getNumFruits()",
+        "deckRestriction": "false"
     },
     {
         "name": "Cotton",
@@ -42,7 +46,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: if(goodType == \"Trinket\"){discount+=1}",
-        "VP": "2*player.getNumTrinkets()"
+        "VP": "2*player.getNumTrinkets()",
+        "deckRestriction": "false"
     },
  */   {
         "name": "Mint",
@@ -51,7 +56,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "HIGHEST SCORING FRUIT"
+        "VP": "HIGHEST SCORING FRUIT",
+        "deckRestriction": "false"
     },
     {
         "name": "Oats",
@@ -60,7 +66,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(Math.abs(player.getNumCrops() - (player.getNumFruits()+player.getNumTrinkets())))"
+        "VP": "2*(Math.abs(player.getNumCrops() - (player.getNumFruits()+player.getNumTrinkets())))",
+        "deckRestriction": "false"
     },
     {
         "name": "Peanuts",
@@ -69,7 +76,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "5*Math.min(player.getNumFruits(), player.getNumCrops(), player.getNumTrinkets())"
+        "VP": "5*Math.min(player.getNumFruits(), player.getNumCrops(), player.getNumTrinkets())",
+        "deckRestriction": "false"
     },
     {
         "name": "Peppers",
@@ -78,7 +86,9 @@ export const allCrops = [
         "onPlay": "loseGood",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor((player.getNumFruits() + player.getNumTrinkets())/2)"
+        "VP": "Math.floor((player.getNumFruits() + player.getNumTrinkets())/2)",
+        "deckRestriction": "false"
+
     },
    {
         "name": "Potatoes",
@@ -87,7 +97,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name === good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name === good3.name)).length)"
+        "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name === good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name === good3.name))).length)",
+        "deckRestriction": "false"
     },
  /*   {
         "name": "Rice",
@@ -96,7 +107,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(player.getNumFruits(), player.getNumCrops())"
+        "VP": "3*Math.min(player.getNumFruits(), player.getNumCrops())",
+        "deckRestriction": "false"
     },
     {
         "name": "Sugarcane",
@@ -105,7 +117,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor((players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[0]].getNumTrinkets()+players[player.neighborNums[1]].getNumFruits()+players[player.neighborNums[1]].getNumTrinkets()) / 2)"
+        "VP": "Math.floor((players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[0]].getNumTrinkets()+players[player.neighborNums[1]].getNumFruits()+players[player.neighborNums[1]].getNumTrinkets()) / 2)",
+        "deckRestriction": "false"
     },
     {
         "name": "Tobacco",
@@ -114,7 +127,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(3*player.getNumTrinkets()) - (player.getNumCrops())"
+        "VP": "(3*player.getNumTrinkets()) - (player.getNumCrops())",
+        "deckRestriction": "false"
     },
     {
         "name": "Tomatoes",
@@ -123,7 +137,8 @@ export const allCrops = [
         "onPlay": "none",
         "active": "socket.emit('activeAbility', 'tomatoAction', myPlayerNum);",
         "ongoing": "none",
-        "VP": "4*Math.floor(player.getNumCrops()/2)"
+        "VP": "4*Math.floor(player.getNumCrops()/2)",
+        "deckRestriction": "false"
     },
     {
         "name": "Wheat",
@@ -132,6 +147,7 @@ export const allCrops = [
         "onPlay": "player.numWorkers+=3",
         "active": "none",
         "ongoing": "none",
-        "VP": "4"
+        "VP": "4",
+        "deckRestriction": "false"
     }*/
 ] 
