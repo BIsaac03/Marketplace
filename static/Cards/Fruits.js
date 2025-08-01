@@ -21,7 +21,7 @@ export const allFruits = [
         "name": "Blackberries",
         "type": "Fruit",
         "image": "static/Images/Blackberries.png",
-        "onPlay": `scoreTableau(player, 0.25)`,
+        "onPlay": `scoreTableau(player, 0.25, false, false, true)`,
         "active": "none",
         "ongoing": "none",
         "VP": "0"
@@ -120,7 +120,7 @@ export const allFruits = [
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": `player.isReady = false; player.choice[0] = \"pineappleTarget\"; io.emit('pineappleTarget', player.playerNum, players);`,
+        "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('pineappleTarget', player.playerNum, players);`,
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten"

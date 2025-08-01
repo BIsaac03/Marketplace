@@ -131,54 +131,29 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
     else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
-        // !!!!!!!!!!! should ensure duplicate tableaus are not created
-        addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
         displayTableaus(players);
-        if(returningPlayer.draftingHand.length >0){
-            selectGood(returningPlayer.draftingHand, "draft");
-        }
         displayReserve(returningPlayer.reserve);
-        if (returningPlayer.choice[0] != undefined && typeof returningPlayer.choice[0] == 'string'){
-            if (returningPlayer.choice[0].includes("Resolve")){
-                eval(returningPlayer.choice[0]);
-            }
-        }
+        addMetaTools(numRounds, currentRound, players.length*2, currentSale);
+
+
         const vendor = players.find(player => player.isVendor == true);
         newVendor(vendor.playerNum, currentSale);
-        if (finalCrops.length != 0){
-            if (!returningPlayer.choice.length > 0){
-                displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
-            }
-            else if (!players.some(player => player.isReady == false)){
-                createFinalScoreboard(players.length);
-                console.log(players)
-                players.sort((a, b) => a.numVP - b.numVP);
-                console.log(players);
-                for (let i = 0; i < players.length; i++){
-                    setTimeout(() => {displayFinalScore(players[i], i, players.length)}, 2000*(i+1));
-                }
-            }
-        }
-        if (returningPlayer.name == vendor.name && finalCrops.length == 0){
-            if (returningPlayer.isReady == false ){
-                if (players[(myPlayerNum + 1)%players.length].choice.length == 0){
-                    selectGood(returningPlayer.reserve, "sell");
-                }
-                else{
-                    displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, 0, false)
-                }
-            }
-        } 
-        else{
-            if(returningPlayer.choice[0] == "pineappleTarget"){
-                const firstNeighborExclusive = (players[players[returningPlayer.playerNum].neighborNums[0]].tableau).filter(good1 => !(players[players[returningPlayer.playerNum].neighborNums[1]].tableau.some(good2 => good2.name == good1.name)));
-                const potentialCopies = firstNeighborExclusive.concat(players[players[returningPlayer.playerNum].neighborNums[1]].tableau)
-                selectGood(potentialCopies, "copy");
-            }
 
-            else if (vendor.isReady == true && returningPlayer.choice.length == 0){
+        const background = document.createElement("img");
+        background.src = "static/Images/Background.jpg";
+        background.id = "backgroundImage";
+        bodyElement.appendChild(background);
+
+        if (returningPlayer.isReady == false){
+            if (returningPlayer.waitingOn == "draft"){
+                selectGood(returningPlayer.draftingHand, "draft");
+            }
+            else if (returningPlayer.waitingOn == "sellGood"){
+                selectGood(returningPlayer.reserve, "sell");
+            }
+            else if (returningPlayer.waitingOn == "buyGood"){
                 const numWorkers = returningPlayer.numWorkers;
                 let hasFigurines = false;
                 const figurines = returningPlayer.tableau.find(trinket => trinket.name == "Figurines");
@@ -186,13 +161,30 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                     hasFigurines = true;
                 }
                 displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, numWorkers, hasFigurines)
-            }   
-        }
+            }
+            else if (returningPlayer.waitingOn == "vendorChoice"){
+                displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, 0, false)
+            }
 
-        const background = document.createElement("img");
-        background.src = "static/Images/Background.jpg";
-        background.id = "backgroundImage";
-        bodyElement.appendChild(background);
+            else if (returningPlayer.waitingOn == "finalSale"){
+                displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
+            }
+            else if (returningPlayer.waitingOn == "finalScores"){
+                createFinalScoreboard(players.length);
+                players.sort((a, b) => a.numVP - b.numVP);
+                for (let i = 0; i < players.length; i++){
+                    setTimeout(() => {displayFinalScore(players[i], i, players.length)}, 2000*(i+1));
+                }
+            }
+            else if (returningPlayer.waitingOn == "pineappleTarget"){
+                const firstNeighborExclusive = (players[players[returningPlayer.playerNum].neighborNums[0]].tableau).filter(good1 => !(players[players[returningPlayer.playerNum].neighborNums[1]].tableau.some(good2 => good2.name == good1.name)));
+                const potentialCopies = firstNeighborExclusive.concat(players[players[returningPlayer.playerNum].neighborNums[1]].tableau)
+                selectGood(potentialCopies, "copy");
+            }
+            else if (returningPlayer.waitingOn != undefined && returningPlayer.waitingOn.includes("Resolve")){
+                eval(returningPlayer.waitingOn);
+            }
+        }
     }
 })
 
@@ -230,9 +222,10 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     background.id = "backgroundImage";
     bodyElement.appendChild(background);
 
-    addMetaTools(numRounds, currentRound, players.length*2, 0)
     createTableaus(players);
     updateStats(players);
+    addMetaTools(numRounds, currentRound, players.length*2, 0)
+
 })
 
 
@@ -529,7 +522,6 @@ function createTableaus(players){
         VP.classList.add("VP");
         stats.appendChild(VP);
         stats.style.backgroundColor = players[i].color[0];
-        console.log(players[i].color)
         if (players[i].color[1] == true){
             stats.style.color = "white";
         }       
@@ -837,8 +829,7 @@ function guavaResolve(modifier, numCoins, isLastRound){
         guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
         const coinEntry = document.createElement("input");
         coinEntry.type = "number";
-        //coinEntry.min = 0;
-        //coinEntry.step = 2;
+        coinEntry.min = 0;
         const confirm = document.createElement("button");
         confirm.addEventListener("click", () =>{
             if (Number(coinEntry.value) <= numCoins){
@@ -926,7 +917,7 @@ function addFinalAvg(avg1, avg2){
 function createFinalScoreboard(numPlayers){
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = 200*numPlayers+"px";
+    finalScores.style.height = 100*numPlayers+"px";
     bodyElement.appendChild(finalScores);
 }
 
