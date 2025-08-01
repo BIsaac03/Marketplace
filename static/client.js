@@ -165,15 +165,24 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             else if (returningPlayer.waitingOn == "vendorChoice"){
                 displayGoodSale(vendor.saleOffer[0], vendor.saleOffer[1], vendor.playerNum, 0, false)
             }
-
             else if (returningPlayer.waitingOn == "finalSale"){
                 displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
             }
             else if (returningPlayer.waitingOn == "finalScores"){
+                console.log("return at end")
                 createFinalScoreboard(players.length);
                 players.sort((a, b) => a.numVP - b.numVP);
                 for (let i = 0; i < players.length; i++){
                     setTimeout(() => {displayFinalScore(players[i], i, players.length)}, 2000*(i+1));
+                }
+                setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
+            }
+            else if (returningPlayer.waitingOn == "loseGood"){
+                if (returningPlayer.tableau.length > 0){
+                    selectGood(returningPlayer.tableau, "lose", true);
+                }
+                else{
+                    socket.emit("readyPlayer", returningPlayer.playerNum);
                 }
             }
             else if (returningPlayer.waitingOn == "pineappleTarget"){
@@ -278,17 +287,13 @@ socket.on("updateStats", (players) => {
 })
 
 socket.on("goodPurchased", (purchasedGood, playerNum) => {
+    console.log(purchasedGood);
     addToTableau(purchasedGood, playerNum)
 })
 
 socket.on("chooseLostGood", (player, isWaiting) => {
     if (myPlayerNum == player.playerNum){
-        if (player.tableau.length > 0){
-            selectGood(player.tableau, "lose", isWaiting);
-        }
-        else{
-            socket.emit("readyPlayer", player.playerNum);
-        }
+        selectGood(player.tableau, "lose", isWaiting);
     }
 })
 
@@ -481,6 +486,11 @@ function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
         selectionPopUp.appendChild(confirmSelection);
         bodyElement.appendChild(goodSelectionDiv);
     } 
+
+    // no goods to select from
+    else{
+        socket.emit("readyPlayer", myPlayerNum);
+    }
 }
 
 function createTableaus(players){
