@@ -168,14 +168,16 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             else if (returningPlayer.waitingOn == "finalSale"){
                 displayFinalSale(finalCrops[0], finalCrops[1], players[myPlayerNum].numCoins);
             }
+            else if (returningPlayer.waitingOn == "seenFinalAvgs"){
+                socket.emit("seenFinalSale", myPlayerNum);
+            }
             else if (returningPlayer.waitingOn == "finalScores"){
                 console.log("return at end")
                 createFinalScoreboard(players.length);
                 players.sort((a, b) => a.numVP - b.numVP);
                 for (let i = 0; i < players.length; i++){
-                    setTimeout(() => {displayFinalScore(players[i], i, players.length)}, 2000*(i+1));
+                    displayFinalScore(players[i], i, players.length);
                 }
-                setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
             }
             else if (returningPlayer.waitingOn == "loseGood"){
                 if (returningPlayer.tableau.length > 0){
@@ -925,10 +927,31 @@ function addFinalAvg(avg1, avg2){
 }
 
 function createFinalScoreboard(numPlayers){
+    const finalScoreContainer = document.createElement("div");
+    finalScoreContainer.id = "finalScoreContainer";
+
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
     finalScores.style.height = 100*numPlayers+"px";
-    bodyElement.appendChild(finalScores);
+
+    const visibilityToggle = document.createElement("img");
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.id = "visibilityToggle";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            finalScores.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            finalScores.style.display = "flex";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+
+    finalScoreContainer.appendChild(visibilityToggle);
+    finalScoreContainer.appendChild(finalScores);
+    bodyElement.appendChild(finalScoreContainer);
 }
 
 function displayFinalScore(player, i, numPlayers){
