@@ -100,6 +100,9 @@ io.on("connection", (socket) => {
             io.emit("gameStartSetup", players, totalRounds, gameRound);
             newRound();
         }
+        else{
+            socket.emit("gameInProgress");
+        }
     })
     socket.on("draftedCard", (myPlayerNum, goodIndex) => {
         const activePlayer = players.find(player => player.playerNum == myPlayerNum)
@@ -306,7 +309,7 @@ io.on("connection", (socket) => {
             "name": "Pineapples",
             "type": "Fruit",
             "image": "static/Images/Pineapples.png",
-            "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
+            "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, player.playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
             "active": "none",
             "ongoing": "none",
             "VP": "overwritten",
@@ -422,13 +425,13 @@ io.on("connection", (socket) => {
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
                         eval(finalCrops[0].onPlay);
                     }
-                    io.emit("goodPurchsed", finalCrops[0], i)
+                    io.emit("goodPurchased", finalCrops[0], i)
                 }
                 if(players[i].choice[1] > (avg2)){
                     if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
                         eval(finalCrops[1].onPlay);
                     }
-                    io.emit("goodPurchsed", finalCrops[1], i)
+                    io.emit("goodPurchased", finalCrops[1], i)
                 }
             }
             // pepper checks
@@ -717,9 +720,9 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
     }
     else if (keepWaiting == undefined){    
         io.emit("endOfGame", players.length);
-        players.sort((a, b) => a.numVP - b.numVP);
+        let sortedPlayers = players.toSorted((a, b) => a.numVP - b.numVP);
         for (let i = 0; i < players.length; i++){
-            setTimeout(() => {io.emit("displayFinalScore", players[i], i, players.length)}, 2000*(i+1));
+            setTimeout(() => {io.emit("displayFinalScore", sortedPlayers[i], i, players.length)}, 2000*(i+1));
             players[i].waitingOn = "finalScores";
         }
         resetPlayerStates();

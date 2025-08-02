@@ -133,7 +133,7 @@ export const allFruits = [
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
-        "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
+        "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, player.playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten",
