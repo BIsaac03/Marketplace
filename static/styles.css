@@ -643,3 +643,14 @@ div[id^="player"] .status{
 #finalScores div span{
     text-align: center;
 }
+
+
+#error{
+    position: fixed;
+    justify-self: center;
+    align-self: center;
+    padding: 20px;
+    font-size: 30px;
+    color: white;
+    background-color: rgb(133, 20, 20);
+}

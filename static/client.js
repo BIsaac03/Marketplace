@@ -76,27 +76,33 @@ socket.on("nameTaken", (duplicateName) => {
     alert("The name \""+duplicateName+"\" is already being used by another player!");
 })
 
-socket.on("newPlayer", () => {
-createLobby();
+socket.on("newPlayer", (currentRound) => {
+    if (currentRound == 0){
+        createLobby();
+    }
+    else{gameInProgress();}
 })
 
 socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound, currentSale, finalCrops) => {
     bodyElement.innerHTML = "";
 
     if (!returningPlayer.isInGame){
-        createLobby();
-        const startGameButton = document.createElement("button");
-        startGameButton.id = "startGame";
-        startGameButton.textContent = "Start Game"
-        startGameButton.addEventListener("click", () => {
-            if (confirm("Are you sure you want to start the game? New players will not be able to join an in-progress game.")){
-                socket.emit("startGame");
-            }
-        })
-        bodyElement.appendChild(startGameButton);
-        
-        const joinGameButton = document.getElementsByClassName("joinGame")[0];
-        joinGameButton.value = "Update"
+        if (currentRound == 0){
+            createLobby();
+            const startGameButton = document.createElement("button");
+            startGameButton.id = "startGame";
+            startGameButton.textContent = "Start Game"
+            startGameButton.addEventListener("click", () => {
+                if (confirm("Are you sure you want to start the game? New players will not be able to join an in-progress game.")){
+                    socket.emit("startGame");
+                }
+            })
+            bodyElement.appendChild(startGameButton);
+            
+            const joinGameButton = document.getElementsByClassName("joinGame")[0];
+            joinGameButton.value = "Update"
+        }
+        else{gameInProgress();}
     }
     
     else{
@@ -194,15 +200,6 @@ socket.on("playerKicked", (playerID) => {
         startGameButton = document.getElementById("startGame");
         startGameButton.remove();
     }
-})
-
-socket.on("gameInProgress", () => {
-    const error = document.createElement("div");
-    error.id = "error";
-    const errorMessage = document.createElement("p");
-    errorMessage.textContent = "A game is already in progress. All players in the game must leave before a new game can be started.";
-    error.appendChild(errorMessage);
-    bodyElement.appendChild(error)
 })
 
 socket.on("gameStartSetup", (players, numRounds, currentRound) => {
@@ -1120,7 +1117,7 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 5;
+    const displayTimeSecs = 4;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
     const loadingBar = document.createElement("progress");
@@ -1205,4 +1202,14 @@ function createLobby(){
     lobby.appendChild(playerCustomization);
     lobby.appendChild(playerListDOM);
     bodyElement.appendChild(lobby);
+}
+
+function gameInProgress(){
+    bodyElement.innerHTML = "";
+    const error = document.createElement("div");
+    error.id = "error";
+    const errorMessage = document.createElement("p");
+    errorMessage.textContent = "A game is already in progress. All players in the game must leave before a new game can be started.";
+    error.appendChild(errorMessage);
+    bodyElement.appendChild(error)
 }

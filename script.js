@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
         if (existingID != undefined) {
             socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
         }
-        else{socket.emit("newPlayer");}
+        else{socket.emit("newPlayer", gameRound);}
         socket.emit("displayExistingPlayers", players);
     })
 
@@ -99,9 +99,6 @@ io.on("connection", (socket) => {
             }
             io.emit("gameStartSetup", players, totalRounds, gameRound);
             newRound();
-        }
-        else{
-            socket.emit("gameInProgress");
         }
     })
     socket.on("draftedCard", (myPlayerNum, goodIndex) => {
