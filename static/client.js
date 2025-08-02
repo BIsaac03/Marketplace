@@ -131,6 +131,9 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
     else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
+        const header = document.createElement("div");
+        header.classList.add("header");
+        bodyElement.appendChild(header);
         addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
@@ -223,6 +226,14 @@ socket.on("playerKicked", (playerID) => {
     }
 })
 
+socket.on("gameInProgress", () => {
+    const error = document.createElement("div");
+    error.id = "error";
+    const errorMessage = document.createElement("p");
+    errorMessage.textContent = "A game is already in progress. All players in the game must leave before a new game can be started.";
+    error.appendChild(errorMessage);
+    bodyElement.appendChild(error)
+})
 
 socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     const userID = readCookieValue("userID");
@@ -1033,7 +1044,9 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
     gameOverview.id = "gameOverview";
     gameOverview.appendChild(roundOverview);
     gameOverview.appendChild(saleCountOverview);
-    bodyElement.appendChild(gameOverview);
+
+    const header = document.getElementsByClassName("header")[0];
+    header.appendChild(gameOverview);
 
     const ruleDocument = document.createElement("img");
     ruleDocument.style.display = "none";
@@ -1051,7 +1064,7 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
         }
         else {ruleDocument.style.display = "grid"}
     })
-    bodyElement.appendChild(infoIcon)
+    header.appendChild(infoIcon)
 }
 
 function displayNextRound(currentRound, totalRounds){
