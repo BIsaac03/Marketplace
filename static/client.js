@@ -11,7 +11,8 @@ function readCookieValue(name){
     return value;
 }
 
-function modifyPlayerList(playerList, playerID, playerName, playerColor){
+function modifyPlayerList(playerID, playerName, playerColor){
+    const playerList = document.getElementById("playerList");
     const existingPlayer = document.getElementById(playerID);
     if (existingPlayer === null){
         const player = document.createElement("div");
@@ -36,7 +37,7 @@ function modifyPlayerList(playerList, playerID, playerName, playerColor){
             })
             player.appendChild(leaveLobbyButton)
 
-        playerList.append(player);
+        playerList.appendChild(player);
 
     }
     else{
@@ -58,20 +59,8 @@ function checkNumWorkers(){
     return numWorkers;
 }
 
-let myPlayerNum = undefined;
-
-////// DOM MANIPULATION
 const bodyElement = document.body;
-const joinGameButton = document.getElementsByClassName("joinGame")[0];
-joinGameButton.addEventListener("click", () => {
-    let playerName = document.getElementById("playerName").value;
-    let playerColor = document.getElementById("playerColor").value;
-    if (playerName != ""){
-        document.cookie = "chosenName="+playerName;
-        document.cookie = "preferredColor="+playerColor;
-        socket.emit("joinGame", readCookieValue("userID"), playerName, playerColor);
-    }
-})
+let myPlayerNum = undefined;
 
 ////// SOCKET EVENTS
 socket.on("connect", () => {  
@@ -81,39 +70,21 @@ socket.on("connect", () => {
         userIDCookie = readCookieValue("userID");
     }
     socket.emit("currentID", userIDCookie);
-
-    const nameEntryField = document.getElementById("playerName");
-    let chosenName = readCookieValue("chosenName");
-    if (nameEntryField != undefined && chosenName != undefined){
-        nameEntryField.value = chosenName;
-    }
-    const colorSelector = document.getElementById("playerColor");
-    let preferredColor = readCookieValue("preferredColor");
-    if (colorSelector != undefined && preferredColor != undefined){
-        colorSelector.value = preferredColor;
-    }
 });
 
 socket.on("nameTaken", (duplicateName) => {
     alert("The name \""+duplicateName+"\" is already being used by another player!");
 })
 
-socket.on("joinedLobby", (player) => {
-    const startGameButton = document.createElement("button");
-    startGameButton.id = "startGame";
-    startGameButton.textContent = "Start Game"
-    startGameButton.addEventListener("click", () => {
-        if (confirm("Are you sure you want to start the game? New players will not be able to join an in-progress game.")){
-            socket.emit("startGame");
-        }
-    })
-    bodyElement.appendChild(startGameButton);
-    joinGameButton.value = "Update"
+socket.on("newPlayer", () => {
+createLobby();
 })
 
 socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound, currentSale, finalCrops) => {
-    console.log(returningPlayer.name + " has returned!")
+    bodyElement.innerHTML = "";
+
     if (!returningPlayer.isInGame){
+        createLobby();
         const startGameButton = document.createElement("button");
         startGameButton.id = "startGame";
         startGameButton.textContent = "Start Game"
@@ -130,7 +101,6 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
     
     else{
         myPlayerNum = returningPlayer.playerNum;
-        bodyElement.innerHTML = "";
 
         displayLoadingScreen();
         addMetaTools(numRounds, currentRound, players.length*2, currentSale);
@@ -204,16 +174,17 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
 })
 
 // modifies list of players in lobby
-const playerList = document.getElementById("playerList");
+//const playerList = document.getElementById("playerList");
 socket.on("displayExistingPlayers", (players) => {
     for (let i = 0; i < players.length; i++){
-        modifyPlayerList(playerList, players[i].userID, players[i].name, players[i].color);
+        modifyPlayerList(players[i].userID, players[i].name, players[i].color);
     }
 })
 socket.on("playerJoined", (playerID, newPlayerName, newPlayerColor) => {
-    modifyPlayerList(playerList, playerID, newPlayerName, newPlayerColor);
+    modifyPlayerList(playerID, newPlayerName, newPlayerColor);
 })
 socket.on("playerKicked", (playerID) => {
+    const playerList = document.getElementById("playerList");
     const playerDOM = document.getElementById(playerID);
     playerList.removeChild(playerDOM);
 
@@ -240,6 +211,7 @@ socket.on("gameStartSetup", (players, numRounds, currentRound) => {
     myPlayerNum = thisPlayer.playerNum;
     bodyElement.innerHTML = "";
 
+    displayLoadingScreen();
     const background = document.createElement("img");
     background.src = "static/Images/Background.jpg";
     background.id = "backgroundImage";
@@ -650,9 +622,6 @@ function createTableaus(players){
     opponentDisplay.appendChild(priorOpponents);
     bodyElement.appendChild(opponentDisplay);
 }
-
-
-/////// DISPLAY UPDATES
 
 function displayReserve(reserve){
     let shouldEnlarge = true;
@@ -1167,4 +1136,73 @@ function displayLoadingScreen(){
         setTimeout(() => {loadingBar.value = (i+1); console.log(i)}, displayTimeSecs * 10* (i+1));
     }
     setTimeout(() => {loadingScreen.remove()}, displayTimeSecs * 1000);
+}
+
+function createLobby(){
+    const header = document.createElement("div");
+    header.classList.add("header");
+    bodyElement.appendChild(header);
+    
+    const title = document.createElement("p");
+    title.classList.add("title");
+    title.textContent = "Lobby";
+    bodyElement.appendChild(title);
+    
+    const lobby = document.createElement("div");
+    lobby.id = "lobby";
+    
+    const playerCustomization = document.createElement("form");
+    playerCustomization.classList.add("playerCustomization");
+    
+    const label = document.createElement("label");
+    label.setAttribute("for", "playerName");
+    label.textContent =  "Player Name:";
+    
+    const playerName = document.createElement("input");
+    playerName.classList.add("playerName");
+    playerName.setAttribute("type", "text");
+    playerName.setAttribute("maxlength", "9");
+    playerName.setAttribute("name", "playerName");
+    playerName.id = "playerName";
+    let chosenName = readCookieValue("chosenName");
+    if (chosenName != undefined){
+        playerName.value = chosenName;
+    }
+    
+    const playerColor = document.createElement("input");
+    playerColor.classList.add("colorSelect");
+    playerColor.setAttribute("type", "color");
+    playerColor.setAttribute("name", "playerColor");
+    playerColor.id = "playerColor";
+    let preferredColor = readCookieValue("preferredColor");
+    if (preferredColor != undefined){
+        playerColor.value = preferredColor;
+    }
+    
+    const submitBtn = document.createElement("input");
+    submitBtn.classList.add("joinGame");
+    submitBtn.setAttribute("type", "submit");
+    submitBtn.setAttribute("value", "Join Game");
+    submitBtn.addEventListener("click", () => {
+        const name = playerName.value;
+        const color = playerColor.value;
+        if (name != ""){
+            document.cookie = "chosenName="+name;
+            document.cookie = "preferredColor="+color;
+            socket.emit("joinGame", readCookieValue("userID"), name, color);
+        }
+    })
+    
+    playerCustomization.appendChild(label);
+    playerCustomization.appendChild(playerName);
+    playerCustomization.appendChild(playerColor);
+    playerCustomization.appendChild(submitBtn);
+    
+    const playerListDOM = document.createElement("ul");
+    playerListDOM.id = "playerList"
+    playerListDOM.textContent = "Joined players:"
+    
+    lobby.appendChild(playerCustomization);
+    lobby.appendChild(playerListDOM);
+    bodyElement.appendChild(lobby);
 }

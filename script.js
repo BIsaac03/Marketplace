@@ -39,6 +39,7 @@ io.on("connection", (socket) => {
         if (existingID != undefined) {
             socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
         }
+        else{socket.emit("newPlayer");}
         socket.emit("displayExistingPlayers", players);
     })
 
@@ -56,7 +57,6 @@ io.on("connection", (socket) => {
         else if (existingID == undefined){
             let thisPlayer = makePlayer(userID, playerName, colorSpecs);
             players.push(thisPlayer);
-            socket.emit("joinedLobby", thisPlayer);
             io.emit("playerJoined", userID, playerName, colorSpecs);
         }
         else{
