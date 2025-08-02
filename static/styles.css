@@ -108,6 +108,29 @@ ul#playerList{
     background-color: rgb(134, 11, 11);
 }
 
+
+#loadingScreen{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    background-color: #e1cbcb;
+    z-index: 100;
+}
+#loadingScreen #progressBar{
+    width: 50vw;
+    justify-self: center;
+    align-self: center;
+    height: 50px;
+}
+#loadingScreen p{
+    position: fixed;
+    top: 90vh;
+    justify-self: center;
+    font-size: 32px;
+}
+
+
 #gameOverview{
     position: fixed;
     left: 2vh;
@@ -142,7 +165,7 @@ justify-content: center;
 text-align: center;
 color: white;
 background-color: rgba(70, 70, 70, 0.90);
-z-index: 100;
+z-index: 11;
 }
 #newRound #intro{
     font-size: 80px;

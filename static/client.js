@@ -74,7 +74,7 @@ joinGameButton.addEventListener("click", () => {
 })
 
 ////// SOCKET EVENTS
-socket.on("connect", () => {
+socket.on("connect", () => {  
     let userIDCookie = readCookieValue("userID");
     if (userIDCookie === undefined){
         document.cookie = "userID="+Math.random().toString(36).substring(1, 30);
@@ -132,6 +132,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
 
+        displayLoadingScreen();
         addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
@@ -329,7 +330,11 @@ socket.on("breakout", (players) => {
     bodyElement.appendChild(myCanvas);
 
     if (players[myPlayerNum].choice[0] == "invest"){
-        var confettiSettings = {target: 'canvas', size: 3};
+        var confettiSettings = {target: 'canvas', size: 3, props:   [     
+                                                                        {type: "svg", src: "static/Icons/discount1.png"},
+                                                                        {type: "svg", src: "static/Icons/discount2.png"},
+                                                                        {type: "svg", src: "static/Icons/discount3.png"}
+                                                                    ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
     }
@@ -352,7 +357,13 @@ socket.on("clearance", (players) => {
     bodyElement.appendChild(myCanvas);
 
     if (players[myPlayerNum].choice[0] == "buy"){
-        var confettiSettings = {target: 'discount', size: 3};
+        var confettiSettings = {target: 'canvas', size: 3, props:   [     
+                                                                        {type: "svg", src: "static/Icons/clearance1.png"},
+                                                                        {type: "svg", src: "static/Icons/clearance2.png"},
+                                                                        {type: "svg", src: "static/Icons/clearance3.png"},
+                                                                        {type: "svg", src: "static/Icons/clearance4.png"},
+                                                                        {type: "svg", src: "static/Icons/clearance5.png"}
+                                                                    ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
     }
@@ -1137,4 +1148,23 @@ function displayNextRound(currentRound, totalRounds){
     bodyElement.appendChild(newRoundDiv);
 
     setTimeout(() => {newRoundDiv.remove()}, 3000);
+}
+
+function displayLoadingScreen(){
+    const displayTimeSecs = 5;
+    const loadingScreen = document.createElement("div");
+    loadingScreen.id = "loadingScreen";
+    const loadingBar = document.createElement("progress");
+    loadingBar.id = "progressBar";
+    loadingBar.max = 100;
+    const loadingTip = document.createElement("p");
+    loadingTip.textContent = tips[Math.floor(Math.random()*tips.length)];
+    loadingScreen.appendChild(loadingBar);
+    loadingScreen.appendChild(loadingTip);
+    bodyElement.appendChild(loadingScreen);
+
+    for (let i = 0; i < 100; i++){
+        setTimeout(() => {loadingBar.value = (i+1); console.log(i)}, displayTimeSecs * 10* (i+1));
+    }
+    setTimeout(() => {loadingScreen.remove()}, displayTimeSecs * 1000);
 }
