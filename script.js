@@ -175,10 +175,12 @@ io.on("connection", (socket) => {
                 if (numBuys > numInvests){
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
+                    io.emit("breakout", players);
                 }
                 else if (numInvests > numBuys){
                     players[vendorNum].choice.push("buy");
                     discount = "clearance";
+                    io.emit("clearance", players);
                 }
                 else{
                     players[vendorNum].waitingOn = "vendorChoice";

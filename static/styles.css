@@ -484,6 +484,23 @@ div[id^="player"] .status{
     background-color: rgb(235, 210, 74);
 }
 
+
+#discount{
+    position: fixed;
+    font-size: 90px;
+    justify-self: center;
+    top: 40vh;
+    z-index: 7;
+}
+#canvas{
+    position: fixed;
+    top: 90px;
+    height: calc(100vh - 90px);
+    width: 100vw;
+    z-index: 6;
+}
+
+
 #abilityConfirmation{
     width: 400px;
     display: grid;

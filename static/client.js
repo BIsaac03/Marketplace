@@ -75,7 +75,7 @@ joinGameButton.addEventListener("click", () => {
 
 ////// SOCKET EVENTS
 socket.on("connect", () => {
-    userIDCookie = readCookieValue("userID");
+    let userIDCookie = readCookieValue("userID");
     if (userIDCookie === undefined){
         document.cookie = "userID="+Math.random().toString(36).substring(1, 30);
         userIDCookie = readCookieValue("userID");
@@ -131,9 +131,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
     else{
         myPlayerNum = returningPlayer.playerNum;
         bodyElement.innerHTML = "";
-        const header = document.createElement("div");
-        header.classList.add("header");
-        bodyElement.appendChild(header);
+
         addMetaTools(numRounds, currentRound, players.length*2, currentSale);
         createTableaus(players);
         updateStats(players);
@@ -314,6 +312,52 @@ socket.on("updateStats", (players) => {
 socket.on("goodPurchased", (purchasedGood, playerNum) => {
     console.log(purchasedGood);
     addToTableau(purchasedGood, playerNum)
+})
+
+socket.on("breakout", (players) => {
+    const breakoutDiv = document.createElement("div");
+    breakoutDiv.id = "discount";
+    const discountType = document.createElement("p");
+    discountType.classList.add("type");
+    discountType.textContent = "BREAKOUT";
+
+    breakoutDiv.appendChild(discountType);
+    bodyElement.appendChild(breakoutDiv);
+
+    const myCanvas = document.createElement("canvas");
+    myCanvas.id = "canvas";
+    bodyElement.appendChild(myCanvas);
+
+    if (players[myPlayerNum].choice[0] == "invest"){
+        var confettiSettings = {target: 'canvas', size: 3};
+        var confetti = new ConfettiGenerator(confettiSettings);
+        confetti.render();
+    }
+
+    setTimeout(() => {breakoutDiv.remove(); myCanvas.remove()}, 5000);
+})
+
+socket.on("clearance", (players) => {
+    const clearanceDiv = document.createElement("div");
+    clearanceDiv.id = "discount";
+    const discountType = document.createElement("p");
+    discountType.classList.add("type");
+    discountType.textContent = "CLEARANCE";
+
+    clearanceDiv.appendChild(discountType);
+    bodyElement.appendChild(clearanceDiv);
+
+    const myCanvas = document.createElement("canvas");
+    myCanvas.id = "canvas";
+    bodyElement.appendChild(myCanvas);
+
+    if (players[myPlayerNum].choice[0] == "buy"){
+        var confettiSettings = {target: 'discount', size: 3};
+        var confetti = new ConfettiGenerator(confettiSettings);
+        confetti.render();
+    }
+
+    setTimeout(() => {clearanceDiv.remove(); myCanvas.remove()}, 2000);
 })
 
 socket.on("chooseLostGood", (player, isWaiting) => {
@@ -1010,6 +1054,9 @@ function displayFinalScore(player, i, numPlayers){
 }
 
 function addMetaTools(numRounds, currentRound, numSales, currentSale){
+    const header = document.createElement("div");
+    header.classList.add("header");
+
     const roundOverview = document.createElement("div");
     roundOverview.id = "roundOverview";
     
@@ -1044,8 +1091,6 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
     gameOverview.id = "gameOverview";
     gameOverview.appendChild(roundOverview);
     gameOverview.appendChild(saleCountOverview);
-
-    const header = document.getElementsByClassName("header")[0];
     header.appendChild(gameOverview);
 
     const ruleDocument = document.createElement("img");
@@ -1064,7 +1109,8 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
         }
         else {ruleDocument.style.display = "grid"}
     })
-    header.appendChild(infoIcon)
+    header.appendChild(infoIcon);
+    bodyElement.appendChild(header);
 }
 
 function displayNextRound(currentRound, totalRounds){
@@ -1090,5 +1136,5 @@ function displayNextRound(currentRound, totalRounds){
     newRoundDiv.appendChild(description2);
     bodyElement.appendChild(newRoundDiv);
 
-    setTimeout(() => {newRoundDiv.remove()}, 4000);
+    setTimeout(() => {newRoundDiv.remove()}, 3000);
 }
