@@ -287,6 +287,7 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
 socket.on("breakout", (players) => {
     const breakoutDiv = document.createElement("div");
     breakoutDiv.id = "discount";
+    breakoutDiv.style.backgroundColor = 'rgb(235, 210, 74)';
     const discountType = document.createElement("p");
     discountType.classList.add("type");
     discountType.textContent = "BREAKOUT";
@@ -299,21 +300,31 @@ socket.on("breakout", (players) => {
     bodyElement.appendChild(myCanvas);
 
     if (players[myPlayerNum].choice[0] == "invest"){
-        var confettiSettings = {target: 'canvas', size: 3, props:   [     
-                                                                        {type: "svg", src: "static/Icons/breakout1.svg"},
-                                                                        {type: "svg", src: "static/Icons/breakout2.svg"},
-                                                                        {type: "svg", src: "static/Icons/breakout3.svg"}
-                                                                    ]};
+        var confettiSettings = {target: 'canvas', size: 3, rotate: true, respawn: false, clock: 75, props:  [     
+                                                                                                                {type: "svg", src: "static/Icons/breakout1.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/breakout2.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/breakout3.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/breakout4.svg"}
+                                                                                                            ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
     }
 
-    setTimeout(() => {breakoutDiv.remove(); myCanvas.remove()}, 5000);
+    setTimeout(() => {breakoutDiv.remove(); myCanvas.remove()}, 3000);
 })
 
-socket.on("clearance", (players) => {
+socket.on("clearance", (players, goodType) => {
     const clearanceDiv = document.createElement("div");
     clearanceDiv.id = "discount";
+    if (goodType == "Fruit"){
+        clearanceDiv.style.backgroundColor = 'rgb(234, 192, 160)';
+    }
+    else if (goodType == "Crop"){
+        clearanceDiv.style.backgroundColor = 'rgb(207, 139, 77)';
+    }
+    else if (goodType == "Trinket"){
+        clearanceDiv.style.backgroundColor = 'rgb(143, 168, 181)';
+    }
     const discountType = document.createElement("p");
     discountType.classList.add("type");
     discountType.textContent = "CLEARANCE";
@@ -326,18 +337,17 @@ socket.on("clearance", (players) => {
     bodyElement.appendChild(myCanvas);
 
     if (players[myPlayerNum].choice[0] == "buy"){
-        var confettiSettings = {target: 'canvas', size: 3, props:   [     
-                                                                        {type: "svg", src: "static/Icons/clearance1.svg"},
-                                                                        {type: "svg", src: "static/Icons/clearance2.svg"},
-                                                                        {type: "svg", src: "static/Icons/clearance3.svg"},
-                                                                        {type: "svg", src: "static/Icons/clearance4.svg"},
-                                                                        {type: "svg", src: "static/Icons/clearance5.svg"}
-                                                                    ]};
+        var confettiSettings = {target: 'canvas', size: 3, rotate: true, respawn: false, clock: 75, props:  [     
+                                                                                                                {type: "svg", src: "static/Icons/clearance1.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/clearance2.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/clearance3.svg"},
+                                                                                                                {type: "svg", src: "static/Icons/clearance4.svg"}
+                                                                                                            ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
     }
 
-    setTimeout(() => {clearanceDiv.remove(); myCanvas.remove()}, 2000);
+    setTimeout(() => {clearanceDiv.remove(); myCanvas.remove()}, 3000);
 })
 
 socket.on("chooseLostGood", (player, isWaiting) => {
