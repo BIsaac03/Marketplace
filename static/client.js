@@ -300,9 +300,9 @@ socket.on("breakout", (players) => {
 
     if (players[myPlayerNum].choice[0] == "invest"){
         var confettiSettings = {target: 'canvas', size: 3, props:   [     
-                                                                        {type: "svg", src: "static/Icons/discount1.png"},
-                                                                        {type: "svg", src: "static/Icons/discount2.png"},
-                                                                        {type: "svg", src: "static/Icons/discount3.png"}
+                                                                        {type: "svg", src: "static/Icons/breakout1.svg"},
+                                                                        {type: "svg", src: "static/Icons/breakout2.svg"},
+                                                                        {type: "svg", src: "static/Icons/breakout3.svg"}
                                                                     ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
@@ -327,11 +327,11 @@ socket.on("clearance", (players) => {
 
     if (players[myPlayerNum].choice[0] == "buy"){
         var confettiSettings = {target: 'canvas', size: 3, props:   [     
-                                                                        {type: "svg", src: "static/Icons/clearance1.png"},
-                                                                        {type: "svg", src: "static/Icons/clearance2.png"},
-                                                                        {type: "svg", src: "static/Icons/clearance3.png"},
-                                                                        {type: "svg", src: "static/Icons/clearance4.png"},
-                                                                        {type: "svg", src: "static/Icons/clearance5.png"}
+                                                                        {type: "svg", src: "static/Icons/clearance1.svg"},
+                                                                        {type: "svg", src: "static/Icons/clearance2.svg"},
+                                                                        {type: "svg", src: "static/Icons/clearance3.svg"},
+                                                                        {type: "svg", src: "static/Icons/clearance4.svg"},
+                                                                        {type: "svg", src: "static/Icons/clearance5.svg"}
                                                                     ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
