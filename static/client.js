@@ -829,6 +829,9 @@ function addToTableau(purchasedGood, playerNum){
                 bodyElement.appendChild(abilityConfirmationDiv);
             })
         }
+        newGood.addEventListener("click", () => {
+            socket.emit("checkScore", purchasedGood, playerNum);
+        })
     }
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);

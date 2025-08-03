@@ -177,7 +177,7 @@ io.on("connection", (socket) => {
                 else if (numInvests > numBuys){
                     players[vendorNum].choice.push("buy");
                     discount = "clearance";
-                    io.emit("clearance", players);
+                    io.emit("clearance", players, goodForSale[0].type);
                 }
                 else{
                     players[vendorNum].waitingOn = "vendorChoice";
@@ -421,12 +421,14 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > (avg1)){
+                    players[i].tableau.push(finalCrops[0]);
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
                         eval(finalCrops[0].onPlay);
                     }
                     io.emit("goodPurchased", finalCrops[0], i)
                 }
                 if(players[i].choice[1] > (avg2)){
+                    players[i].tableau.push(finalCrops[1]);
                     if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
                         eval(finalCrops[1].onPlay);
                     }
@@ -480,6 +482,12 @@ io.on("connection", (socket) => {
         }
     })
 
+
+    socket.on("checkScore", (good, playerNum) => {
+        const player = players[playerNum];
+        const score = player.tableau.find(myGood => myGood.name == good.name);
+        console.log(eval(score.VP));
+    })
 
     socket.on("disconnect", (reason) => {
         //console.log(reason);
@@ -726,6 +734,7 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
         }
         resetPlayerStates();
         setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
+        setTimeout(() => {resetGameState()}, 10000);
     }
 }
 
@@ -750,6 +759,19 @@ function endOfRound(){
             scoreTableau(players[i], 0.5, false, false, false);
         }
     }
+}
+
+function resetGameState(){
+    players.length = 0;
+    numBuys = 0;
+    numInvests = 0;
+    finalCrops.length = 0;
+    gameRound = 0;
+    totalRounds = 0;
+    saleCount = 0;
+    fruitsRemaining = allFruits;
+    cropsRemaining = allCrops;
+    trinketsRemaining = allTrinkets;
 }
 
 function makePlayer(userID, name, color){
