@@ -1,5 +1,5 @@
-//const socket = io("https://marketplace-pfci.onrender.com/");
-const socket = io("http://localhost:3000");
+const socket = io("https://marketplace-pfci.onrender.com/");
+//const socket = io("http://localhost:3000");
 
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');

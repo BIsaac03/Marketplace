@@ -126,7 +126,8 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)",
+        "VP": "2*(player.tableau.filter(good => ((players[player.neighborNums[0]].tableau.includes(good) + players[player.neighborNums[1]].tableau.includes(good)) == 1)).length)",
+        //"VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)",
         "deckRestriction": "false"
     },
     {

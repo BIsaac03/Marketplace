@@ -19,8 +19,8 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        //origin: "http://marketplace-pfci.onrender.com",
-        origin: "http://127.0.0.1:5500",
+        origin: "http://marketplace-pfci.onrender.com",
+        //origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -507,9 +507,12 @@ let finalCrops = [];
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
-let fruitsRemaining = allFruits;
-let cropsRemaining = allCrops;
-let trinketsRemaining = allTrinkets;
+let savedFruits = allFruits
+let savedCrops = allCrops;
+let savedTrinkets = allTrinkets;
+let fruitsRemaining = savedFruits;
+let cropsRemaining = savedCrops;
+let trinketsRemaining = savedTrinkets;
 
 
 function resetPlayerStates() {
@@ -769,9 +772,9 @@ function resetGameState(){
     gameRound = 0;
     totalRounds = 0;
     saleCount = 0;
-    fruitsRemaining = allFruits;
-    cropsRemaining = allCrops;
-    trinketsRemaining = allTrinkets;
+    fruitsRemaining = savedFruits;
+    cropsRemaining = savedCrops;
+    trinketsRemaining = savedTrinkets;
 }
 
 function makePlayer(userID, name, color){
