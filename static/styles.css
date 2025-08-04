@@ -9,7 +9,9 @@ body{
     height: 100vh;
 }
 .header{
-    background-color: rgb(223, 179, 98);
+    position: sticky;
+    top: 0vh;
+    background-color: rgba(223, 179, 98, 0.7);
     height: 90px;
     display: grid;
     align-items: center;
@@ -311,7 +313,7 @@ div[id^="player"] .status{
     display: flex;
     gap: 75px;
     padding: 25px;
-    margin-top: 150px;
+    margin-top: 30px;
     background-color: rgba(182, 126, 126, 0.4);
 }
 
@@ -346,7 +348,7 @@ div[id^="player"] .status{
     display: grid;
     grid-template-columns: repeat(3, auto);
     padding: 25px;
-    margin-top: 150px;
+    margin-top: 30px;
     background-color: rgba(182, 126, 126, 0.4);
     z-index: 6;
 }
@@ -355,26 +357,22 @@ div[id^="player"] .status{
 }
 
 #visibilityToggle{
-    width: 50px;
+    width: 60px;
+    z-index: 10;
 }
 
 #goodSelectionDiv{
     display: grid;
     grid-template-rows: repeat(3, auto);
     font-size: 40px;
-    margin-bottom: 30px;
-    background-color: #e1cbcb;
+    margin: 30px 0px;
+    background-color: rgba(160, 160, 160, 0.7);
     position: absolute;
     justify-self: center;
     justify-items: center;
     align-items: center;
-    margin-top: 240px;
-    padding: 5px;
+    border-radius: 50px;
     z-index: 5;
-}
-#goodSelectionDiv #visibilityToggle{
-    grid-row: 1 / 2; 
-    width: 50px;
 }
 #goodSelectionDiv #message{
     grid-row: 2 / 3;
@@ -386,7 +384,7 @@ div[id^="player"] .status{
     align-items: center;
     display: grid;
     grid-template: repeat(3, auto) / repeat(3, auto);
-    padding: 0px 25px 10px 25px;
+    padding: 0px 20px 10px 20px;
 }
 #selectionPopUp div[id^="selected"] {
     display: grid;
@@ -436,11 +434,14 @@ div[id^="player"] .status{
 }
 
 #offerContainer{
+    position: fixed;
+    top: 30px;
     display: grid;
     justify-self: center;
     background-color: rgba(160, 160, 160, 0.7);
     justify-items: center;
     height: fit-content;
+    border-radius: 30px;
     z-index: 5;
     grid-template-rows: auto auto;
 }
@@ -516,7 +517,7 @@ div[id^="player"] .status{
 
 #discount{
     position: fixed;
-    top: 15vh;
+    top: 40vh;
     justify-self: center;
     background-color: antiquewhite;
     padding: 20px;
@@ -585,19 +586,18 @@ div[id^="player"] .status{
 
 #cropSaleContainer{
     position: absolute;
-    top: 25vh;
+    top: 30px;
     justify-self: center;
     display: grid;
     grid-template-rows: auto auto;
     justify-items: center;
-    padding-top: 10px;
     background-color: rgba(160, 160, 160, 0.7);
 }
 #cropSale{
     display: grid;
     grid-template: auto auto auto auto/ auto auto;
     justify-items: center;
-    gap: 20px;
+    column-gap: 80px;
     padding: 20px;
 }
 #cropSale img{
@@ -609,6 +609,7 @@ div[id^="player"] .status{
     margin: 20px;
     text-align: center;
     font-size: 40px;
+    border-radius: 15px;
 }
 #cropSale button{
     grid-column: 1 / 3;
@@ -617,6 +618,10 @@ div[id^="player"] .status{
     height: 50px;
     border-radius: 10px;
     font-size: 16px;
+}
+#cropSale p {
+    font-size: 60px;
+    font-weight: bold;
 }
 
 
@@ -635,7 +640,7 @@ div[id^="player"] .status{
     width: 400px;
     display: flex;
     flex-direction: column-reverse;
-    gap: 50px;
+    gap: 51px;
     padding: 25px;
 }
 #finalScores div{
