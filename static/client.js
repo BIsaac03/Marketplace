@@ -1,5 +1,5 @@
-const socket = io("https://marketplace-pfci.onrender.com/");
-//const socket = io("http://localhost:3000");
+//const socket = io("https://marketplace-pfci.onrender.com/");
+const socket = io("http://localhost:3000");
 
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');
@@ -13,36 +13,38 @@ function readCookieValue(name){
 
 function modifyPlayerList(playerID, playerName, playerColor){
     const playerList = document.getElementById("playerList");
-    const existingPlayer = document.getElementById(playerID);
-    if (existingPlayer === null){
-        const player = document.createElement("div");
-        player.id = playerID;
-        player.classList.add("player");
-
-        const playerColorDOM = document.createElement("div");
-        playerColorDOM.classList.add("playerColor");
-        playerColorDOM.style.backgroundColor = playerColor[0];
-        player.appendChild(playerColorDOM);
-
-        const playerNameDOM = document.createElement("li");
-        playerNameDOM.classList.add("playerName");
-        playerNameDOM.textContent = playerName;
-        player.appendChild(playerNameDOM);
-
-            const leaveLobbyButton = document.createElement("button");
-            leaveLobbyButton.id = "leaveLobbyButton";
-            leaveLobbyButton.textContent = "X";
-            leaveLobbyButton.addEventListener("click", () => {
-                socket.emit("leftLobby", playerID);
-            })
-            player.appendChild(leaveLobbyButton)
-
-        playerList.appendChild(player);
-
-    }
-    else{
-        existingPlayer.children[0].style.backgroundColor = playerColor[0];
-        existingPlayer.children[1].textContent = playerName;
+    if (playerList != undefined){
+        const existingPlayer = document.getElementById(playerID);
+        if (existingPlayer === null){
+            const player = document.createElement("div");
+            player.id = playerID;
+            player.classList.add("player");
+    
+            const playerColorDOM = document.createElement("div");
+            playerColorDOM.classList.add("playerColor");
+            playerColorDOM.style.backgroundColor = playerColor[0];
+            player.appendChild(playerColorDOM);
+    
+            const playerNameDOM = document.createElement("li");
+            playerNameDOM.classList.add("playerName");
+            playerNameDOM.textContent = playerName;
+            player.appendChild(playerNameDOM);
+    
+                const leaveLobbyButton = document.createElement("button");
+                leaveLobbyButton.id = "leaveLobbyButton";
+                leaveLobbyButton.textContent = "X";
+                leaveLobbyButton.addEventListener("click", () => {
+                    socket.emit("leftLobby", playerID);
+                })
+                player.appendChild(leaveLobbyButton)
+    
+            playerList.appendChild(player);
+    
+        }
+        else{
+            existingPlayer.children[0].style.backgroundColor = playerColor[0];
+            existingPlayer.children[1].textContent = playerName;
+        }
     }
 }
 
@@ -285,21 +287,21 @@ socket.on("goodPurchased", (purchasedGood, playerNum) => {
 })
 
 socket.on("breakout", (players) => {
-    const breakoutDiv = document.createElement("div");
-    breakoutDiv.id = "discount";
-    breakoutDiv.style.backgroundColor = 'rgb(235, 210, 74)';
-    const discountType = document.createElement("p");
-    discountType.classList.add("type");
-    discountType.textContent = "BREAKOUT";
-
-    breakoutDiv.appendChild(discountType);
-    bodyElement.appendChild(breakoutDiv);
-
-    const myCanvas = document.createElement("canvas");
-    myCanvas.id = "canvas";
-    bodyElement.appendChild(myCanvas);
-
     if (players[myPlayerNum].choice[0] == "invest"){
+        const breakoutDiv = document.createElement("div");
+        breakoutDiv.id = "discount";
+        breakoutDiv.style.backgroundColor = 'rgb(235, 210, 74)';
+        const discountType = document.createElement("p");
+        discountType.classList.add("type");
+        discountType.textContent = "BREAKOUT";
+
+        breakoutDiv.appendChild(discountType);
+        bodyElement.appendChild(breakoutDiv);
+
+        const myCanvas = document.createElement("canvas");
+        myCanvas.id = "canvas";
+        bodyElement.appendChild(myCanvas);
+        
         var confettiSettings = {target: 'canvas', size: 3, rotate: true, respawn: false, clock: 75, props:  [     
                                                                                                                 {type: "svg", src: "static/Icons/breakout1.svg"},
                                                                                                                 {type: "svg", src: "static/Icons/breakout2.svg"},
@@ -308,35 +310,35 @@ socket.on("breakout", (players) => {
                                                                                                             ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
-    }
 
-    setTimeout(() => {breakoutDiv.remove(); myCanvas.remove()}, 3000);
+        setTimeout(() => {breakoutDiv.remove(); myCanvas.remove()}, 3000);
+    }
 })
 
 socket.on("clearance", (players, goodType) => {
-    const clearanceDiv = document.createElement("div");
-    clearanceDiv.id = "discount";
-    if (goodType == "Fruit"){
-        clearanceDiv.style.backgroundColor = 'rgb(234, 192, 160)';
-    }
-    else if (goodType == "Crop"){
-        clearanceDiv.style.backgroundColor = 'rgb(207, 139, 77)';
-    }
-    else if (goodType == "Trinket"){
-        clearanceDiv.style.backgroundColor = 'rgb(143, 168, 181)';
-    }
-    const discountType = document.createElement("p");
-    discountType.classList.add("type");
-    discountType.textContent = "CLEARANCE";
-
-    clearanceDiv.appendChild(discountType);
-    bodyElement.appendChild(clearanceDiv);
-
-    const myCanvas = document.createElement("canvas");
-    myCanvas.id = "canvas";
-    bodyElement.appendChild(myCanvas);
-
     if (players[myPlayerNum].choice[0] == "buy"){
+        const clearanceDiv = document.createElement("div");
+        clearanceDiv.id = "discount";
+        if (goodType == "Fruit"){
+            clearanceDiv.style.backgroundColor = 'rgb(234, 192, 160)';
+        }
+        else if (goodType == "Crop"){
+            clearanceDiv.style.backgroundColor = 'rgb(207, 139, 77)';
+        }
+        else if (goodType == "Trinket"){
+            clearanceDiv.style.backgroundColor = 'rgb(143, 168, 181)';
+        }
+        const discountType = document.createElement("p");
+        discountType.classList.add("type");
+        discountType.textContent = "CLEARANCE";
+
+        clearanceDiv.appendChild(discountType);
+        bodyElement.appendChild(clearanceDiv);
+
+        const myCanvas = document.createElement("canvas");
+        myCanvas.id = "canvas";
+        bodyElement.appendChild(myCanvas);
+
         var confettiSettings = {target: 'canvas', size: 3, rotate: true, respawn: false, clock: 75, props:  [     
                                                                                                                 {type: "svg", src: "static/Icons/clearance1.svg"},
                                                                                                                 {type: "svg", src: "static/Icons/clearance2.svg"},
@@ -345,9 +347,9 @@ socket.on("clearance", (players, goodType) => {
                                                                                                             ]};
         var confetti = new ConfettiGenerator(confettiSettings);
         confetti.render();
-    }
 
-    setTimeout(() => {clearanceDiv.remove(); myCanvas.remove()}, 3000);
+        setTimeout(() => {clearanceDiv.remove(); myCanvas.remove()}, 3000);
+    }
 })
 
 socket.on("chooseLostGood", (player, isWaiting) => {
@@ -387,6 +389,26 @@ socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRou
     if (playerNum == myPlayerNum){
         maskResolve(modifier, numCoins, numTrinkets, isLastRound);
     }
+})
+
+socket.on("addMask", (type, trinketNum, playerNum) => {
+    const allTrinkets = document.querySelectorAll(`#player${playerNum} .Trinkets img`);
+    const addToDiv = document.querySelector(`#player${playerNum} .${type}s`)
+    const maskedDiv = document.createElement("div");
+    maskedDiv.classList.add("good");
+    const maskedGood = document.createElement("img");
+    maskedGood.src = allTrinkets[trinketNum].src;
+    const mask = document.createElement("img");
+    if (type == "Fruit"){
+        mask.src = "static/Images/fruitMask";
+    }
+    else if (type = "Crop"){
+        mask.src = "static/Images/cropMask";
+    }
+    mask.classList.add("mask");
+    maskedDiv.appendChild(maskedGood);
+    maskedDiv.appendChild(mask);
+    addToDiv.appendChild(maskedDiv);
 })
 
 socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound) => {
@@ -430,10 +452,12 @@ function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
         visibilityToggle.addEventListener("click", () => {
             if (visibilityToggle.src.endsWith("visibility-off.svg")){
                 selectionPopUp.style.display = "none";
+                message.style.display = "none";
                 visibilityToggle.src = "static/Icons/visibility-on.svg";
             } 
             else if (visibilityToggle.src.endsWith("visibility-on.svg")){
                 selectionPopUp.style.display = "grid";
+                message.style.display = "block";
                 visibilityToggle.src = "static/Icons/visibility-off.svg";
             }
         })
@@ -760,10 +784,12 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             currentOffer.style.display = "none";
+            //offerContainer.style.opacity = "0.4";
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             currentOffer.style.display = "grid";
+            //offerContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -876,6 +902,9 @@ function newVendor(vendorNum, saleCount){
 }
 
 function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
+    const maskContainer = document.createElement("div");
+    maskContainer.id = "maskContainer";
+
     const maskDiv = document.createElement("div");
     maskDiv.id = "maskDiv";
     const toFruitDescription = document.createElement("p");
@@ -889,10 +918,11 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     coinToCrop.type = "number";
     coinToCrop.min = 0;
     const confirm = document.createElement("button");
+    confirm.textContent = "Confirm";
     confirm.addEventListener("click", () =>{
         if (coinToFruit.value + coinToCrop.value <= Math.min(numCoins, numTrinkets) && coinToFruit.value >= 0 && coinToCrop.value >= 0){
             socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
-            maskDiv.remove();
+            maskContainer.remove();
         }
     })
     maskDiv.appendChild(toFruitDescription);
@@ -900,28 +930,69 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     maskDiv.appendChild(toCropDescription);
     maskDiv.appendChild(coinToCrop);
     maskDiv.appendChild(confirm);
-    bodyElement.appendChild(maskDiv);
+
+    const visibilityToggle = document.createElement("img");
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.id = "visibilityToggle";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            maskDiv.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            maskDiv.style.display = "grid";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+    maskContainer.appendChild(visibilityToggle);
+    maskContainer.appendChild(maskDiv);
+    bodyElement.appendChild(maskContainer);
 }
 
 function guavaResolve(modifier, numCoins, isLastRound){
+    const guavaContainer = document.createElement("div");
+    guavaContainer.id = "guavaContainer";
+
     const guavaDiv = document.createElement("div");
-        guavaDiv.id = "guavaDiv";
-        const guavaDescription = document.createElement("p");
-        guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
-        const coinEntry = document.createElement("input");
-        coinEntry.type = "number";
-        coinEntry.min = 0;
-        const confirm = document.createElement("button");
-        confirm.addEventListener("click", () =>{
-            if (Number(coinEntry.value) <= numCoins && Number(coinEntry.value) >= 0){
-                socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
-                guavaDiv.remove();               
-            }
-        })
-        guavaDiv.appendChild(guavaDescription);
-        guavaDiv.appendChild(coinEntry);
-        guavaDiv.appendChild(confirm);
-        bodyElement.appendChild(guavaDiv);
+    guavaDiv.id = "guavaDiv";
+    const guavaDescription = document.createElement("p");
+    guavaDescription.textContent = "Spend coins to increase the value of Guavas:"
+    const guavaPic = document.createElement("img");
+    guavaPic.src = "static/Images/Guavas.png";
+    const coinEntry = document.createElement("input");
+    coinEntry.type = "number";
+    coinEntry.min = 0;
+    const confirm = document.createElement("button");
+    confirm.textContent = "Confirm";
+    confirm.addEventListener("click", () =>{
+        if (Number(coinEntry.value) <= numCoins && Number(coinEntry.value) >= 0){
+            socket.emit("guavasSet", myPlayerNum, coinEntry.value, modifier, isLastRound);
+            guavaContainer.remove();               
+        }
+    })
+    guavaDiv.appendChild(guavaDescription);
+    guavaDiv.appendChild(guavaPic);
+    guavaDiv.appendChild(coinEntry);
+    guavaDiv.appendChild(confirm);
+  
+    const visibilityToggle = document.createElement("img");
+    visibilityToggle.src = "static/Icons/visibility-off.svg";
+    visibilityToggle.id = "visibilityToggle";
+    visibilityToggle.classList.add("icon");
+    visibilityToggle.addEventListener("click", () => {
+        if (visibilityToggle.src.endsWith("visibility-off.svg")){
+            guavaDiv.style.display = "none";
+            visibilityToggle.src = "static/Icons/visibility-on.svg";
+        } 
+        else if (visibilityToggle.src.endsWith("visibility-on.svg")){
+            guavaDiv.style.display = "grid";
+            visibilityToggle.src = "static/Icons/visibility-off.svg";
+        }
+    })
+    guavaContainer.appendChild(visibilityToggle);
+    guavaContainer.appendChild(guavaDiv);
+    bodyElement.appendChild(guavaContainer);
 }
 
 function displayFinalSale(firstCrop, secondCrop, numCoins){
@@ -938,9 +1009,11 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     const good2 = document.createElement("img");
     good2.src = secondCrop.image;
     const bid1 = document.createElement("input")
+    bid1.id = "bid1"
     bid1.type = "number";
     bid1.min = 0;
     const bid2 = document.createElement("input")
+    bid2.id = "bid2";
     bid2.type = "number";
     bid2.min = 0;
     const confirmButton = document.createElement("button");
@@ -966,10 +1039,12 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             finalSaleDiv.style.display = "none";
+            //cropSaleContainer.style.opacity = "0.4";
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             finalSaleDiv.style.display = "grid";
+            //cropSaleContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -982,8 +1057,22 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
 function addFinalAvg(avg1, avg2){
     const firstAvg = document.getElementById("avg1");
     firstAvg.textContent = avg1;
+    const myBid1 = document.getElementById("bid1");
+    if (myBid1.value > avg1){
+        firstAvg.style.color = "green";
+    }
+    else{
+        firstAvg.style.color = "red";
+    }
     const secondAvg = document.getElementById("avg2");
     secondAvg.textContent = avg2;
+    const myBid2 = document.getElementById("bid2");
+    if (myBid2.value > avg2){
+        secondAvg.style.color = "green";
+    }
+    else{
+        secondAvg.style.color = "red";
+    }
     const button = document.createElement("button");
     button.id = "confirm;"
     button.textContent = "Continue";
@@ -1001,7 +1090,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = 100*numPlayers+"px";
+    finalScores.style.height = (120*numPlayers-51)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";
@@ -1010,10 +1099,12 @@ function createFinalScoreboard(numPlayers){
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             finalScores.style.display = "none";
+            //finalScoreContainer.style.opacity = "0.4"
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             finalScores.style.display = "flex";
+            //finalScoreContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -1171,7 +1262,7 @@ function createLobby(){
     const playerName = document.createElement("input");
     playerName.classList.add("playerName");
     playerName.setAttribute("type", "text");
-    playerName.setAttribute("maxlength", "9");
+    playerName.setAttribute("maxlength", "10");
     playerName.setAttribute("name", "playerName");
     playerName.id = "playerName";
     let chosenName = readCookieValue("chosenName");

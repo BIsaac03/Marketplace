@@ -19,8 +19,8 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://marketplace-pfci.onrender.com",
-        //origin: "http://127.0.0.1:5500",
+        //origin: "http://marketplace-pfci.onrender.com",
+        origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -280,7 +280,7 @@ io.on("connection", (socket) => {
     socket.on("activeAbility", (abilityType, playerNum) => {
         if (abilityType == "perfumeAction"){
             socket.emit("chooseLostGood", players[playerNum], false);
-            players[playerNum].numVP += 5;
+            players[playerNum].numVP += 6;
         }
         else if (abilityType == "tomatoAction"){
             const tomatoes = players[playerNum].tableau.find(good => good.name == "Tomatoes")
@@ -356,7 +356,7 @@ io.on("connection", (socket) => {
                                                     "onPlay": "none",
                                                     "active": "none",
                                                     "ongoing": "none",
-                                                    "VP": "Math.ceil(Math.random()*12",
+                                                    "VP": "Math.ceil(Math.random()*12)",
                                                     "deckRestriction": "false"
                                                 })
             }
@@ -379,19 +379,12 @@ io.on("connection", (socket) => {
 
     socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
+        players[playerNum].masked = [newFruits, newCrops];
         for (let i = 0; i < newFruits; i++){
-            players[playerNum].tableau.push(
-                {
-                    "name": "Masked",
-                    "type": "Fruit",
-                    "image": "",
-                    "onPlay": "none",
-                    "active": "none",
-                    "ongoing": "none",
-                    "VP": "0",
-                    "deckRestriction": "false"
-                }
-            )
+            socket.emit("addMask", "fruit", i, playerNum);
+        }
+        for (let i =0; i < newCrops; i++){
+            socket.emit("addMask", "crop", i+newFruits, playerNum);
         }
         scoreTableau(players[playerNum], modifier, true, false, isLastRound);
     })
@@ -419,6 +412,7 @@ io.on("connection", (socket) => {
             let avg1 = Math.floor(runningBid1 / players.length);
             let avg2 = Math.floor(runningBid2 / players.length);
             for (let i = 0; i < players.length; i++){
+                
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > (avg1)){
                     players[i].tableau.push(finalCrops[0]);
@@ -507,12 +501,12 @@ let finalCrops = [];
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
-let savedFruits = allFruits
+let savedFruits = allFruits;
 let savedCrops = allCrops;
 let savedTrinkets = allTrinkets;
-let fruitsRemaining = savedFruits;
-let cropsRemaining = savedCrops;
-let trinketsRemaining = savedTrinkets;
+let fruitsRemaining = allFruits;
+let cropsRemaining = allCrops;
+let trinketsRemaining = allTrinkets;
 
 
 function resetPlayerStates() {
@@ -788,6 +782,7 @@ function makePlayer(userID, name, color){
     let numCoins = 20;
     let numWorkers = 1;
     let numVP = 0;
+    let masked = [0, 0];
     let isReady = false;
     let waitingOn = undefined;
     let isInGame = false;
@@ -802,7 +797,7 @@ function makePlayer(userID, name, color){
     }
 
     const getNumFruits = () => {
-        let numFruits = 0;
+        let numFruits = masked[0];
         for (let i = 0; i < tableau.length; i++){
             if (tableau[i].type == "Fruit"){
                 numFruits += 1;
@@ -812,7 +807,7 @@ function makePlayer(userID, name, color){
     }
 
     const getNumCrops = () => {
-        let numCrops = 0;
+        let numCrops = masked[1];
         for (let i = 0; i < tableau.length; i++){
             if (tableau[i].type == "Crop"){
                 numCrops += 1;
@@ -831,5 +826,5 @@ function makePlayer(userID, name, color){
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, saleOffer, choice, numCoins, numWorkers, numVP, isReady, waitingOn, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, saleOffer, choice, numCoins, numWorkers, numVP, masked, isReady, waitingOn, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
 }

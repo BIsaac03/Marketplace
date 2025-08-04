@@ -350,6 +350,7 @@ div[id^="player"] .status{
     padding: 25px;
     margin-top: 30px;
     background-color: rgba(182, 126, 126, 0.4);
+    background-color: rgba(160, 160, 160, 0.7);
     z-index: 6;
 }
 #detailedReserve>div{
@@ -564,24 +565,34 @@ div[id^="player"] .status{
     background-color: rgb(109, 23, 23);
 }
 
-#guavaDiv{
+#guavaContainer{
     position: absolute;
-    top: 25vh;
-    background-color: rgba(160, 160, 160, 0.7);
+    top: 30px;
     justify-self: center;
+    display: grid;
+    justify-items: center;
+    background-color: rgba(160, 160, 160, 0.7);
+}
+#guavaDiv{
     justify-items: center;
     display: grid;
     grid-template-rows: auto auto auto;
-    padding: 20px;
+    row-gap: 15px;
+    font-size: 50px;
+    font-weight: bold;
+    padding-bottom: 20px;
 }
 #guavaDiv input{
     font-size: 36px;
     width: 75px;
     height: 75px;
+    margin: 20px;
 }
 #guavaDiv button{
-    height: 30px;
-    width: 50px;
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
 #cropSaleContainer{
@@ -620,7 +631,7 @@ div[id^="player"] .status{
     font-size: 16px;
 }
 #cropSale p {
-    font-size: 60px;
+    font-size: 90px;
     font-weight: bold;
 }
 
