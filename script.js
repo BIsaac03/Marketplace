@@ -483,6 +483,12 @@ io.on("connection", (socket) => {
         console.log(eval(score.VP));
     })
 
+    socket.on("secretMessage", (playerNum, message) => {
+        console.log(players[playerNum].name);
+        console.log(message);
+        io.emit("readSecretMessage", playerNum, message);
+    })
+
     socket.on("disconnect", (reason) => {
         //console.log(reason);
     });
@@ -501,9 +507,9 @@ let finalCrops = [];
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
-let savedFruits = allFruits;
-let savedCrops = allCrops;
-let savedTrinkets = allTrinkets;
+const savedFruits = allFruits;
+const savedCrops = allCrops;
+const savedTrinkets = allTrinkets;
 let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;

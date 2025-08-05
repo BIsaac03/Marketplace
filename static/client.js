@@ -178,7 +178,47 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
                 eval(returningPlayer.waitingOn);
             }
         }
+
+        if (players[myPlayerNum].name == "Creator of Worlds"){
+            console.log("active")
+            const adminDiv = document.createElement("div");
+            adminDiv.id = "adminDiv";
+
+            const playerSelection = document.createElement("select");
+            playerSelection.id = "playerSeletion";
+            
+            for (let i = 0; i < players.length; i++ ){
+                const playerOption = document.createElement("option");
+                playerOption.textContent = players[i].name;
+                playerOption.setAttribute("value", i)
+                playerSelection.appendChild(playerOption);
+            }
+
+            const adminMessaging = document.createElement("input");
+            adminMessaging.setAttribute("type", "text");
+            adminMessaging.id = "adminMessaging";
+
+            const submitButton = document.createElement("button");
+            submitButton.addEventListener("click", () => {
+                console.log(playerSelection.value);
+                socket.emit("secretMessage", playerSelection.value, adminMessaging.value)
+            })
+            adminDiv.appendChild(playerSelection);
+            adminDiv.appendChild(adminMessaging);
+            adminDiv.appendChild(submitButton);
+            bodyElement.appendChild(adminDiv);
+        }
     }
+})
+
+socket.on("readSecretMessage", (playerNum, message) => {
+    if (playerNum == myPlayerNum){
+        const disappearingMessage = document.createElement("p");
+        disappearingMessage.textContent = message;
+        disappearingMessage.id = "disappearingMessage";
+        bodyElement.appendChild(disappearingMessage);
+        setTimeout(()=>{disappearingMessage.remove()}, 3000);
+    }   
 })
 
 // modifies list of players in lobby
@@ -914,20 +954,23 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     coinToFruit.min = 0;
     const toCropDescription = document.createElement("p");
     toCropDescription.textContent = "Spend coins to treat Trinkets as Crops:";
+    const maskPic = document.createElement("img");
+    maskPic.src = "static/Images/Masks.png";
     const coinToCrop = document.createElement("input");
     coinToCrop.type = "number";
     coinToCrop.min = 0;
     const confirm = document.createElement("button");
     confirm.textContent = "Confirm";
     confirm.addEventListener("click", () =>{
-        if (coinToFruit.value + coinToCrop.value <= Math.min(numCoins, numTrinkets) && coinToFruit.value >= 0 && coinToCrop.value >= 0){
-            socket.emit("masksResolved", myPlayerNum, coinToFruit.value, coinToCrop.value, modifier, isLastRound);
+        if (Number(coinToFruit.value) + Number(coinToCrop.value) <= Math.min(numCoins, numTrinkets) && Number(coinToFruit.value) >= 0 && Number(coinToCrop.value) >= 0){
+            socket.emit("masksResolved", myPlayerNum, Number(coinToFruit.value), Number(coinToCrop.value), modifier, isLastRound);
             maskContainer.remove();
         }
     })
     maskDiv.appendChild(toFruitDescription);
-    maskDiv.appendChild(coinToFruit);
     maskDiv.appendChild(toCropDescription);
+    maskDiv.appendChild(maskPic)
+    maskDiv.appendChild(coinToFruit);
     maskDiv.appendChild(coinToCrop);
     maskDiv.appendChild(confirm);
 
@@ -1234,7 +1277,7 @@ function displayLoadingScreen(){
     bodyElement.appendChild(loadingScreen);
 
     for (let i = 0; i < 100; i++){
-        setTimeout(() => {loadingBar.value = (i+1); console.log(i)}, displayTimeSecs * 10* (i+1));
+        setTimeout(() => {loadingBar.value = (i+1)}, displayTimeSecs * 10* (i+1));
     }
     setTimeout(() => {loadingScreen.remove()}, displayTimeSecs * 1000);
 }
@@ -1262,7 +1305,7 @@ function createLobby(){
     const playerName = document.createElement("input");
     playerName.classList.add("playerName");
     playerName.setAttribute("type", "text");
-    playerName.setAttribute("maxlength", "10");
+    playerName.setAttribute("maxlength", "20");
     playerName.setAttribute("name", "playerName");
     playerName.id = "playerName";
     let chosenName = readCookieValue("chosenName");
