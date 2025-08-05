@@ -290,7 +290,7 @@ div[id^="player"] .status{
 #opponentDisplay .tableau{
     grid-area: 2 / 2 / 3 / 3;
 } 
-#opponentDisplay .tableau div{
+#opponentDisplay .tableau>div{
     display: grid;
     grid-template-columns: auto auto;
     grid-template-rows: repeat(auto-fill, 57px);
@@ -343,7 +343,7 @@ div[id^="player"] .status{
     display: flex;
     gap: 75px;
     padding: 25px;
-    margin-top: 30px;
+    margin-top: 15px;
     background-color: rgba(182, 126, 126, 0.4);
 }
 
@@ -379,7 +379,7 @@ div[id^="player"] .status{
     display: grid;
     grid-template-columns: repeat(3, auto);
     padding: 25px;
-    margin-top: 30px;
+    margin-top: 15px;
     background-color: rgba(182, 126, 126, 0.4);
     background-color: rgba(160, 160, 160, 0.7);
     z-index: 6;
@@ -388,7 +388,7 @@ div[id^="player"] .status{
     padding: 20px;
 }
 
-#visibilityToggle{
+#visibilityToggle.icon{
     width: 60px;
     z-index: 10;
 }
@@ -397,7 +397,7 @@ div[id^="player"] .status{
     display: grid;
     grid-template-rows: repeat(3, auto);
     font-size: 40px;
-    margin: 30px 0px;
+    margin: 15px 0px;
     background-color: rgba(160, 160, 160, 0.7);
     position: absolute;
     justify-self: center;
@@ -410,7 +410,7 @@ div[id^="player"] .status{
     grid-row: 2 / 3;
 }
 #goodSelectionDiv img{
-    width: 250px;
+    width: 350px;
 }
 #selectionPopUp{
     grid-row: 3 / 4;
@@ -424,19 +424,19 @@ div[id^="player"] .status{
 #selectionPopUp div[id^="selected"] {
     display: grid;
     background-color: rgb(173, 224, 125);
-    padding: 20px;
+    padding: 10px;
 }
 #selectionPopUp img[id^="selected"]{
-    width: 407px;
+    width: 374px;
 }
 #selectionPopUp div:not([id^="selected"]){
-    padding: 30px;
+    padding: 22px;
 }
 #selectionPopUp #setPrice{
     grid-column: 1 / 4;
     width: 75px;
     height: 75px;
-    margin: 20px;
+    margin: 10px;
     text-align: center;
     font-size: 40px;
 }
@@ -467,7 +467,7 @@ div[id^="player"] .status{
 
 #offerContainer{
     position: fixed;
-    top: 30px;
+    top: 15px;
     display: grid;
     justify-self: center;
     background-color: rgba(160, 160, 160, 0.7);
@@ -594,7 +594,7 @@ div[id^="player"] .status{
 
 #guavaContainer{
     position: absolute;
-    top: 30px;
+    top: 15px;
     justify-self: center;
     display: grid;
     justify-items: center;
@@ -619,7 +619,7 @@ div[id^="player"] .status{
 
 #maskContainer{
     position: absolute;
-    top: 30px;
+    top: 15px;
     justify-self: center;
     display: grid;
     justify-items: center;
@@ -666,7 +666,7 @@ div[id^="player"] .status{
 
 #cropSaleContainer{
     position: absolute;
-    top: 30px;
+    top: 15px;
     justify-self: center;
     display: grid;
     grid-template-rows: auto auto;
@@ -717,7 +717,7 @@ div[id^="player"] .status{
     width: 400px;
     display: flex;
     flex-direction: column-reverse;
-    gap: 51px;
+    gap: 50px;
     padding: 25px;
 }
 #finalScores div{

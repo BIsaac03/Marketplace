@@ -99,7 +99,7 @@ export const allFruits = [
         "VP": "player.getNumTrinkets()",
         "deckRestriction": "false"
     },
-    {
+ */   {
         "name": "Papayas",
         "type": "Fruit",
         "image": "static/Images/Papayas.png",
@@ -109,7 +109,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
-  */  {
+    {
         "name": "Passion_Fruit",
         "type": "Fruit",
         "image": "static/Images/Passion_Fruit.png",

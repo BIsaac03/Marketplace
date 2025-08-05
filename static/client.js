@@ -274,6 +274,12 @@ socket.on("updatePlayerStatus", (isReady, playerNum) => {
 
 /////// GAME LOGIC
 socket.on("newRound", (currentRoundNum, totalRoundsNum) => {
+    const masked = document.getElementsByClassName("masked");
+    if (masked != undefined){
+        for (let i = 0; i < masked.length; i++){
+            masked[i].remove();
+        }
+    }
     const currentRound = document.getElementById("currentRound");
     currentRound.textContent = currentRoundNum
     const currentSaleCount = document.getElementById("currentSaleCount");
@@ -433,6 +439,7 @@ socket.on("addMask", (type, trinketNum, playerNum) => {
     const allTrinkets = document.querySelectorAll(`#player${playerNum} .Trinkets img`);
     const addToDiv = document.querySelector(`#player${playerNum} .${type}s`)
     const maskedDiv = document.createElement("div");
+    maskedDiv.classList.add("masked")
     maskedDiv.classList.add("good");
     const maskedGood = document.createElement("img");
     maskedGood.src = allTrinkets[trinketNum].src;
@@ -1143,7 +1150,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = (240*numPlayers-51)+"px";
+    finalScores.style.height = (120*numPlayers-50)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";
