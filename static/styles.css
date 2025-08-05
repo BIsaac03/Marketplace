@@ -8,6 +8,15 @@ body{
     width: 100vw;
     height: 100vh;
 }
+
+button{
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+
 .header{
     position: sticky;
     top: 0vh;
@@ -217,13 +226,13 @@ z-index: 11;
     overflow: auto;
 }
 .myself .stats .playerName{
-    font-size: 48px;
+    font-size: max(30px, auto);
+}
+#opponentDisplay .stats .playerName{
+    font-size: min(16px, auto);
 }
 .vendor .playerName{
     text-decoration: underline;
-}
-#opponentDisplay .stats .playerName{
-    font-size: 24px;
 }
 #opponentDisplay div[id^="player"]{
     display: grid;
@@ -409,9 +418,6 @@ div[id^="player"] .status{
 #selectionPopUp button{
     grid-area: 3 / 1 / 4 / 4;
     width: 100px;
-    height: 50px;
-    border-radius: 10px;
-    font-size: 16px;
 }
 
 #selectionPopUp>div.typeContainer{
@@ -552,10 +558,6 @@ div[id^="player"] .status{
 }
 #abilityConfirmation button{
     grid-area: 2 / 1 / 3 / 2;
-    height: 50px;
-    width: 150px;
-    border-radius: 10px;
-    font-size: 25px;
 }
 #abilityConfirmation #activateAbility{
     grid-area: 2 / 2 / 3 / 3;
@@ -587,12 +589,54 @@ div[id^="player"] .status{
     width: 75px;
     height: 75px;
     margin: 20px;
+    text-align: center;
 }
-#guavaDiv button{
-    width: 100px;
-    height: 50px;
-    border-radius: 10px;
-    font-size: 16px;
+
+#maskContainer{
+    position: absolute;
+    top: 30px;
+    justify-self: center;
+    display: grid;
+    justify-items: center;
+    background-color: rgba(160, 160, 160, 0.7);
+}
+#maskDiv{
+    justify-items: center;
+    display: grid;
+    grid-template: auto auto / auto auto auto;
+    row-gap: 15px;
+    font-size: 50px;
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+#maskDiv p{
+    text-align: center;
+    width: 500px;
+    height: auto;
+    justify-self: left;
+    align-self: end;
+}
+#maskDiv img{
+    grid-area: 1 / 2 / 3 / 3;
+}
+#maskDiv input{
+    font-size: 36px;
+    width: 75px;
+    height: 75px;
+    margin: 20px;
+    text-align: center;
+}
+#maskDiv button{
+    grid-column: 1 / 4;
+}
+
+.tableau>div>div.good{
+    display: grid;
+    grid-template: auto / auto;
+}
+.tableau>div>div.good img{
+    grid-area: 1 / 1 / 2 / 2;
+    align-self: center;
 }
 
 #cropSaleContainer{
@@ -625,10 +669,6 @@ div[id^="player"] .status{
 #cropSale button{
     grid-column: 1 / 3;
     margin-top: -75px;
-    width: 100px;
-    height: 50px;
-    border-radius: 10px;
-    font-size: 16px;
 }
 #cropSale p {
     font-size: 90px;
@@ -663,7 +703,21 @@ div[id^="player"] .status{
     text-align: center;
 }
 
-
+#adminDiv{
+    position: absolute;
+    top: 0px;
+    justify-self: center;
+}
+#disappearingMessage{
+    position: absolute;
+    justify-self: center;
+    align-self: center;
+    font-size: 100px;
+    font-weight: bold;
+    color: red;
+    background-color: rgba(160, 160, 160, 0.7);
+    z-index: 20;
+}
 #error{
     position: fixed;
     justify-self: center;

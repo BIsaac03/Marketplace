@@ -200,7 +200,6 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
 
             const submitButton = document.createElement("button");
             submitButton.addEventListener("click", () => {
-                console.log(playerSelection.value);
                 socket.emit("secretMessage", playerSelection.value, adminMessaging.value)
             })
             adminDiv.appendChild(playerSelection);
@@ -322,7 +321,6 @@ socket.on("updateStats", (players) => {
 })
 
 socket.on("goodPurchased", (purchasedGood, playerNum) => {
-    console.log(purchasedGood);
     addToTableau(purchasedGood, playerNum)
 })
 
@@ -438,12 +436,14 @@ socket.on("addMask", (type, trinketNum, playerNum) => {
     maskedDiv.classList.add("good");
     const maskedGood = document.createElement("img");
     maskedGood.src = allTrinkets[trinketNum].src;
+
     const mask = document.createElement("img");
+    const maskNum = Math.ceil(Math.random()*8)
     if (type == "Fruit"){
-        mask.src = "static/Images/fruitMask";
+        mask.src = "static/Images/Masks/Fruits/mask"+maskNum+".svg";
     }
     else if (type = "Crop"){
-        mask.src = "static/Images/cropMask";
+        mask.src = "static/Images/Masks/Crops/mask"+maskNum+".svg";
     }
     mask.classList.add("mask");
     maskedDiv.appendChild(maskedGood);
@@ -796,6 +796,12 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
         const workerCheck = document.createElement("input");
         workerCheck.type = "checkbox";
         workerCheck.id = "workerCheck";
+        workerCheck.addEventListener("click", () => {
+            const doubleWorkerCheck = document.getElementById("doubleWorkerCheck");
+            if (workerCheck.checked == false && doubleWorkerCheck != undefined && doubleWorkerCheck.checked == true){
+                doubleWorkerCheck.checked = false;
+            }
+        })
         workerDiv.appendChild(workerCheck);
 
         if (hasFigurines && numWorkers > 1){
@@ -806,7 +812,7 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
             doubleWorkerCheck.type = "checkbox";
             doubleWorkerCheck.id = "doubleWorkerCheck";
             doubleWorkerCheck.addEventListener("click", () => {
-                if (workerCheck.checked == false){
+                if (doubleWorkerCheck.checked == true && workerCheck.checked == false){
                     workerCheck.checked = true;
                 }
             })
