@@ -1,5 +1,5 @@
 export const allCrops = [
- /*   {
+    {
         "name": "Beans",
         "type": "Crop",
         "image": "static/Images/Beans.png",
@@ -19,7 +19,7 @@ export const allCrops = [
         "VP": "player.getNumGoods()",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Coffee",
         "type": "Crop",
         "image": "static/Images/Coffee.png",
@@ -29,7 +29,7 @@ export const allCrops = [
         "VP": `2*(player.getNumCrops() - player.tableau.some(good => good.name == "Coffee"))`,
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Corn",
         "type": "Crop",
         "image": "static/Images/Corn.png",
@@ -49,7 +49,7 @@ export const allCrops = [
         "VP": "2*player.getNumTrinkets()",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Mint",
         "type": "Crop",
         "image": "static/Images/Mint.png",
@@ -100,7 +100,7 @@ export const allCrops = [
         "VP": "3*(player.tableau.filter(good1 => (!players[player.neighborNums[0]].tableau.some(good2 => good1.name === good2.name) && !players[player.neighborNums[1]].tableau.some(good3 => good1.name === good3.name))).length)",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Rice",
         "type": "Crop",
         "image": "static/Images/Rice.png",
@@ -149,5 +149,5 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "4",
         "deckRestriction": "false"
-    }*/
+    }
 ] 

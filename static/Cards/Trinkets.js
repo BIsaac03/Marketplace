@@ -1,5 +1,5 @@
 export const allTrinkets = [
-  /*  {
+    {
         "name": "Artwork",
         "type": "Trinket",
         "image": "static/Images/Artwork.png",
@@ -59,7 +59,7 @@ export const allTrinkets = [
         "VP": "3*Math.min(player.getNumFruits(), player.getNumTrinkets())",
         "deckRestriction": "false"
     },
-  */  {
+    {
         "name": "Figurines",
         "type": "Trinket",
         "image": "static/Images/Figurines.png",
@@ -89,7 +89,7 @@ export const allTrinkets = [
         "VP": "0",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Necklaces",
         "type": "Trinket",
         "image": "static/Images/Necklaces.png",
@@ -148,5 +148,5 @@ export const allTrinkets = [
         "ongoing": "BREAKOUT + 2VP WHEN YOU BUY A CARD YOU CANNOT AFFORD",
         "VP": "0",
         "deckRestriction": "false"
-    }*/
+    }
 ]

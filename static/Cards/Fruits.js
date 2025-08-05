@@ -1,5 +1,5 @@
 export const allFruits = [
-/*    {
+    {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -59,7 +59,7 @@ export const allFruits = [
         "VP": `players[player.neighborNums[0]].getNumFruits()+players[player.neighborNums[1]].getNumFruits()`,
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Guavas",
         "type": "Fruit",
         "image": "static/Images/Guavas.png",
@@ -89,7 +89,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Oranges",
         "type": "Fruit",
         "image": "static/Images/Oranges.png",
@@ -109,7 +109,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
-*/    {
+    {
         "name": "Passion_Fruit",
         "type": "Fruit",
         "image": "static/Images/Passion_Fruit.png",
@@ -127,7 +127,6 @@ export const allFruits = [
         "active": "none",
         "ongoing": "none",
         "VP": "2*(player.tableau.filter(good => ((players[player.neighborNums[0]].tableau.includes(good) + players[player.neighborNums[1]].tableau.includes(good)) == 1)).length)",
-        //"VP": "2*(player.tableau.filter(good => (players[player.neighborNums[0]].tableau.filter(good => !players[player.neighborNums[1]].tableau.includes(good)))).length)",
         "deckRestriction": "false"
     },
     {
@@ -140,7 +139,7 @@ export const allFruits = [
         "VP": "overwritten",
         "deckRestriction": "gameRound == 1"
     },
- /*   {
+    {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "static/Images/Strawberries.png",
@@ -149,5 +148,5 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "Math.floor((player.numCoins + player.choice[0] + player.choice[1])/3)",
         "deckRestriction": "false"
-    }*/
+    }
 ]

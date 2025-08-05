@@ -379,12 +379,14 @@ io.on("connection", (socket) => {
 
     socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
-        players[playerNum].masked = [newFruits, newCrops];
+        players[playerNum].masked.length = 0;
+        players[playerNum].masked.push(newFruits)
+        players[playerNum].masked.push(newCrops);
         for (let i = 0; i < newFruits; i++){
-            socket.emit("addMask", "fruit", i, playerNum);
+            io.emit("addMask", "Fruit", i, playerNum);
         }
         for (let i =0; i < newCrops; i++){
-            socket.emit("addMask", "crop", i+newFruits, playerNum);
+            io.emit("addMask", "Crop", i+newFruits, playerNum);
         }
         scoreTableau(players[playerNum], modifier, true, false, isLastRound);
     })
@@ -484,8 +486,6 @@ io.on("connection", (socket) => {
     })
 
     socket.on("secretMessage", (playerNum, message) => {
-        console.log(players[playerNum].name);
-        console.log(message);
         io.emit("readSecretMessage", playerNum, message);
     })
 
