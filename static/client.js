@@ -679,6 +679,7 @@ function createTableaus(players){
 
         if (players[i] == players[myPlayerNum]){
             player.classList.add("myself");
+            player.style.borderTop = "2px solid "+players[i].color[0];
             bodyElement.appendChild(player);
         }
         else{
@@ -1270,7 +1271,7 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 5;
+    const displayTimeSecs = 3;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
     const title = document.createElement("p");
