@@ -257,7 +257,7 @@ z-index: 11;
     grid-template: auto 1fr / auto auto;
     row-gap: 2px;
     height: fit-content;
-    padding: 5px 20px;
+    padding: 0px 20px 5px 20px;
 }
 div[id^="player"] .status{
     grid-area: 1 / 1 / 2 / 3;

@@ -773,6 +773,7 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     chooseBuy.classList.add(goodForSale[0].type)
     chooseBuy.addEventListener("click", () => {
         const numWorkers = checkNumWorkers();
+        console.log(numWorkers);
         socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })
@@ -783,6 +784,7 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     chooseInvest.id = "chooseInvest";
     chooseInvest.addEventListener("click", () => {
         const numWorkers = checkNumWorkers();
+        console.log(numWorkers);
         socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })

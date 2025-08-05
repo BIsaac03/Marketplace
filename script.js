@@ -92,12 +92,13 @@ io.on("connection", (socket) => {
                 else {players[i].neighborNums.push(players.length-1)};
             }
             if (players.length < 5){
-                totalRounds = 1;
+                totalRounds = 3;
             }
             else if (players.length >= 5){
                 totalRounds = 2;
             }
             io.emit("gameStartSetup", players, totalRounds, gameRound);
+            console.log("totalRounds: "+totalRounds);
             newRound();
         }
     })
@@ -169,6 +170,8 @@ io.on("connection", (socket) => {
 
             if (wait == undefined){
                 // determine discount
+                console.log("buys: "+numBuys);
+                console.log("invests: "+numInvests)
                 if (numBuys > numInvests){
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
@@ -772,9 +775,15 @@ function resetGameState(){
     gameRound = 0;
     totalRounds = 0;
     saleCount = 0;
-    fruitsRemaining = savedFruits;
-    cropsRemaining = savedCrops;
-    trinketsRemaining = savedTrinkets;
+
+    fruitsRemaining.length = 0;
+    cropsRemaining.length = 0;
+    trinketsRemaining.length = 0;{
+    for (let i = 0; i < 15; i++)
+        fruitsRemaining.push(savedFruits[i]);
+        cropsRemaining.push(savedCrops[i]);
+        trinketsRemaining.push(savedTrinkets[i]);
+    }
 }
 
 function makePlayer(userID, name, color){
