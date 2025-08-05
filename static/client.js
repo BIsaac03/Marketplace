@@ -570,6 +570,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
             const setPrice = document.createElement("input")
             setPrice.type = "number";
             setPrice.min = 1;
+            setPrice.max = 99;
             setPrice.id = "setPrice"
             selectionPopUp.appendChild(setPrice);
     
@@ -579,7 +580,7 @@ function selectGood(goodsToSelectFrom, typeOfSelection, isWaiting){
         confirmSelection.addEventListener("click", () => {
             const selectedGoodDOM = document.getElementById("selectedGood");
             const setPrice = document.getElementById("setPrice");
-            if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || Number(setPrice.value) > 0)){
+            if (selectedGoodDOM != undefined && (typeOfSelection != "sell" || (Number(setPrice.value) > 0 && Number(setPrice.value < 100)))){
                 if(typeOfSelection == "draft"){
                     if (goodsToSelectFrom.length == 1){
                         socket.emit("finalDraft", myPlayerNum);
@@ -1140,7 +1141,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = (120*numPlayers-51)+"px";
+    finalScores.style.height = (240*numPlayers-51)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";

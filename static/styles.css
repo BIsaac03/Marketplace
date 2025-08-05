@@ -213,6 +213,7 @@ z-index: 11;
     height: 60vh;
     font-size: 38px;
     text-align: center;
+    overflow: auto;
     display: grid;
     grid-template: 1fr / 250px 1fr;
 }
@@ -242,7 +243,7 @@ z-index: 11;
 }
 .myself .stats .playerName{
     font-size: 40px;
-    height: 120px;
+    height: 100px;
 }
 #opponentDisplay .stats .playerName{
     font-size: 16px;
@@ -254,9 +255,9 @@ z-index: 11;
 #opponentDisplay div[id^="player"]{
     display: grid;
     grid-template: auto 1fr / auto auto;
-    row-gap: 5px;
+    row-gap: 2px;
     height: fit-content;
-    padding: 10px 20px;
+    padding: 5px 20px;
 }
 div[id^="player"] .status{
     grid-area: 1 / 1 / 2 / 3;
@@ -270,10 +271,13 @@ div[id^="player"] .status{
     width: 100px;
 }
 #opponentDisplay{
+    position: absolute;
+    top: 90px;
+    height: calc(40vh - 90px);
+    overflow: auto;
     display: grid;
     grid-template-columns: auto auto;
     justify-self: center;
-    margin-top: -10px;
 }
 #opponentDisplay .later{
     display: grid;
