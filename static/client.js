@@ -216,7 +216,7 @@ socket.on("readSecretMessage", (playerNum, message) => {
         disappearingMessage.textContent = message;
         disappearingMessage.id = "disappearingMessage";
         bodyElement.appendChild(disappearingMessage);
-        setTimeout(()=>{disappearingMessage.remove()}, 3000);
+        setTimeout(()=>{disappearingMessage.remove()}, 2000);
     }   
 })
 
@@ -438,7 +438,7 @@ socket.on("addMask", (type, trinketNum, playerNum) => {
     maskedGood.src = allTrinkets[trinketNum].src;
 
     const mask = document.createElement("img");
-    const maskNum = Math.ceil(Math.random()*8)
+    const maskNum = Math.ceil(Math.random()*6)
     if (type == "Fruit"){
         mask.src = "static/Images/Masks/Fruits/mask"+maskNum+".svg";
     }
@@ -1270,14 +1270,18 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 4;
+    const displayTimeSecs = 5;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
+    const title = document.createElement("p");
+    title.id = "title";
+    title.textContent = "Marketplace";
     const loadingBar = document.createElement("progress");
     loadingBar.id = "progressBar";
     loadingBar.max = 100;
     const loadingTip = document.createElement("p");
     loadingTip.textContent = tips[Math.floor(Math.random()*tips.length)];
+    loadingScreen.appendChild(title);
     loadingScreen.appendChild(loadingBar);
     loadingScreen.appendChild(loadingTip);
     bodyElement.appendChild(loadingScreen);

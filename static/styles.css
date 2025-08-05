@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "titleFont";
+    src: url("Fonts/Algerian_Regular.ttf");
+}
+  
 *{
     padding: 0px;
     margin: 0px;
@@ -131,14 +136,23 @@ ul#playerList{
     width: 100vw;
     height: 100vh;
     display: grid;
-    background-color: #e1cbcb;
+    background-color: #e8c991;
     z-index: 100;
+}
+#loadingScreen #title{
+    position: absolute;
+    top: 25vh;
+    justify-self: center;
+    align-self: center;
+    font-size: 150px;
+    font-family: "titleFont";
 }
 #loadingScreen #progressBar{
     width: 50vw;
+    accent-color: rgb(60, 60, 60);
     justify-self: center;
     align-self: center;
-    height: 50px;
+    height: 75px;
 }
 #loadingScreen p{
     position: fixed;
@@ -647,6 +661,7 @@ div[id^="player"] .status{
     grid-template-rows: auto auto;
     justify-items: center;
     background-color: rgba(160, 160, 160, 0.7);
+    z-index: 4;
 }
 #cropSale{
     display: grid;
