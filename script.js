@@ -19,8 +19,8 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://marketplace-pfci.onrender.com",
-        //origin: "http://127.0.0.1:5500",
+        //origin: "http://marketplace-pfci.onrender.com",
+        origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -98,8 +98,7 @@ io.on("connection", (socket) => {
                 totalRounds = 2;
             }
             io.emit("gameStartSetup", players, totalRounds, gameRound);
-            console.log("totalRounds: "+totalRounds);
-            newRound();
+            setTimeout(() => {newRound()}, 3000);
         }
     })
     socket.on("draftedCard", (myPlayerNum, goodIndex) => {
@@ -170,8 +169,6 @@ io.on("connection", (socket) => {
 
             if (wait == undefined){
                 // determine discount
-                console.log("buys: "+numBuys);
-                console.log("invests: "+numInvests)
                 if (numBuys > numInvests){
                     players[vendorNum].choice.push("invest");
                     discount = "breakout";
@@ -383,21 +380,21 @@ io.on("connection", (socket) => {
     socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
         players[playerNum].masked.length = 0;
-        players[playerNum].masked.push(newFruits)
-        players[playerNum].masked.push(newCrops);
+        players[playerNum].masked.push(Math.floor(newFruits/3))
+        players[playerNum].masked.push(Math.floor(newCrops/3));
         for (let i = 0; i < newFruits; i++){
             io.emit("addMask", "Fruit", i, playerNum);
         }
-        for (let i =0; i < newCrops; i++){
+        for (let i = 0; i < newCrops; i++){
             io.emit("addMask", "Crop", i+newFruits, playerNum);
         }
         scoreTableau(players[playerNum], modifier, true, false, isLastRound);
     })
 
-    socket.on("guavasSet", (playerNum, guavaValue, modifier, isLastRound) => {
-        players[playerNum].numCoins -= guavaValue;
+    socket.on("guavasSet", (playerNum, coinsSpent, modifier, isLastRound) => {
+        players[playerNum].numCoins -= coinsSpent;
         const guavas = players[playerNum].tableau.find(fruit => fruit.name == "Guavas");
-        guavas.VP = guavaValue;
+        guavas.VP = 2*Math.floor(coinsSpent/5);
         scoreTableau(players[playerNum], modifier, true, true, isLastRound);
     })
 
@@ -417,7 +414,7 @@ io.on("connection", (socket) => {
             let avg1 = Math.floor(runningBid1 / players.length);
             let avg2 = Math.floor(runningBid2 / players.length);
             for (let i = 0; i < players.length; i++){
-                
+                const player = players.find(player => player.playerNum == playerNum);
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > (avg1)){
                     players[i].tableau.push(finalCrops[0]);
@@ -619,19 +616,22 @@ function createDraftingDeck(numPlayers){
 }
 
 function validateDeck(deck){
+    console.log(gameRound);
     for (let i = 0; i < deck.length; i++){
-        if(i.deckRestriction){
-            if (i.type == "Fruit"){
-                fruitsRemaining.push(deck.splice(i, 1)[0])
+        if(eval(deck[i].deckRestriction)){
+            const restrictedGood = deck.splice(i, 1)[0];
+            if (deck[i].type == "Fruit"){
+                console.log("caught 'em")
                 deck.push(fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0])
+                fruitsRemaining.push(restrictedGood)
             }
-            else if (i.type == "Crop"){
-                cropsRemaining.push(deck.splice(i, 1)[0])
+            else if (deck[i].type == "Crop"){
                 deck.push(cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0]) 
+                cropsRemaining.push(restrictedGood)
             }
-            else if (i.type == "Trinket"){
-                trinketsRemaining.push(deck.splice(i, 1)[0])
+            else if (deck[i].type == "Trinket"){
                 deck.push(trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0])
+                trinketsRemaining.push(restrictedGood)
             }
             return false
         }

@@ -127,7 +127,7 @@ export const allCrops = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(3*player.getNumTrinkets()) - (player.getNumCrops())",
+        "VP": "(5*player.getNumTrinkets()) - (2*player.getNumCrops())",
         "deckRestriction": "false"
     },
     {
