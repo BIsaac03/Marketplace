@@ -9,7 +9,7 @@ export const allTrinkets = [
         "VP": "(player.getNumTrinkets() >= 1)*1 + (player.getNumTrinkets() >= 3)*4 + (player.getNumTrinkets() >= 5)*5 + (player.getNumTrinkets() >= 7)*10",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Bracelets",
         "type": "Trinket",
         "image": "static/Images/Bracelets.png",
@@ -49,7 +49,7 @@ export const allTrinkets = [
         "VP": "players[player.neighborNums[0]].tableau.filter(good => players[player.neighborNums[1]].tableau.includes(good) && !player.tableau.includes(good)).length",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Fabrics",
         "type": "Trinket",
         "image": "static/Images/Fabrics.png",
@@ -79,7 +79,7 @@ export const allTrinkets = [
         "VP": "0",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Masks",
         "type": "Trinket",
         "image": "static/Images/Masks.png",
@@ -89,7 +89,7 @@ export const allTrinkets = [
         "VP": "0",
         "deckRestriction": "false"
     },
-    {
+ /*   {
         "name": "Necklaces",
         "type": "Trinket",
         "image": "static/Images/Necklaces.png",

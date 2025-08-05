@@ -147,7 +147,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor(player.numCoins/3)",
+        "VP": "Math.floor((player.numCoins + player.choice[0] + player.choice[1])/3)",
         "deckRestriction": "false"
     }*/
 ]
