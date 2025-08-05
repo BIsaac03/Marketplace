@@ -19,8 +19,8 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        //origin: "http://marketplace-pfci.onrender.com",
-        origin: "http://127.0.0.1:5500",
+        origin: "http://marketplace-pfci.onrender.com",
+        //origin: "http://127.0.0.1:5500",
 }
 });
 
