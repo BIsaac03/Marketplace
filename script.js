@@ -17,6 +17,15 @@ const __dirname = dirname(__filename);
 const app = express();
 const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/static/styles.css');
+    res.sendFile(__dirname + '/static/client.js');
+});
+
+app.use("/static", express.static('./static/'));
+
 const io = new Server(httpServer, {
     cors: {
         origin: "http://marketplace-pfci.onrender.com",
@@ -26,15 +35,8 @@ const io = new Server(httpServer, {
 
 io.use((socket, next) => {
     currentID = socket.handshake.auth.token;
+    console.log(currentID);
     next();
-});
-
-app.use("/static", express.static('./static/'));
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-    res.sendFile(__dirname + '/static/styles.css');
-    res.sendFile(__dirname + '/static/client.js');
 });
 
 let currentID = undefined;

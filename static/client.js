@@ -24,7 +24,6 @@ const socket = io.connect("https://marketplace-pfci.onrender.com/", {
 //const socket = io("http://localhost:3000");
 
 
-
 function modifyPlayerList(playerID, playerName, playerColor){
     const playerList = document.getElementById("playerList");
     if (playerList != undefined){
