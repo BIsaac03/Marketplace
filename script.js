@@ -815,7 +815,7 @@ function makePlayer(userID, name, color){
     let reserve = [];
     let saleOffer = [];
     let choice = [];
-    let numCoins = 20;
+    let numCoins = 10;
     let numWorkers = 1;
     let numVP = 0;
     let masked = [0, 0];
