@@ -19,9 +19,14 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 const io = new Server(httpServer, {
     cors: {
-        //origin: "http://marketplace-pfci.onrender.com",
-        origin: "http://127.0.0.1:5500",
+        origin: "http://marketplace-pfci.onrender.com",
+        //origin: "http://127.0.0.1:5500",
 }
+});
+
+io.use((socket, next) => {
+    currentID = socket.handshake.auth.token;
+    next();
 });
 
 app.use("/static", express.static('./static/'));
@@ -30,18 +35,17 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
     res.sendFile(__dirname + '/static/styles.css');
     res.sendFile(__dirname + '/static/client.js');
-  });
+});
 
+let currentID = undefined;
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
-    socket.on("currentID", (currentID) => {
-        const existingID = players.find(player => player.userID == currentID);
-        if (existingID != undefined) {
-            socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
-        }
-        else{socket.emit("newPlayer", gameRound);}
-        socket.emit("displayExistingPlayers", players);
-    })
+    const existingID = players.find(player => player.userID == currentID);
+    if (existingID != undefined) {
+        socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
+    }
+    else{socket.emit("newPlayer", gameRound);}
+    socket.emit("displayExistingPlayers", players);
 
     socket.on("joinGame", (userID, playerName, playerColor) => {
         let colorSpecs = undefined;

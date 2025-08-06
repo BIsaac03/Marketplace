@@ -1,6 +1,3 @@
-//const socket = io("https://marketplace-pfci.onrender.com/");
-const socket = io("http://localhost:3000");
-
 function readCookieValue(name){
     const allCookies = document.cookie.split(';');
     const cookie = allCookies.find((cookie) => cookie.trim().startsWith(name));
@@ -10,6 +7,23 @@ function readCookieValue(name){
     const value = cookie.trim().replace(name+"=", "");
     return value;
 }
+
+let userIDCookie = readCookieValue("userID");
+if (userIDCookie === undefined){
+    document.cookie = "userID="+Math.random().toString(36).substring(1, 30);
+    userIDCookie = readCookieValue("userID");
+}
+
+
+const socket = io.connect("https://marketplace-pfci.onrender.com/", {
+    auth: {
+        token: userIDCookie
+    }
+});
+
+//const socket = io("http://localhost:3000");
+
+
 
 function modifyPlayerList(playerID, playerName, playerColor){
     const playerList = document.getElementById("playerList");
@@ -66,12 +80,7 @@ let myPlayerNum = undefined;
 
 ////// SOCKET EVENTS
 socket.on("connect", () => {  
-    let userIDCookie = readCookieValue("userID");
-    if (userIDCookie === undefined){
-        document.cookie = "userID="+Math.random().toString(36).substring(1, 30);
-        userIDCookie = readCookieValue("userID");
-    }
-    socket.emit("currentID", userIDCookie);
+    console.log("connected");
 });
 
 socket.on("nameTaken", (duplicateName) => {
