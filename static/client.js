@@ -1336,7 +1336,7 @@ function createLobby(){
     playerName.setAttribute("maxlength", "20");
     playerName.setAttribute("name", "playerName");
     playerName.id = "playerName";
-    let chosenName = readCookieValue("chosenName");
+    let chosenName = localStorage.getItem("chosenName");
     if (chosenName != undefined){
         playerName.value = chosenName;
     }
@@ -1346,7 +1346,7 @@ function createLobby(){
     playerColor.setAttribute("type", "color");
     playerColor.setAttribute("name", "playerColor");
     playerColor.id = "playerColor";
-    let preferredColor = readCookieValue("preferredColor");
+    let preferredColor = localStorage.getItem("preferredColor");
     if (preferredColor != undefined){
         playerColor.value = preferredColor;
     }
@@ -1359,8 +1359,8 @@ function createLobby(){
         const name = playerName.value;
         const color = playerColor.value;
         if (name != ""){
-            //document.cookie = "chosenName="+name;
-            //document.cookie = "preferredColor="+color;
+            localStorage.setItem('chosenName', name);
+            localStorage.setItem('preferredColor', color);
             socket.emit("joinGame", readCookieValue("userID"), name, color);
         }
     })
