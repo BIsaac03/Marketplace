@@ -178,10 +178,11 @@ ul#playerList{
     left: 95vw;
 }
 #rulesDoc{
-    width: 50px;
+    width: 1400px;
     position: fixed;
-    left: 45vw;
-    top: 30vh;
+    justify-self: center;
+    align-self: center;
+    z-index: 20;
 }
 
 #newRound{
@@ -256,7 +257,7 @@ z-index: 11;
     display: grid;
     grid-template: auto 1fr / auto auto;
     row-gap: 2px;
-    height: 210px;
+    height: 230px;
     padding: 0px 20px 5px 20px;
 }
 div[id^="player"] .status{

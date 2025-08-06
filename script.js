@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
                 else {players[i].neighborNums.push(players.length-1)};
             }
             if (players.length < 5){
-                totalRounds = 3;
+                totalRounds = 1;
             }
             else if (players.length >= 5){
                 totalRounds = 2;
@@ -416,6 +416,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < players.length; i++){
                 const player = players.find(player => player.playerNum == playerNum);
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
+                players[i].finalSaleCoins += (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > (avg1)){
                     players[i].tableau.push(finalCrops[0]);
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
@@ -616,20 +617,18 @@ function createDraftingDeck(numPlayers){
 }
 
 function validateDeck(deck){
-    console.log(gameRound);
     for (let i = 0; i < deck.length; i++){
         if(eval(deck[i].deckRestriction)){
             const restrictedGood = deck.splice(i, 1)[0];
-            if (deck[i].type == "Fruit"){
-                console.log("caught 'em")
+            if (restrictedGood.type == "Fruit"){
                 deck.push(fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0])
                 fruitsRemaining.push(restrictedGood)
             }
-            else if (deck[i].type == "Crop"){
+            else if (restrictedGood.type == "Crop"){
                 deck.push(cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0]) 
                 cropsRemaining.push(restrictedGood)
             }
-            else if (deck[i].type == "Trinket"){
+            else if (restrictedGood.type == "Trinket"){
                 deck.push(trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0])
                 trinketsRemaining.push(restrictedGood)
             }
@@ -798,6 +797,7 @@ function makePlayer(userID, name, color){
     let numWorkers = 1;
     let numVP = 0;
     let masked = [0, 0];
+    let finalSaleCoins = 0
     let isReady = false;
     let waitingOn = undefined;
     let isInGame = false;
@@ -841,5 +841,5 @@ function makePlayer(userID, name, color){
         return numTrinkets;
     }
 
-    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, saleOffer, choice, numCoins, numWorkers, numVP, masked, isReady, waitingOn, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
+    return {userID, name, color, playerNum, neighborNums, tableau, draftingHand, reserve, saleOffer, choice, numCoins, numWorkers, numVP, masked, finalSaleCoins, isReady, waitingOn, isInGame, isVendor, getNumGoods, getNumFruits, getNumCrops, getNumTrinkets}
 }

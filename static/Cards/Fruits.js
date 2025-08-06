@@ -1,5 +1,5 @@
 export const allFruits = [
- /*   {
+    {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -99,7 +99,7 @@ export const allFruits = [
         "VP": "player.getNumTrinkets()",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Papayas",
         "type": "Fruit",
         "image": "static/Images/Papayas.png",
@@ -146,7 +146,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "Math.floor((player.numCoins + player.choice[0] + player.choice[1])/5)",
+        "VP": "Math.floor((player.numCoins + player.finalSaleCoins)/5)",
         "deckRestriction": "false"
     }
 ]

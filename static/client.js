@@ -1236,8 +1236,7 @@ function addMetaTools(numRounds, currentRound, numSales, currentSale){
 
     const ruleDocument = document.createElement("img");
     ruleDocument.style.display = "none";
-    //ruleDocument.src = "/static/rulesOverview.png";
-    ruleDocument.src = "/static/Icons/edit.svg";
+    ruleDocument.src = "/static/Images/rulesOverview.png";
 
     ruleDocument.id = "rulesDoc";
     bodyElement.appendChild(ruleDocument)
