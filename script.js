@@ -22,10 +22,10 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/static/styles.css');
+    res.sendFile(__dirname + '/static/client.js');
 });
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/static/client.js');
+    res.sendFile(__dirname + '/static/styles.css');
 });
 
 app.use("/static", express.static('./static/'));
@@ -47,9 +47,9 @@ let currentID = undefined;
 
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
-    const existingID = players.find(player => player.userID == currentID);
-    if (existingID != undefined) {
-        socket.emit("returningPlayer", existingID, players, totalRounds, gameRound, saleCount, finalCrops);
+    const existingPlayer = players.find(player => player.userID == currentID);
+    if (existingPlayer != undefined) {
+        socket.emit("returningPlayer", existingPlayer, players, totalRounds, gameRound, saleCount, finalCrops);
     }
     else{socket.emit("newPlayer", gameRound);}
     socket.emit("displayExistingPlayers", players);
@@ -489,7 +489,6 @@ io.on("connection", (socket) => {
             }
         }
     })
-
 
     socket.on("checkScore", (good, playerNum) => {
         const player = players[playerNum];

@@ -1158,7 +1158,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = (120*numPlayers-50)+"px";
+    finalScores.style.height = (150*numPlayers-50)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";
@@ -1288,7 +1288,7 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 3;
+    const displayTimeSecs = 2;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
     const title = document.createElement("p");
