@@ -39,7 +39,6 @@ const io = new Server(httpServer, {
 
 io.use((socket, next) => {
     currentID = socket.handshake.auth.token;
-    console.log(currentID);
     next();
 });
 
@@ -315,21 +314,11 @@ io.on("connection", (socket) => {
      })
 
     socket.on("copyGood", (copiedGood, playerNum) => {
-        let personalPineapples = {
-            "name": "Pineapples",
-            "type": "Fruit",
-            "image": "static/Images/Pineapples.png",
-            "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, player.playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
-            "active": "none",
-            "ongoing": "none",
-            "VP": "overwritten",
-            "deckRestriction": "gameRound == 1"
-        }
-        personalPineapples.VP = copiedGood.VP;
-        personalPineapples.ongoing = copiedGood.image;
-        players[playerNum].tableau.push(personalPineapples);
+        const pineapples = players[playerNum].tableau.find(good => good.name == "Pineapples");
+        pineapples.VP = copiedGood.VP;
+        pineapples.ongoing = copiedGood.image;
         players[playerNum].choice.length = 0;
-        io.emit("goodPurchased", personalPineapples, playerNum);
+        io.emit("goodPurchased", pineapples, playerNum);
 
         players[playerNum].isReady = true;
         io.emit("updatePlayerStatus", true, playerNum);
@@ -349,14 +338,7 @@ io.on("connection", (socket) => {
         else{
             resolvePurchase(players[playerNum], players[playerNum].draftingHand[0])
             if (players[playerNum].draftingHand[0].name == "Peppers"){
-                for (let i = 0; i < players.length; i++){
-                    if (i != playerNum){
-                        players[i].waitingOn = "loseGood";
-                        players[i].isReady = false;
-                        io.emit("updatePlayerStatus", false, i);
-                        io.emit("chooseLostGood", players[i], true);
-                    }
-                }
+                gotPeppers = playerNum
             }
 
             if (players[playerNum].reserve.some(good => good.name == "Pins")){
@@ -377,18 +359,34 @@ io.on("connection", (socket) => {
         io.emit("updatePlayerStatus", true, playerNum);
         let keepWaiting = players.find(player => player.isReady == false)
         if (keepWaiting == undefined){
-            saleCount += 1;
-            const vendor = players.find(player => player.isVendor == true);
-            vendor.waitingOn = "sellGood"
-            vendor.isReady = false;
-            io.emit("updatePlayerStatus", false, vendor.playerNum);
-            io.emit("setSaleTerms", vendor.reserve, vendor.playerNum, saleCount);
-            io.emit("turnUpdate", players);
-            io.emit("displayReserve", players);
+
+            // endOfTurn() moves vendor clockwise; vendor should not move here, so move counter-clockwise to counteract
+            const oldVendor = players.find(player => player.isVendor == true);
+            oldVendor.isVendor = false;
+            if (oldVendor.playerNum == 0){
+                players[players.length - 1].isVendor = true;
+            }
+            else{
+                players[oldVendor.playerNum-1].isVendor = true;
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            if (gotPeppers != undefined){
+                for (let i = 0; i < players.length; i++){
+                    if (i != gotPeppers){
+                        players[i].waitingOn = "loseGood";
+                        players[i].isReady = false;
+                        io.emit("updatePlayerStatus", false, i);
+                        io.emit("chooseLostGood", players[i], true);
+                    }
+                }
+            }
+
+            else{endOfTurn();}
         }
     })
 
-    socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound) => {
+    socket.on("masksResolved", (playerNum, newFruits, newCrops, modifier, isLastRound, isMidGameScoring) => {
         players[playerNum].numCoins -= (newFruits + newCrops);
         players[playerNum].masked.length = 0;
         players[playerNum].masked.push(Math.floor(newFruits/3))
@@ -399,14 +397,14 @@ io.on("connection", (socket) => {
         for (let i = 0; i < newCrops; i++){
             io.emit("addMask", "Crop", i+newFruits, playerNum);
         }
-        scoreTableau(players[playerNum], modifier, true, false, isLastRound);
+        scoreTableau(players[playerNum], modifier, true, false, isLastRound, isMidGameScoring);
     })
 
-    socket.on("guavasSet", (playerNum, coinsSpent, modifier, isLastRound) => {
+    socket.on("guavasSet", (playerNum, coinsSpent, modifier, isLastRound, isMidGameScoring) => {
         players[playerNum].numCoins -= coinsSpent;
         const guavas = players[playerNum].tableau.find(fruit => fruit.name == "Guavas");
         guavas.VP = 2*Math.floor(coinsSpent/5);
-        scoreTableau(players[playerNum], modifier, true, true, isLastRound);
+        scoreTableau(players[playerNum], modifier, true, true, isLastRound, isMidGameScoring);
     })
 
     socket.on("resolveFinalSale", (bid1, bid2, playerNum) => {
@@ -429,14 +427,14 @@ io.on("connection", (socket) => {
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 players[i].finalSaleCoins += (players[i].choice[0] + players[i].choice[1]);
                 if(players[i].choice[0] > avg1){
-                    players[i].tableau.push(finalCrops[0]);
+                    players[i].tableau.push(JSON.parse(JSON.stringify(finalCrops[0])));
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
                         eval(finalCrops[0].onPlay);
                     }
                     io.emit("goodPurchased", finalCrops[0], i)
                 }
                 if(players[i].choice[1] > avg2){
-                    players[i].tableau.push(finalCrops[1]);
+                    players[i].tableau.push(JSON.parse(JSON.stringify(finalCrops[1])));
                     if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
                         eval(finalCrops[1].onPlay);
                     }
@@ -485,7 +483,7 @@ io.on("connection", (socket) => {
             resetPlayerStates();
             for (let i = 0; i < players.length; i++){
                 players[i].waitingOn = "scoring";
-                scoreTableau(players[i], 1, false, false, true);
+                scoreTableau(players[i], 1, false, false, true, false);
             }
         }
     })
@@ -514,9 +512,10 @@ let finalCrops = [];
 let gameRound = 0;
 let totalRounds = 0;
 let saleCount = 0;
-const savedFruits = allFruits;
-const savedCrops = allCrops;
-const savedTrinkets = allTrinkets;
+let gotPeppers = undefined;
+const savedFruits = JSON.parse(JSON.stringify(allFruits));
+const savedCrops = JSON.parse(JSON.stringify(allCrops));
+const savedTrinkets = JSON.parse(JSON.stringify(allTrinkets));
 let fruitsRemaining = allFruits;
 let cropsRemaining = allCrops;
 let trinketsRemaining = allTrinkets;
@@ -539,16 +538,17 @@ function endOfTurn(){
             numBuys = 0;
             numInvests = 0;
             const oldVendor = players.find(player => player.isVendor == true);
-            const goodForSale = oldVendor.saleOffer[0];
-    
-            // remove good from vendor reserve
-            for (let i = 0; i < goodForSale.length; i++){
-                const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
-                oldVendor.reserve.splice(indexOfSoldGood, 1);
+
+            if (oldVendor.saleOffer.length > 0){
+                const goodForSale = oldVendor.saleOffer[0];
+                // remove good from vendor reserve
+                for (let i = 0; i < goodForSale.length; i++){
+                    const indexOfSoldGood = oldVendor.reserve.findIndex(good => good.name == goodForSale[i].name);
+                    oldVendor.reserve.splice(indexOfSoldGood, 1);
+                }
+                oldVendor.saleOffer.length = 0;
             }
-    
-            oldVendor.saleOffer.length = 0;
-    
+
             // proceed to next vendor
             oldVendor.isVendor = false;
             if (oldVendor.playerNum == players.length-1){
@@ -627,16 +627,16 @@ function validateDeck(deck){
         if(eval(deck[i].deckRestriction)){
             const restrictedGood = deck.splice(i, 1)[0];
             if (restrictedGood.type == "Fruit"){
-                deck.push(fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0])
-                fruitsRemaining.push(restrictedGood)
+                deck.push(fruitsRemaining.splice(Math.floor(Math.random()*(fruitsRemaining.length)), 1)[0]);
+                fruitsRemaining.push(restrictedGood);
             }
             else if (restrictedGood.type == "Crop"){
-                deck.push(cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0]) 
-                cropsRemaining.push(restrictedGood)
+                deck.push(cropsRemaining.splice(Math.floor(Math.random()*(cropsRemaining.length)), 1)[0]); 
+                cropsRemaining.push(restrictedGood);
             }
             else if (restrictedGood.type == "Trinket"){
-                deck.push(trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0])
-                trinketsRemaining.push(restrictedGood)
+                deck.push(trinketsRemaining.splice(Math.floor(Math.random()*(trinketsRemaining.length)), 1)[0]);
+                trinketsRemaining.push(restrictedGood);
             }
             return false
         }
@@ -664,8 +664,8 @@ function checkDiscount(tableau, goodType){
 }
 
 function resolvePurchase(player, goodForSale){
+    player.tableau.push(JSON.parse(JSON.stringify(goodForSale)));
     if (goodForSale.name != "Pineapples"){
-        player.tableau.push(goodForSale);
         io.emit("goodPurchased", goodForSale, player.playerNum);
     }
     if (goodForSale.onPlay != "none" && goodForSale.onPlay != "loseGood"){
@@ -673,20 +673,20 @@ function resolvePurchase(player, goodForSale){
     }
 }
 
-function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastRound){
+function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastRound, isMidGameScoring){
     if (player.tableau.some(trinket => trinket.name == "Masks" && evaluatedMasks == false)){
-        player.waitingOn = "maskResolve("+modifier+","+player.numCoins+","+player.getNumTrinkets()+","+isLastRound+")";
+        player.waitingOn = "maskResolve("+modifier+","+player.numCoins+","+player.getNumTrinkets()+","+isLastRound+","+isMidGameScoring+")";
         player.isReady = false;
         io.emit("updatePlayerStatus", false, player.playerNum);
-        io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets(), isLastRound)
+        io.emit("resolveMasks", modifier, player.playerNum, player.numCoins, player.getNumTrinkets(), isLastRound, isMidGameScoring)
         return 0;
     }
 
     if (player.tableau.some(fruit => fruit.name == "Guavas" && evaluatedGuavas == false)){
-        player.waitingOn = "guavaResolve("+modifier+","+player.numCoins+","+isLastRound+")";
+        player.waitingOn = "guavaResolve("+modifier+","+player.numCoins+","+isLastRound+","+isMidGameScoring+")";
         player.isReady = false;
         io.emit("updatePlayerStatus", false, player.playerNum);
-        io.emit("setGuavaValue", modifier, player.playerNum, player.numCoins, isLastRound)
+        io.emit("setGuavaValue", modifier, player.playerNum, player.numCoins, isLastRound, isMidGameScoring)
         return 0;
     }
 
@@ -732,20 +732,24 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
     io.emit("updatePlayerStatus", true, player.playerNum);
 
     const keepWaiting = players.find(player => player.isReady == false);
-    if (keepWaiting == undefined && !isLastRound){
-        newRound();
-        io.emit("turnUpdate", players);
-    }
-    else if (keepWaiting == undefined){    
-        io.emit("endOfGame", players.length);
-        let sortedPlayers = players.toSorted((a, b) => a.numVP - b.numVP);
-        for (let i = 0; i < players.length; i++){
-            setTimeout(() => {io.emit("displayFinalScore", sortedPlayers[i], i, players.length)}, 2000*(i+1));
-            players[i].waitingOn = "finalScores";
+    if (keepWaiting == undefined){
+        setTimeout(() => {io.emit("removeMasks");}, 10000);
+        if (!isLastRound && !isMidGameScoring){
+            newRound();
+            io.emit("turnUpdate", players);
         }
-        resetPlayerStates();
-        setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
-        //setTimeout(() => {resetGameState()}, 10000);
+
+        else if (isLastRound){    
+            io.emit("endOfGame", players.length);
+            let sortedPlayers = players.toSorted((a, b) => a.numVP - b.numVP);
+            for (let i = 0; i < players.length; i++){
+                setTimeout(() => {io.emit("displayFinalScore", sortedPlayers[i], i, players.length)}, 2000*(i+1));
+                players[i].waitingOn = "finalScores";
+            }
+            resetPlayerStates();
+            setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
+            setTimeout(() => {resetGameState()}, 60000);
+        }
     }
 }
 
@@ -767,7 +771,7 @@ function endOfRound(){
         resetPlayerStates();
         for (let i = 0; i < players.length; i++){
             players[i].waitingOn = "scoring";
-            scoreTableau(players[i], 0.5, false, false, false);
+            scoreTableau(players[i], 0.5, false, false, false, false);
         }
     }
 }
@@ -781,14 +785,9 @@ function resetGameState(){
     totalRounds = 0;
     saleCount = 0;
 
-    fruitsRemaining.length = 0;
-    cropsRemaining.length = 0;
-    trinketsRemaining.length = 0;{
-    for (let i = 0; i < 15; i++)
-        fruitsRemaining.push(savedFruits[i]);
-        cropsRemaining.push(savedCrops[i]);
-        trinketsRemaining.push(savedTrinkets[i]);
-    }
+    fruitsRemaining = JSON.parse(JSON.stringify(savedFruits));
+    cropsRemaining = JSON.parse(JSON.stringify(savedCrops));
+    trinketsRemaining = JSON.parse(JSON.stringify(savedTrinkets));
 }
 
 function makePlayer(userID, name, color){
