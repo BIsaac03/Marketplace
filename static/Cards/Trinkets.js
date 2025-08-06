@@ -1,5 +1,5 @@
 export const allTrinkets = [
-    {
+ /*   {
         "name": "Artwork",
         "type": "Trinket",
         "image": "static/Images/Artwork.png",
@@ -46,7 +46,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "DISCOUNT: discount+=1;",
-        "VP": "players[player.neighborNums[0]].tableau.filter(good => players[player.neighborNums[1]].tableau.includes(good) && !player.tableau.includes(good)).length",
+        "VP": "players[player.neighborNums[0]].tableau.filter(good1 => players[player.neighborNums[1]].tableau.some(good2 => good1.name == good2.name) && !player.tableau.some(myGood => good1.name == myGood.name)).length",
         "deckRestriction": "false"
     },
     {
@@ -79,7 +79,7 @@ export const allTrinkets = [
         "VP": "0",
         "deckRestriction": "false"
     },
-    {
+ */   {
         "name": "Masks",
         "type": "Trinket",
         "image": "static/Images/Masks.png",
@@ -123,7 +123,7 @@ export const allTrinkets = [
         "name": "Postcards",
         "type": "Trinket",
         "image": "static/Images/Postcards.png",
-        "onPlay": "scoreTableau(player, 0.5, false, false, true);player.numVP -= 4",
+        "onPlay": "scoreTableau(player, 0.5, false, false, false, true);player.numVP -= 4",
         "active": "none",
         "ongoing": "none",
         "VP": "0",
@@ -139,7 +139,7 @@ export const allTrinkets = [
         "VP": "2",
         "deckRestriction": "false"
     },
-    {
+ /*   {
         "name": "Shells",
         "type": "Trinket",
         "image": "static/Images/Shells.png",
@@ -148,5 +148,5 @@ export const allTrinkets = [
         "ongoing": "BREAKOUT + 2VP WHEN YOU BUY A CARD YOU CANNOT AFFORD",
         "VP": "0",
         "deckRestriction": "false"
-    }
+    }*/
 ]

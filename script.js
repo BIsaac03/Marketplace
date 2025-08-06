@@ -391,10 +391,10 @@ io.on("connection", (socket) => {
         players[playerNum].masked.length = 0;
         players[playerNum].masked.push(Math.floor(newFruits/3))
         players[playerNum].masked.push(Math.floor(newCrops/3));
-        for (let i = 0; i < newFruits; i++){
+        for (let i = 0; i < Math.floor(newFruits/3); i++){
             io.emit("addMask", "Fruit", i, playerNum);
         }
-        for (let i = 0; i < newCrops; i++){
+        for (let i = 0; i < Math.floor(newCrops/3); i++){
             io.emit("addMask", "Crop", i+newFruits, playerNum);
         }
         scoreTableau(players[playerNum], modifier, true, false, isLastRound, isMidGameScoring);
@@ -692,32 +692,37 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
 
     // set VP of variable goods
     const mint = player.tableau.find(crop => crop.name == "Mint");
+    const mintyPineapple = player.tableau.find(fruit => fruit.name == "Pineapple" && fruit.VP == "HIGHEST SCORING FRUIT");
     if (mint != undefined){
         let highestFruit = 0;
         for (let i = 0; i < player.tableau.length; i++){
-            if (player.tableau[i].type == "Fruit"){
+            if (player.tableau[i].type == "Fruit" && player.tableau[i] != mintyPineapple){
                 const fruitVP = eval(player.tableau[i].VP);
                 if (fruitVP > highestFruit){
                     highestFruit = fruitVP;
                 }
             }
         }
+        
         mint.VP = highestFruit;
+        if (mintyPineapple != undefined){
+            mintyPineapple.VP = highestFruit;
+        }
     }
-    if (player.tableau.some(fruit => fruit.name == "Mangoes")){
+
+    const mangoes = player.tableau.find(fruit => fruit.name == "Mangoes")
+    if (mangoes != undefined){
         let lowestCrop = 999;
-        let cropIndex = undefined;
         for (let i = 0; i < player.tableau.length; i++){
             if (player.tableau[i].type == "Crop"){
                 const cropVP = eval(player.tableau[i].VP);
                 if (cropVP < lowestCrop){
                     lowestCrop = cropVP;
-                    cropIndex = i;
                 }
             }
         }
         if (lowestCrop < 999){
-            player.tableau[cropIndex].VP = lowestCrop*3;
+            mangoes.VP = lowestCrop*2;
         }
     }
 
@@ -727,13 +732,23 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
     }
     let adjustedScore = addedScore * modifier;
     player.numVP += adjustedScore;
+    if (mint != undefined){
+        mint.VP = "HIGHEST SCORING FRUIT";
+    }
+    if (mintyPineapple != undefined){
+        mintyPineapple.VP = "HIGHEST SCORING FRUIT";
+    }
+    if (mangoes != undefined){
+        mangoes.VP = 0;
+
+    }
 
     player.isReady = true;
     io.emit("updatePlayerStatus", true, player.playerNum);
 
     const keepWaiting = players.find(player => player.isReady == false);
     if (keepWaiting == undefined){
-        setTimeout(() => {io.emit("removeMasks");}, 10000);
+        setTimeout(() => {io.emit("removeMasks");}, 30000);
         if (!isLastRound && !isMidGameScoring){
             newRound();
             io.emit("turnUpdate", players);

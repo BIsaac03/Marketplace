@@ -23,7 +23,7 @@ export const allFruits = [
         "name": "Blackberries",
         "type": "Fruit",
         "image": "static/Images/Blackberries.png",
-        "onPlay": `scoreTableau(player, 0.25, false, false, true)`,
+        "onPlay": `scoreTableau(player, 0.25, false, false, false, true)`,
         "active": "none",
         "ongoing": "none",
         "VP": "0",
@@ -69,7 +69,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
-*/    {
+    {
         "name": "Kiwis",
         "type": "Fruit",
         "image": "static/Images/Kiwis.png",
@@ -79,7 +79,7 @@ export const allFruits = [
         "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;",
         "deckRestriction": "players.length == 6"
     },
-    {
+  */  {
         "name": "Mangoes",
         "type": "Fruit",
         "image": "static/Images/Mangoes.png",
@@ -89,7 +89,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
-    {
+ /*   {
         "name": "Oranges",
         "type": "Fruit",
         "image": "static/Images/Oranges.png",
@@ -119,17 +119,17 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "gameRound == totalRounds"
     },
-    {
+ */   {
         "name": "Pears",
         "type": "Fruit",
         "image": "static/Images/Pears.png",
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "2*(player.tableau.filter(good => ((players[player.neighborNums[0]].tableau.includes(good) + players[player.neighborNums[1]].tableau.includes(good)) == 1)).length)",
+        "VP": "2*(player.tableau.filter(good1 => ((players[player.neighborNums[0]].tableau.some(good2 => good1.name == good2.name) + players[player.neighborNums[1]].tableau.some(good3 => good1.name == good3.name)) == 1)).length)",
         "deckRestriction": "false"
     },
-/*    {
+    {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
@@ -137,9 +137,10 @@ export const allFruits = [
         "active": "none",
         "ongoing": "none",
         "VP": "overwritten",
-        "deckRestriction": "gameRound == 1"
+        "deckRestriction": "false"
+        //"deckRestriction": "gameRound == 1"
     },
-    {
+   /* {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "static/Images/Strawberries.png",
