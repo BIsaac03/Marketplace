@@ -35,11 +35,7 @@ io.use((socket, next) => {
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
-});
-app.get('/', (req, res) => {
     res.sendFile(__dirname + '/static/styles.css');
-});
-app.get('/', (req, res) => {
     res.sendFile(__dirname + '/static/client.js');
 });
 
@@ -504,10 +500,6 @@ io.on("connection", (socket) => {
     socket.on("secretMessage", (playerNum, message) => {
         io.emit("readSecretMessage", playerNum, message);
     })
-
-    socket.on("disconnect", (reason) => {
-        console.log(reason);
-    });
 });
 
 httpServer.listen(port, function () {
