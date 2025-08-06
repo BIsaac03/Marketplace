@@ -1,5 +1,5 @@
 export const allCrops = [
-    {
+  /*  {
         "name": "Beans",
         "type": "Crop",
         "image": "static/Images/Beans.png",
@@ -79,7 +79,7 @@ export const allCrops = [
         "VP": "5*Math.min(player.getNumFruits(), player.getNumCrops(), player.getNumTrinkets())",
         "deckRestriction": "false"
     },
-    {
+ */   {
         "name": "Peppers",
         "type": "Crop",
         "image": "static/Images/Peppers.png",
@@ -140,7 +140,7 @@ export const allCrops = [
         "VP": "4*Math.floor(player.getNumCrops()/2)",
         "deckRestriction": "false"
     },
-    {
+ /*   {
         "name": "Wheat",
         "type": "Crop",
         "image": "static/Images/Wheat.png",
@@ -149,5 +149,5 @@ export const allCrops = [
         "ongoing": "none",
         "VP": "4",
         "deckRestriction": "false"
-    }
+    }*/
 ] 

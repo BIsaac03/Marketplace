@@ -1,5 +1,5 @@
 export const allFruits = [
-    {
+ /*   {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -36,7 +36,7 @@ export const allFruits = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "3*Math.min(player.numCoins/4, player.getNumFruits())",
+        "VP": "4*Math.min(Math.floor(player.numCoins/7), player.getNumFruits())",
         "deckRestriction": "false"
     },
     {
@@ -69,7 +69,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
-    {
+*/    {
         "name": "Kiwis",
         "type": "Fruit",
         "image": "static/Images/Kiwis.png",
@@ -129,7 +129,7 @@ export const allFruits = [
         "VP": "2*(player.tableau.filter(good => ((players[player.neighborNums[0]].tableau.includes(good) + players[player.neighborNums[1]].tableau.includes(good)) == 1)).length)",
         "deckRestriction": "false"
     },
-    {
+/*    {
         "name": "Pineapples",
         "type": "Fruit",
         "image": "static/Images/Pineapples.png",
@@ -148,5 +148,5 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "Math.floor((player.numCoins + player.finalSaleCoins)/5)",
         "deckRestriction": "false"
-    }
+    }*/
 ]

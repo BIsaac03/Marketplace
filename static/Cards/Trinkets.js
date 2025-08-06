@@ -6,7 +6,7 @@ export const allTrinkets = [
         "onPlay": "none",
         "active": "none",
         "ongoing": "none",
-        "VP": "(player.getNumTrinkets() >= 1)*1 + (player.getNumTrinkets() >= 3)*4 + (player.getNumTrinkets() >= 5)*5 + (player.getNumTrinkets() >= 7)*10",
+        "VP": "(player.getNumTrinkets() >= 2)*1 + (player.getNumTrinkets() >= 3)*4 + (player.getNumTrinkets() >= 4)*5 + (player.getNumTrinkets() >= 5)*10",
         "deckRestriction": "false"
     },
     {

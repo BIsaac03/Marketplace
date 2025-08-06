@@ -32,8 +32,8 @@ app.use("/static", express.static('./static/'));
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://marketplace-pfci.onrender.com",
-        //origin: "http://127.0.0.1:5500",
+        //origin: "http://marketplace-pfci.onrender.com",
+        origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -428,14 +428,14 @@ io.on("connection", (socket) => {
                 const player = players.find(player => player.playerNum == playerNum);
                 players[i].numCoins -= (players[i].choice[0] + players[i].choice[1]);
                 players[i].finalSaleCoins += (players[i].choice[0] + players[i].choice[1]);
-                if(players[i].choice[0] > (avg1)){
+                if(players[i].choice[0] > avg1){
                     players[i].tableau.push(finalCrops[0]);
                     if (finalCrops[0].onPlay != "none" && finalCrops[0].onPlay != "loseGood"){
                         eval(finalCrops[0].onPlay);
                     }
                     io.emit("goodPurchased", finalCrops[0], i)
                 }
-                if(players[i].choice[1] > (avg2)){
+                if(players[i].choice[1] > avg2){
                     players[i].tableau.push(finalCrops[1]);
                     if (finalCrops[1].onPlay != "none" && finalCrops[1].onPlay != "loseGood"){
                         eval(finalCrops[1].onPlay);
@@ -446,7 +446,7 @@ io.on("connection", (socket) => {
             // pepper checks
             if (finalCrops[0].onPlay == "loseGood"){
                 for (let i = 0; i < players.length; i++){
-                    if(players[i].choice[0] <= (avg1)){
+                    if (players[i].choice[0] <= (avg1)){
                         players[i].waitingOn = "loseGood";
                         players[i].isReady = false;
                         io.emit("updatePlayerStatus", false, i);
@@ -456,7 +456,7 @@ io.on("connection", (socket) => {
             }
             else if (finalCrops[1].onPlay == "loseGood"){
                 for (let i = 0; i < players.length; i++){
-                    if(players[i].choice[0] <= (avg1)){
+                    if (players[i].choice[1] <= (avg2)){
                         players[i].waitingOn = "loseGood";
                         players[i].isReady = false;
                         io.emit("updatePlayerStatus", false, i);
@@ -745,7 +745,7 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
         }
         resetPlayerStates();
         setTimeout(() => {io.emit("turnUpdate", players)}, 2000*players.length);
-        setTimeout(() => {resetGameState()}, 10000);
+        //setTimeout(() => {resetGameState()}, 10000);
     }
 }
 
