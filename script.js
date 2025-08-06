@@ -18,13 +18,6 @@ const app = express();
 const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-    res.sendFile(__dirname + '/static/styles.css');
-    res.sendFile(__dirname + '/static/client.js');
-});
-
-app.use("/static", express.static('./static/'));
 
 const io = new Server(httpServer, {
     cors: {
@@ -39,7 +32,23 @@ io.use((socket, next) => {
     next();
 });
 
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/static/styles.css');
+});
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/static/client.js');
+});
+
+
+app.use("/static", express.static('./static/'));
+
+
 let currentID = undefined;
+
 /////////// SERVER EVENTS
 io.on("connection", (socket) => {
     const existingID = players.find(player => player.userID == currentID);
@@ -497,14 +506,14 @@ io.on("connection", (socket) => {
     })
 
     socket.on("disconnect", (reason) => {
-        //console.log(reason);
+        console.log(reason);
     });
 });
 
 httpServer.listen(port, function () {
     var host = httpServer.address().address
-  var port = httpServer.address().port
-  console.log('App listening at https://%s:%s', host, port)
+    var port = httpServer.address().port
+    console.log('App listening at https://%s:%s', host, port)
 });
 
 let players = [];
