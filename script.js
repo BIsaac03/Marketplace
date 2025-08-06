@@ -18,6 +18,17 @@ const app = express();
 const httpServer = createServer(app);
 const port = process.env.PORT || 3000 ;
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/static/styles.css');
+});
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/static/client.js');
+});
+
+app.use("/static", express.static('./static/'));
 
 const io = new Server(httpServer, {
     cors: {
@@ -31,17 +42,6 @@ io.use((socket, next) => {
     console.log(currentID);
     next();
 });
-
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-    res.sendFile(__dirname + '/static/styles.css');
-    res.sendFile(__dirname + '/static/client.js');
-});
-
-
-app.use("/static", express.static('./static/'));
-
 
 let currentID = undefined;
 
