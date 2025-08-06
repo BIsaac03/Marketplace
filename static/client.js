@@ -1359,8 +1359,8 @@ function createLobby(){
         const name = playerName.value;
         const color = playerColor.value;
         if (name != ""){
-            document.cookie = "chosenName="+name;
-            document.cookie = "preferredColor="+color;
+            //document.cookie = "chosenName="+name;
+            //document.cookie = "preferredColor="+color;
             socket.emit("joinGame", readCookieValue("userID"), name, color);
         }
     })
