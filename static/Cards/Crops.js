@@ -1,5 +1,5 @@
 export const allCrops = [
-  /*  {
+    {
         "name": "Beans",
         "type": "Crop",
         "image": "static/Images/Beans.png",
@@ -49,7 +49,7 @@ export const allCrops = [
         "VP": "2*player.getNumTrinkets()",
         "deckRestriction": "false"
     },
-*/    {
+    {
         "name": "Mint",
         "type": "Crop",
         "image": "static/Images/Mint.png",
@@ -59,7 +59,7 @@ export const allCrops = [
         "VP": "HIGHEST SCORING FRUIT",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Oats",
         "type": "Crop",
         "image": "static/Images/Oats.png",
@@ -90,7 +90,7 @@ export const allCrops = [
         "deckRestriction": "false"
 
     },
-  */  {
+    {
         "name": "Potatoes",
         "type": "Crop",
         "image": "static/Images/Potatoes.png",
@@ -110,7 +110,7 @@ export const allCrops = [
         "VP": "3*Math.min(player.getNumFruits(), player.getNumCrops())",
         "deckRestriction": "false"
     },
-/*    {
+    {
         "name": "Sugarcane",
         "type": "Crop",
         "image": "static/Images/Sugarcane.png",
@@ -130,7 +130,7 @@ export const allCrops = [
         "VP": "(5*player.getNumTrinkets()) - (2*player.getNumCrops())",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Tomatoes",
         "type": "Crop",
         "image": "static/Images/Tomatoes.png",

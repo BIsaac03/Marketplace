@@ -32,8 +32,8 @@ app.use("/static", express.static('./static/'));
 
 const io = new Server(httpServer, {
     cors: {
-        //origin: "http://marketplace-pfci.onrender.com",
-        origin: "http://127.0.0.1:5500",
+        origin: "http://marketplace-pfci.onrender.com",
+        //origin: "http://127.0.0.1:5500",
 }
 });
 
@@ -692,11 +692,11 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
 
     // set VP of variable goods
     const mint = player.tableau.find(crop => crop.name == "Mint");
-    const mintyPineapple = player.tableau.find(fruit => fruit.name == "Pineapple" && fruit.VP == "HIGHEST SCORING FRUIT");
-    if (mint != undefined){
+    const mintyPineapples = player.tableau.find(fruit => fruit.name == "Pineapples" && fruit.VP == "HIGHEST SCORING FRUIT");
+    if (mint != undefined || mintyPineapples != undefined){
         let highestFruit = 0;
         for (let i = 0; i < player.tableau.length; i++){
-            if (player.tableau[i].type == "Fruit" && player.tableau[i] != mintyPineapple){
+            if (player.tableau[i].type == "Fruit" && player.tableau[i] != mintyPineapples){
                 const fruitVP = eval(player.tableau[i].VP);
                 if (fruitVP > highestFruit){
                     highestFruit = fruitVP;
@@ -704,9 +704,11 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
             }
         }
         
-        mint.VP = highestFruit;
-        if (mintyPineapple != undefined){
-            mintyPineapple.VP = highestFruit;
+        if (mint != undefined){
+            mint.VP = highestFruit;
+        }
+        if (mintyPineapples != undefined){
+            mintyPineapples.VP = highestFruit;
         }
     }
 
@@ -735,8 +737,8 @@ function scoreTableau(player, modifier, evaluatedMasks, evaluatedGuavas, isLastR
     if (mint != undefined){
         mint.VP = "HIGHEST SCORING FRUIT";
     }
-    if (mintyPineapple != undefined){
-        mintyPineapple.VP = "HIGHEST SCORING FRUIT";
+    if (mintyPineapples != undefined){
+        mintyPineapples.VP = "HIGHEST SCORING FRUIT";
     }
     if (mangoes != undefined){
         mangoes.VP = 0;

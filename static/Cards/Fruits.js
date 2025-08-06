@@ -1,5 +1,5 @@
 export const allFruits = [
- /*   {
+    {
         "name": "Apples",
         "type": "Fruit",
         "image": "static/Images/Apples.png",
@@ -79,7 +79,7 @@ export const allFruits = [
         "VP": "let kiwis = 0; for(let i = 0; i < players.length; i++){if(players[i].tableau.some(fruit => fruit.name == \"Kiwis\")){kiwis += 1;}}; 3*kiwis;",
         "deckRestriction": "players.length == 6"
     },
-  */  {
+    {
         "name": "Mangoes",
         "type": "Fruit",
         "image": "static/Images/Mangoes.png",
@@ -89,7 +89,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Oranges",
         "type": "Fruit",
         "image": "static/Images/Oranges.png",
@@ -119,7 +119,7 @@ export const allFruits = [
         "VP": "0",
         "deckRestriction": "gameRound == totalRounds"
     },
- */   {
+    {
         "name": "Pears",
         "type": "Fruit",
         "image": "static/Images/Pears.png",
@@ -136,11 +136,10 @@ export const allFruits = [
         "onPlay": `player.waitingOn = \"pineappleTarget\"; player.isReady = false; io.emit('updatePlayerStatus', false, player.playerNum) ; io.emit('pineappleTarget', player.playerNum, players);`,
         "active": "none",
         "ongoing": "none",
-        "VP": "overwritten",
-        "deckRestriction": "false"
-        //"deckRestriction": "gameRound == 1"
+        "VP": "0",
+        "deckRestriction": "gameRound == 1"
     },
-   /* {
+    {
         "name": "Strawberries",
         "type": "Fruit",
         "image": "static/Images/Strawberries.png",
@@ -149,5 +148,5 @@ export const allFruits = [
         "ongoing": "none",
         "VP": "Math.floor((player.numCoins + player.finalSaleCoins)/5)",
         "deckRestriction": "false"
-    }*/
+    }
 ]

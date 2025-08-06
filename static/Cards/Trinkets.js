@@ -1,5 +1,5 @@
 export const allTrinkets = [
- /*   {
+    {
         "name": "Artwork",
         "type": "Trinket",
         "image": "static/Images/Artwork.png",
@@ -79,7 +79,7 @@ export const allTrinkets = [
         "VP": "0",
         "deckRestriction": "false"
     },
- */   {
+    {
         "name": "Masks",
         "type": "Trinket",
         "image": "static/Images/Masks.png",
@@ -139,7 +139,7 @@ export const allTrinkets = [
         "VP": "2",
         "deckRestriction": "false"
     },
- /*   {
+    {
         "name": "Shells",
         "type": "Trinket",
         "image": "static/Images/Shells.png",
@@ -148,5 +148,5 @@ export const allTrinkets = [
         "ongoing": "BREAKOUT + 2VP WHEN YOU BUY A CARD YOU CANNOT AFFORD",
         "VP": "0",
         "deckRestriction": "false"
-    }*/
+    }
 ]

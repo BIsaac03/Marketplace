@@ -21,7 +21,7 @@ const socket = io.connect("https://marketplace-pfci.onrender.com/", {
     }
 });
 
-//const socket = io("http://localhost:3000");
+//const socket = io("http://localhost:3000", {
 
 
 function modifyPlayerList(playerID, playerName, playerColor){
@@ -129,7 +129,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
         newVendor(vendor.playerNum, currentSale);
 
         const background = document.createElement("img");
-        background.src = "static/Images/Background-min.jpg";
+        background.src = "static/Images/Background.jpg";
         background.id = "backgroundImage";
         bodyElement.appendChild(background);
 
@@ -187,7 +187,7 @@ socket.on("returningPlayer", (returningPlayer, players, numRounds, currentRound,
             }
         }
 
-        if (players[myPlayerNum].name == "Creator of Worlds"){
+        if (players[myPlayerNum].name == "Mr. Creator"){
             console.log("active")
             const adminDiv = document.createElement("div");
             adminDiv.id = "adminDiv";
@@ -282,12 +282,6 @@ socket.on("updatePlayerStatus", (isReady, playerNum) => {
 
 /////// GAME LOGIC
 socket.on("newRound", (currentRoundNum, totalRoundsNum) => {
-    const masked = document.getElementsByClassName("masked");
-    if (masked != undefined){
-        for (let i = 0; i < masked.length; i++){
-            masked[i].remove();
-        }
-    }
     const currentRound = document.getElementById("currentRound");
     currentRound.textContent = currentRoundNum
     const currentSaleCount = document.getElementById("currentSaleCount");
@@ -437,9 +431,9 @@ socket.on("changeTomatoType", (newType, playerNum) => {
     }
 })
 
-socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRound) => {
+socket.on("resolveMasks", (modifier, playerNum, numCoins, numTrinkets, isLastRound, isMidGameScoring) => {
     if (playerNum == myPlayerNum){
-        maskResolve(modifier, numCoins, numTrinkets, isLastRound);
+        maskResolve(modifier, numCoins, numTrinkets, isLastRound, isMidGameScoring);
     }
 })
 
@@ -466,9 +460,17 @@ socket.on("addMask", (type, trinketNum, playerNum) => {
     addToDiv.appendChild(maskedDiv);
 })
 
-socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound) => {
+socket.on("removeMasks", () => {
+    const masked = document.querySelectorAll(`.tableau>div>div.masked`)
+    if (masked != undefined){
+        for (let i = 0; i < masked.length; i++){
+            masked[i].remove();
+        }
+    }
+})
+socket.on("setGuavaValue", (modifier, playerNum, numCoins, isLastRound, isMidGameScoring) => {
     if (playerNum == myPlayerNum){
-        guavaResolve(modifier, numCoins, isLastRound)
+        guavaResolve(modifier, numCoins, isLastRound, isMidGameScoring);
     }
 })
 
@@ -788,7 +790,6 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     chooseBuy.classList.add(goodForSale[0].type)
     chooseBuy.addEventListener("click", () => {
         const numWorkers = checkNumWorkers();
-        console.log(numWorkers);
         socket.emit("saleResult", "buy", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })
@@ -799,7 +800,6 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     chooseInvest.id = "chooseInvest";
     chooseInvest.addEventListener("click", () => {
         const numWorkers = checkNumWorkers();
-        console.log(numWorkers);
         socket.emit("saleResult", "invest", myPlayerNum, goodForSale, price, vendorNum, numWorkers);
         offerContainer.remove();
     })
@@ -920,9 +920,9 @@ function addToTableau(purchasedGood, playerNum){
                 bodyElement.appendChild(abilityConfirmationDiv);
             })
         }
-        newGood.addEventListener("click", () => {
-            socket.emit("checkScore", purchasedGood, playerNum);
-        })
+        //newGood.addEventListener("click", () => {
+        //   socket.emit("checkScore", purchasedGood, playerNum);
+        //})
     }
     const tableauSection = document.querySelector(`#player${playerNum} .${purchasedGood.type}s`)
     tableauSection.appendChild(newGood);
@@ -1158,7 +1158,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = (150*numPlayers-50)+"px";
+    finalScores.style.height = (188*numPlayers-50)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";
@@ -1186,6 +1186,7 @@ function displayFinalScore(player, i, numPlayers){
     const finalScores = document.getElementById("finalScores");
     const playerDiv = document.createElement("div");
     if (i == numPlayers - 1){
+        playerDiv.style.fontFamily = "gameFont";
         playerDiv.style.fontWeight = "bold";
     }
     
@@ -1288,7 +1289,7 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 2;
+    const displayTimeSecs = 3;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
     const title = document.createElement("p");
