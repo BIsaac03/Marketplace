@@ -985,7 +985,7 @@ function maskResolve(modifier, numCoins, numTrinkets, isLastRound){
     const confirm = document.createElement("button");
     confirm.textContent = "Confirm";
     confirm.addEventListener("click", () =>{
-        if (Number(coinToFruit.value) + Number(coinToCrop.value) <= Math.min(numCoins, numTrinkets) && Number(coinToFruit.value) >= 0 && Number(coinToCrop.value) >= 0){
+        if (Number(coinToFruit.value) + Number(coinToCrop.value) <= Math.min(numCoins, numTrinkets*3) && Number(coinToFruit.value) >= 0 && Number(coinToCrop.value) >= 0){
             socket.emit("masksResolved", myPlayerNum, Number(coinToFruit.value), Number(coinToCrop.value), modifier, isLastRound);
             maskContainer.remove();
         }
