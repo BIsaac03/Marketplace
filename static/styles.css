@@ -268,7 +268,8 @@ div[id^="player"] .status{
     justify-self: center;
 }
 #opponentDisplay .stats img{
-    width: 40px;
+    width: 50px;
+    margin: -5px;
 }
 #opponentDisplay .stats{
     width: 100px;
@@ -347,7 +348,7 @@ div[id^="player"] .status{
     gap: 75px;
     padding: 25px;
     margin-top: 15px;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
 }
 
 
@@ -383,7 +384,7 @@ div[id^="player"] .status{
     grid-template-columns: repeat(3, auto);
     padding: 25px;
     margin-top: 15px;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
     z-index: 6;
 }
 #detailedReserve>div{
@@ -400,7 +401,7 @@ div[id^="player"] .status{
     grid-template-rows: repeat(3, auto);
     font-size: 40px;
     margin: 15px 0px;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
     position: absolute;
     justify-self: center;
     justify-items: center;
@@ -472,7 +473,7 @@ div[id^="player"] .status{
     top: 15px;
     display: grid;
     justify-self: center;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
     justify-items: center;
     height: fit-content;
     border-radius: 30px;
@@ -600,7 +601,7 @@ div[id^="player"] .status{
     justify-self: center;
     display: grid;
     justify-items: center;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
 }
 #guavaDiv{
     justify-items: center;
@@ -625,7 +626,7 @@ div[id^="player"] .status{
     justify-self: center;
     display: grid;
     justify-items: center;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
 }
 #maskDiv{
     justify-items: center;
@@ -666,8 +667,7 @@ div[id^="player"] .status{
     align-self: center;
 }
 #opponentDisplay .good img{
-    width: 50px;
-    margin: -5px;
+    width: 40px;
 }
 
 #cropSaleContainer{
@@ -677,7 +677,7 @@ div[id^="player"] .status{
     display: grid;
     grid-template-rows: auto auto;
     justify-items: center;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
     z-index: 4;
 }
 #cropSale{
@@ -750,7 +750,7 @@ div[id^="player"] .status{
     font-size: 100px;
     font-weight: bold;
     color: red;
-    background-color: rgba(160, 160, 160, 0.7);
+    background-color: rgba(160, 160, 160, 0.8);
     z-index: 20;
 }
 #error{

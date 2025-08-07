@@ -849,12 +849,10 @@ function displayGoodSale(goodForSale, price, vendorNum, numWorkers, hasFigurines
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             currentOffer.style.display = "none";
-            //offerContainer.style.opacity = "0.4";
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             currentOffer.style.display = "grid";
-            //offerContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -1107,12 +1105,10 @@ function displayFinalSale(firstCrop, secondCrop, numCoins){
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             finalSaleDiv.style.display = "none";
-            //cropSaleContainer.style.opacity = "0.4";
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             finalSaleDiv.style.display = "grid";
-            //cropSaleContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -1158,7 +1154,7 @@ function createFinalScoreboard(numPlayers){
 
     const finalScores = document.createElement("div");
     finalScores.id = "finalScores";
-    finalScores.style.height = (188*numPlayers-50)+"px";
+    finalScores.style.height = (150*numPlayers-50)+"px";
 
     const visibilityToggle = document.createElement("img");
     visibilityToggle.src = "static/Icons/visibility-off.svg";
@@ -1167,12 +1163,10 @@ function createFinalScoreboard(numPlayers){
     visibilityToggle.addEventListener("click", () => {
         if (visibilityToggle.src.endsWith("visibility-off.svg")){
             finalScores.style.display = "none";
-            //finalScoreContainer.style.opacity = "0.4"
             visibilityToggle.src = "static/Icons/visibility-on.svg";
         } 
         else if (visibilityToggle.src.endsWith("visibility-on.svg")){
             finalScores.style.display = "flex";
-            //finalScoreContainer.style.opacity = "1";
             visibilityToggle.src = "static/Icons/visibility-off.svg";
         }
     })
@@ -1289,7 +1283,7 @@ function displayNextRound(currentRound, totalRounds){
 }
 
 function displayLoadingScreen(){
-    const displayTimeSecs = 3;
+    const displayTimeSecs = 4;
     const loadingScreen = document.createElement("div");
     loadingScreen.id = "loadingScreen";
     const title = document.createElement("p");
