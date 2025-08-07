@@ -102,7 +102,7 @@ io.on("connection", (socket) => {
                 else {players[i].neighborNums.push(players.length-1)};
             }
             if (players.length < 5){
-                totalRounds = 1;
+                totalRounds = 3;
             }
             else if (players.length >= 5){
                 totalRounds = 2;
